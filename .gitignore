@@ -16,3 +16,6 @@ test/dev.html
 lib
 *~~bak
 styleguide
+*.map
+*.jsx
+*.ts.js
