@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Function to render the progress table cell
  */
 

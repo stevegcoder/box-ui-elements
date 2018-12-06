@@ -1,5 +1,4 @@
 /**
- * @flow
  * @file Droppable area containing upload item list
  */
 

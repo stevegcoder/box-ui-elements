@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Item list component
  */
 

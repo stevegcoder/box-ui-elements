@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Content Uploader component
  * @author Box
  */
@@ -159,7 +159,7 @@ class ContentUploader extends Component<Props, State> {
      * @return {void}
      */
     componentDidMount() {
-        this.rootElement = ((document.getElementById(this.id): any): HTMLElement);
+        this.rootElement = ((document.getElementById(this.id)) as HTMLElement);
         this.appElement = this.rootElement;
     }
 

@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Upload state content component
  */
 
@@ -28,7 +28,7 @@ const UploadStateContent = ({ fileInputLabel, folderInputLabel, message, onChang
 
         onChange(event);
 
-        const currentTarget = (event.currentTarget: HTMLInputElement);
+        const currentTarget = (event.currentTarget as HTMLInputElement);
         // resets the file input selection
         currentTarget.value = '';
     };

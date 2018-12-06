@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Component for a progress bar
  */
 

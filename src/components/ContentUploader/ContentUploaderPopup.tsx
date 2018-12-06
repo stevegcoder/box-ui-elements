@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Content Uploader Popup Component
  * @author Box
  */

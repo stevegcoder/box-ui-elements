@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Component for file icon and name
  */
 

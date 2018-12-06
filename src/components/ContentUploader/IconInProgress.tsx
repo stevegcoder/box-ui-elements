@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Icon
  * @author Box
  */

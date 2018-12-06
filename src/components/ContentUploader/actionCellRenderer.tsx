@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Function to render the action table cell
  */
 

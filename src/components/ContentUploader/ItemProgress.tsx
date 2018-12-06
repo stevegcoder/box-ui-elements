@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Upload item progress component
  */
 

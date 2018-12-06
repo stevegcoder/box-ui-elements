@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Input element for folder/file upload
  * @author Box
  */

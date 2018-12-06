@@ -1,5 +1,5 @@
 /**
- * @flow
+
  * @file Function to render the name table cell
  */
 
