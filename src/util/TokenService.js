@@ -3,16 +3,39 @@
  * @file An example of a token managing service
  * @author Box
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { TYPED_ID_FOLDER_PREFIX, TYPED_ID_FILE_PREFIX } from '../constants';
-const error = new Error('Bad id or auth token. ID should be typed id like file_123 or folder_123! Token should be a string or function.');
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+const error = new Error(
+    'Bad id or auth token. ID should be typed id like file_123 or folder_123! Token should be a string or function.',
+);
 class TokenService {
     /**
      * Function to fetch a single token. The user supplied token can either
@@ -26,15 +49,17 @@ class TokenService {
      * @return {Promise} that resolves to a token
      */
     static getToken(id, tokenOrTokenFunction) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             // Make sure we are getting typed ids
             // Tokens should either be null or undefined or string or functions
             // Anything else is not supported and throw error
-            if ((tokenOrTokenFunction !== null &&
-                tokenOrTokenFunction !== undefined &&
-                typeof tokenOrTokenFunction !== 'string' &&
-                typeof tokenOrTokenFunction !== 'function') ||
-                (!id.startsWith(TYPED_ID_FOLDER_PREFIX) && !id.startsWith(TYPED_ID_FILE_PREFIX))) {
+            if (
+                (tokenOrTokenFunction !== null &&
+                    tokenOrTokenFunction !== undefined &&
+                    typeof tokenOrTokenFunction !== 'string' &&
+                    typeof tokenOrTokenFunction !== 'function') ||
+                (!id.startsWith(TYPED_ID_FOLDER_PREFIX) && !id.startsWith(TYPED_ID_FILE_PREFIX))
+            ) {
                 throw error;
             }
             // Token is a simple string or null or undefined
@@ -50,6 +75,7 @@ class TokenService {
             throw error;
         });
     }
+
     /**
      * Gets a string read token.
      * Defaults to a simple token string.
@@ -60,7 +86,7 @@ class TokenService {
      * @return {Promise} that resolves to a token
      */
     static getReadToken(id, tokenOrTokenFunction) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             const token = yield TokenService.getToken(id, tokenOrTokenFunction);
             if (token && typeof token === 'object') {
                 return token.read;
@@ -68,6 +94,7 @@ class TokenService {
             return token;
         });
     }
+
     /**
      * Gets a string write token.
      * Defaults to either the read token or a simple token string.
@@ -78,7 +105,7 @@ class TokenService {
      * @return {Promise} that resolves to a token
      */
     static getWriteToken(id, tokenOrTokenFunction) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             const token = yield TokenService.getToken(id, tokenOrTokenFunction);
             if (token && typeof token === 'object') {
                 return token.write || token.read;
@@ -86,6 +113,7 @@ class TokenService {
             return token;
         });
     }
+
     /**
      * Function to fetch and cache multiple tokens. The user supplied token can either
      * itself be a simple token or instead be a function that returns a promise.
@@ -100,15 +128,19 @@ class TokenService {
      * @return {Promise<TokenMap>} that resolves to a token map
      */
     static cacheTokens(ids, tokenOrTokenFunction) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             // Make sure we are getting typed ids
             // Tokens should either be null or undefined or string or functions
             // Anything else is not supported and throw error
-            if ((tokenOrTokenFunction !== null &&
-                tokenOrTokenFunction !== undefined &&
-                typeof tokenOrTokenFunction !== 'string' &&
-                typeof tokenOrTokenFunction !== 'function') ||
-                !ids.every(itemId => itemId.startsWith(TYPED_ID_FOLDER_PREFIX) || itemId.startsWith(TYPED_ID_FILE_PREFIX))) {
+            if (
+                (tokenOrTokenFunction !== null &&
+                    tokenOrTokenFunction !== undefined &&
+                    typeof tokenOrTokenFunction !== 'string' &&
+                    typeof tokenOrTokenFunction !== 'function') ||
+                !ids.every(
+                    itemId => itemId.startsWith(TYPED_ID_FOLDER_PREFIX) || itemId.startsWith(TYPED_ID_FILE_PREFIX),
+                )
+            ) {
                 throw error;
             }
             // Only need to fetch and cache multiple tokens when the user supplied token was a
@@ -121,4 +153,4 @@ class TokenService {
     }
 }
 export default TokenService;
-//# sourceMappingURL=TokenService.js.map
+// # sourceMappingURL=TokenService.js.map

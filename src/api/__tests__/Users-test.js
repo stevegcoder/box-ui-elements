@@ -1,4 +1,5 @@
 import Users from '../Users';
+
 let users;
 describe('api/Users', () => {
     beforeEach(() => {
@@ -15,4 +16,4 @@ describe('api/Users', () => {
         });
     });
 });
-//# sourceMappingURL=Users-test.js.map
+// # sourceMappingURL=Users-test.js.map

@@ -3,18 +3,48 @@
  * @file Network utilities
  * @author Box
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import axios from 'axios';
 import getProp from 'lodash/get';
 import TokenService from './TokenService';
-import { HEADER_ACCEPT, HEADER_CLIENT_NAME, HEADER_CLIENT_VERSION, HEADER_CONTENT_TYPE, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OPTIONS, } from '../constants';
+import {
+    HEADER_ACCEPT,
+    HEADER_CLIENT_NAME,
+    HEADER_CLIENT_VERSION,
+    HEADER_CONTENT_TYPE,
+    HTTP_POST,
+    HTTP_PUT,
+    HTTP_DELETE,
+    HTTP_OPTIONS,
+} from '../constants';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 const DEFAULT_UPLOAD_TIMEOUT_MS = 120000;
 class Xhr {
     /**
@@ -30,14 +60,23 @@ class Xhr {
      * @param {string} [options.responseInterceptor] - Response interceptor
      * @return {Xhr} Cache instance
      */
-    constructor({ id, clientName, token, version, sharedLink, sharedLinkPassword, responseInterceptor, requestInterceptor, } = {}) {
+    constructor({
+        id,
+        clientName,
+        token,
+        version,
+        sharedLink,
+        sharedLinkPassword,
+        responseInterceptor,
+        requestInterceptor,
+    } = {}) {
         /**
          * Error interceptor that wraps the passed in responseInterceptor
          *
          * @param {Object} error - Error object from axios
          * @return {Promise} rejected promise with error info
          */
-        this.errorInterceptor = (error) => {
+        this.errorInterceptor = error => {
             const errorObject = getProp(error, 'response.data', error);
             if (typeof this.responseInterceptor === 'function') {
                 this.responseInterceptor(errorObject);
@@ -61,6 +100,7 @@ class Xhr {
             this.axios.interceptors.request.use(requestInterceptor);
         }
     }
+
     /**
      * Utility to parse a URL.
      *
@@ -81,6 +121,7 @@ class Xhr {
             port: a.port,
         };
     }
+
     /**
      * Builds a list of required XHR headers.
      *
@@ -89,11 +130,14 @@ class Xhr {
      * @return {Object} Headers
      */
     getHeaders(id, args = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const headers = Object.assign({
-                Accept: 'application/json',
-                [HEADER_CONTENT_TYPE]: 'application/json',
-            }, args);
+        return __awaiter(this, void 0, void 0, function*() {
+            const headers = Object.assign(
+                {
+                    Accept: 'application/json',
+                    [HEADER_CONTENT_TYPE]: 'application/json',
+                },
+                args,
+            );
             if (this.sharedLink) {
                 headers.BoxApi = `shared_link=${this.sharedLink}`;
                 if (this.sharedLinkPassword) {
@@ -116,6 +160,7 @@ class Xhr {
             return headers;
         });
     }
+
     /**
      * HTTP GETs a URL
      *
@@ -125,14 +170,17 @@ class Xhr {
      * @param {Object} [params] - Key-value map of querystring params
      * @return {Promise} - HTTP response
      */
-    get({ url, id, params = {}, headers = {}, }) {
-        return this.getHeaders(id, headers).then(hdrs => this.axios.get(url, {
-            cancelToken: this.axiosSource.token,
-            params,
-            headers: hdrs,
-            parsedUrl: this.getParsedUrl(url),
-        }));
+    get({ url, id, params = {}, headers = {} }) {
+        return this.getHeaders(id, headers).then(hdrs =>
+            this.axios.get(url, {
+                cancelToken: this.axiosSource.token,
+                params,
+                headers: hdrs,
+                parsedUrl: this.getParsedUrl(url),
+            }),
+        );
     }
+
     /**
      * HTTP POSTs a URL with JSON data
      *
@@ -144,16 +192,19 @@ class Xhr {
      * @param {string} [method] - xhr type
      * @return {Promise} - HTTP response
      */
-    post({ url, id, data, params, headers = {}, method = HTTP_POST, }) {
-        return this.getHeaders(id, headers).then(hdrs => this.axios({
-            url,
-            data,
-            params,
-            method,
-            parsedUrl: this.getParsedUrl(url),
-            headers: hdrs,
-        }));
+    post({ url, id, data, params, headers = {}, method = HTTP_POST }) {
+        return this.getHeaders(id, headers).then(hdrs =>
+            this.axios({
+                url,
+                data,
+                params,
+                method,
+                parsedUrl: this.getParsedUrl(url),
+                headers: hdrs,
+            }),
+        );
     }
+
     /**
      * HTTP PUTs a URL with JSON data
      *
@@ -164,9 +215,10 @@ class Xhr {
      * @param {Object} [headers] - Key-value map of headers
      * @return {Promise} - HTTP response
      */
-    put({ url, id, data, params, headers = {}, }) {
+    put({ url, id, data, params, headers = {} }) {
         return this.post({ id, url, data, params, headers, method: HTTP_PUT });
     }
+
     /**
      * HTTP DELETEs a URL with JSON data
      *
@@ -176,9 +228,10 @@ class Xhr {
      * @param {Object} [headers] - Key-value map of headers
      * @return {Promise} - HTTP response
      */
-    delete({ url, id, data = {}, headers = {}, }) {
+    delete({ url, id, data = {}, headers = {} }) {
         return this.post({ id, url, data, headers, method: HTTP_DELETE });
     }
+
     /**
      * HTTP OPTIONs a URL with JSON data.
      *
@@ -190,18 +243,21 @@ class Xhr {
      * @param {Function} errorHandler - Error handler
      * @return {void}
      */
-    options({ id, url, data, headers = {}, successHandler, errorHandler, }) {
+    options({ id, url, data, headers = {}, successHandler, errorHandler }) {
         return this.getHeaders(id, headers)
-            .then(hdrs => this.axios({
-            url,
-            data,
-            method: HTTP_OPTIONS,
-            headers: hdrs,
-        })
-            .then(successHandler)
-            .catch(errorHandler))
+            .then(hdrs =>
+                this.axios({
+                    url,
+                    data,
+                    method: HTTP_OPTIONS,
+                    headers: hdrs,
+                })
+                    .then(successHandler)
+                    .catch(errorHandler),
+            )
             .catch(errorHandler);
     }
+
     /**
      * HTTP POST or PUT a URL with File data. Uses native XHR for progress event.
      *
@@ -218,63 +274,76 @@ class Xhr {
      * @param {Function} [idleTimeoutHandler]
      * @return {void}
      */
-    uploadFile({ id, url, data, headers = {}, method = HTTP_POST, successHandler, errorHandler, progressHandler, withIdleTimeout = false, idleTimeoutDuration = DEFAULT_UPLOAD_TIMEOUT_MS, idleTimeoutHandler, }) {
+    uploadFile({
+        id,
+        url,
+        data,
+        headers = {},
+        method = HTTP_POST,
+        successHandler,
+        errorHandler,
+        progressHandler,
+        withIdleTimeout = false,
+        idleTimeoutDuration = DEFAULT_UPLOAD_TIMEOUT_MS,
+        idleTimeoutHandler,
+    }) {
         return this.getHeaders(id, headers)
             .then(hdrs => {
-            let idleTimeout;
-            let progressHandlerToUse = progressHandler;
-            if (withIdleTimeout) {
-                // Func that aborts upload and executes timeout callback
-                const idleTimeoutFunc = () => {
-                    this.abort();
-                    if (idleTimeoutHandler) {
-                        idleTimeoutHandler();
-                    }
-                };
-                idleTimeout = setTimeout(idleTimeoutFunc, idleTimeoutDuration);
-                // Progress handler that aborts upload if there has been no progress for >= timeoutMs
-                progressHandlerToUse = event => {
-                    clearTimeout(idleTimeout);
+                let idleTimeout;
+                let progressHandlerToUse = progressHandler;
+                if (withIdleTimeout) {
+                    // Func that aborts upload and executes timeout callback
+                    const idleTimeoutFunc = () => {
+                        this.abort();
+                        if (idleTimeoutHandler) {
+                            idleTimeoutHandler();
+                        }
+                    };
                     idleTimeout = setTimeout(idleTimeoutFunc, idleTimeoutDuration);
-                    progressHandler(event);
-                };
-            }
-            this.axios({
-                url,
-                data,
-                transformRequest: (reqData, reqHeaders) => {
-                    // Remove Accept & Content-Type added by getHeaders()
-                    delete reqHeaders[HEADER_ACCEPT];
-                    delete reqHeaders[HEADER_CONTENT_TYPE];
-                    if (headers[HEADER_CONTENT_TYPE]) {
-                        reqHeaders[HEADER_CONTENT_TYPE] = headers[HEADER_CONTENT_TYPE];
-                    }
-                    // Convert to FormData if needed
-                    if (reqData && !(reqData instanceof Blob) && reqData.attributes) {
-                        const formData = new FormData();
-                        Object.keys(reqData).forEach(key => {
-                            formData.append(key, reqData[key]);
-                        });
-                        return formData;
-                    }
-                    return reqData;
-                },
-                method,
-                headers: hdrs,
-                onUploadProgress: progressHandlerToUse,
-                cancelToken: this.axiosSource.token,
+                    // Progress handler that aborts upload if there has been no progress for >= timeoutMs
+                    progressHandlerToUse = event => {
+                        clearTimeout(idleTimeout);
+                        idleTimeout = setTimeout(idleTimeoutFunc, idleTimeoutDuration);
+                        progressHandler(event);
+                    };
+                }
+                this.axios({
+                    url,
+                    data,
+                    transformRequest: (reqData, reqHeaders) => {
+                        // Remove Accept & Content-Type added by getHeaders()
+                        delete reqHeaders[HEADER_ACCEPT];
+                        delete reqHeaders[HEADER_CONTENT_TYPE];
+                        if (headers[HEADER_CONTENT_TYPE]) {
+                            reqHeaders[HEADER_CONTENT_TYPE] = headers[HEADER_CONTENT_TYPE];
+                        }
+                        // Convert to FormData if needed
+                        if (reqData && !(reqData instanceof Blob) && reqData.attributes) {
+                            const formData = new FormData();
+                            Object.keys(reqData).forEach(key => {
+                                formData.append(key, reqData[key]);
+                            });
+                            return formData;
+                        }
+                        return reqData;
+                    },
+                    method,
+                    headers: hdrs,
+                    onUploadProgress: progressHandlerToUse,
+                    cancelToken: this.axiosSource.token,
+                })
+                    .then(response => {
+                        clearTimeout(idleTimeout);
+                        successHandler(response);
+                    })
+                    .catch(error => {
+                        clearTimeout(idleTimeout);
+                        errorHandler(error);
+                    });
             })
-                .then(response => {
-                clearTimeout(idleTimeout);
-                successHandler(response);
-            })
-                .catch(error => {
-                clearTimeout(idleTimeout);
-                errorHandler(error);
-            });
-        })
             .catch(errorHandler);
     }
+
     /**
      * Aborts an axios request.
      *
@@ -287,4 +356,4 @@ class Xhr {
     }
 }
 export default Xhr;
-//# sourceMappingURL=Xhr.js.map
+// # sourceMappingURL=Xhr.js.map

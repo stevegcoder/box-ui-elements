@@ -4,6 +4,7 @@
  * @author Box
  */
 import merge from 'lodash/merge';
+
 class Cache {
     /**
      * [constructor]
@@ -13,6 +14,7 @@ class Cache {
     constructor() {
         this.cache = {};
     }
+
     /**
      * Caches a simple object in memory.
      *
@@ -23,6 +25,7 @@ class Cache {
     set(key, value) {
         this.cache[key] = value;
     }
+
     /**
      * Merges cached values for objects.
      *
@@ -33,11 +36,11 @@ class Cache {
     merge(key, value) {
         if (this.has(key)) {
             this.set(key, merge({}, this.get(key), value));
-        }
-        else {
+        } else {
             throw new Error(`Key ${key} not in cache!`);
         }
     }
+
     /**
      * Deletes object from in-memory cache.
      *
@@ -47,6 +50,7 @@ class Cache {
     unset(key) {
         delete this.cache[key];
     }
+
     /**
      * Deletes all object from in-memory cache
      * that match the key as prefix.
@@ -55,12 +59,13 @@ class Cache {
      * @return {void}
      */
     unsetAll(prefix) {
-        Object.keys(this.cache).forEach((key) => {
+        Object.keys(this.cache).forEach(key => {
             if (key.startsWith(prefix)) {
                 delete this.cache[key];
             }
         });
     }
+
     /**
      * Checks if cache has provided key.
      *
@@ -70,6 +75,7 @@ class Cache {
     has(key) {
         return {}.hasOwnProperty.call(this.cache, key);
     }
+
     /**
      * Fetches a cached object from in-memory cache if available.
      *
@@ -84,4 +90,4 @@ class Cache {
     }
 }
 export default Cache;
-//# sourceMappingURL=Cache.js.map
+// # sourceMappingURL=Cache.js.map

@@ -1,13 +1,50 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { withData } from 'leche';
-import { toISOStringNoMS, getFileLastModifiedAsISONoMSIfPossible, tryParseJson, isDataTransferItemAFolder, getFileFromDataTransferItem, doesFileContainAPIOptions, doesDataTransferItemContainAPIOptions, getFile, getDataTransferItem, getFileAPIOptions, getDataTransferItemAPIOptions, DEFAULT_API_OPTIONS, getFileId, getDataTransferItemId, } from '../uploads';
+import {
+    toISOStringNoMS,
+    getFileLastModifiedAsISONoMSIfPossible,
+    tryParseJson,
+    isDataTransferItemAFolder,
+    getFileFromDataTransferItem,
+    doesFileContainAPIOptions,
+    doesDataTransferItemContainAPIOptions,
+    getFile,
+    getDataTransferItem,
+    getFileAPIOptions,
+    getDataTransferItemAPIOptions,
+    DEFAULT_API_OPTIONS,
+    getFileId,
+    getDataTransferItemId,
+} from '../uploads';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+
 const mockFile = { name: 'hi' };
 const entry = {
     name: 'hi',
@@ -25,63 +62,71 @@ describe('util/uploads', () => {
         });
     });
     describe('getFileLastModifiedAsISONoMSIfPossible()', () => {
-        withData({
-            'file with valid lastModified': [
-                {
-                    lastModified: 1483326245678,
-                },
-                '2017-01-02T03:04:05Z',
-            ],
-            'file with non-numeric lastModified (string)': [
-                {
-                    lastModified: 'not a number',
-                },
-                null,
-            ],
-            // I don't know of a browser that has lastModified as a Date object, but I just added
-            // these two test cases to confirm that our code does something reasonable (i.e. return
-            // a string or null, but not crash).
-            'file with non-numeric lastModified (valid Date)': [
-                {
-                    lastModified: new Date('2017-01-02T03:04:05.678Z'),
-                },
-                '2017-01-02T03:04:05Z',
-            ],
-            'file with non-numeric lastModified (invalid Date)': [
-                {
-                    lastModified: new Date('not valid'),
-                },
-                null,
-            ],
-            'file no lastModified': [{}, null],
-        }, (file, expectedResult) => {
-            test('should return the properly formatted date when possible and return null otherwise', () => {
-                expect(getFileLastModifiedAsISONoMSIfPossible(file)).toBe(expectedResult);
-            });
-        });
+        withData(
+            {
+                'file with valid lastModified': [
+                    {
+                        lastModified: 1483326245678,
+                    },
+                    '2017-01-02T03:04:05Z',
+                ],
+                'file with non-numeric lastModified (string)': [
+                    {
+                        lastModified: 'not a number',
+                    },
+                    null,
+                ],
+                // I don't know of a browser that has lastModified as a Date object, but I just added
+                // these two test cases to confirm that our code does something reasonable (i.e. return
+                // a string or null, but not crash).
+                'file with non-numeric lastModified (valid Date)': [
+                    {
+                        lastModified: new Date('2017-01-02T03:04:05.678Z'),
+                    },
+                    '2017-01-02T03:04:05Z',
+                ],
+                'file with non-numeric lastModified (invalid Date)': [
+                    {
+                        lastModified: new Date('not valid'),
+                    },
+                    null,
+                ],
+                'file no lastModified': [{}, null],
+            },
+            (file, expectedResult) => {
+                test('should return the properly formatted date when possible and return null otherwise', () => {
+                    expect(getFileLastModifiedAsISONoMSIfPossible(file)).toBe(expectedResult);
+                });
+            },
+        );
     });
     describe('tryParseJson()', () => {
-        withData([
-            ['', null],
-            ['a', null],
-            ['{', null],
-            ['1', 1],
-            ['"a"', 'a'],
-            ['{}', {}],
-            ['[1,2,3]', [1, 2, 3]],
-            ['{"a": 1}', { a: 1 }],
-        ], (str, expectedResult) => {
-            test('should return correct results', () => {
-                expect(tryParseJson(str)).toEqual(expectedResult);
-            });
-        });
+        withData(
+            [
+                ['', null],
+                ['a', null],
+                ['{', null],
+                ['1', 1],
+                ['"a"', 'a'],
+                ['{}', {}],
+                ['[1,2,3]', [1, 2, 3]],
+                ['{"a": 1}', { a: 1 }],
+            ],
+            (str, expectedResult) => {
+                test('should return correct results', () => {
+                    expect(tryParseJson(str)).toEqual(expectedResult);
+                });
+            },
+        );
     });
     describe('doesFileContainAPIOptions()', () => {
         test('should return true when argument is UploadFileWithAPIOptions type', () => {
-            expect(doesFileContainAPIOptions({
-                file: mockFile,
-                options,
-            })).toBeTruthy();
+            expect(
+                doesFileContainAPIOptions({
+                    file: mockFile,
+                    options,
+                }),
+            ).toBeTruthy();
         });
         test('should return false when argument is UploadFile type', () => {
             expect(doesFileContainAPIOptions(mockFile)).toBeFalsy();
@@ -89,10 +134,12 @@ describe('util/uploads', () => {
     });
     describe('doesDataTransferItemContainAPIOptions()', () => {
         test('should return true when argument is UploadDataTransferItemWithAPIOptions type', () => {
-            expect(doesDataTransferItemContainAPIOptions({
-                item: mockItem,
-                options,
-            })).toBeTruthy();
+            expect(
+                doesDataTransferItemContainAPIOptions({
+                    item: mockItem,
+                    options,
+                }),
+            ).toBeTruthy();
         });
         test('should return false when argument is DataTransferItem type', () => {
             expect(doesDataTransferItemContainAPIOptions(mockItem)).toBeFalsy();
@@ -100,10 +147,12 @@ describe('util/uploads', () => {
     });
     describe('getFile()', () => {
         test('should return file when argument is UploadFileWithAPIOptions type', () => {
-            expect(getFile({
-                file: mockFile,
-                options,
-            })).toEqual(mockFile);
+            expect(
+                getFile({
+                    file: mockFile,
+                    options,
+                }),
+            ).toEqual(mockFile);
         });
         test('should return file when argument is UploadFile type', () => {
             expect(getFile(mockFile)).toEqual(mockFile);
@@ -111,10 +160,12 @@ describe('util/uploads', () => {
     });
     describe('getDataTransferItem()', () => {
         test('should return item when argument is UploadDataTransferItemWithAPIOptions type', () => {
-            expect(getDataTransferItem({
-                item: mockItem,
-                options,
-            })).toEqual(mockItem);
+            expect(
+                getDataTransferItem({
+                    item: mockItem,
+                    options,
+                }),
+            ).toEqual(mockItem);
         });
         test('should return item when argument is DataTransferItem type', () => {
             expect(getDataTransferItem(mockItem)).toEqual(mockItem);
@@ -122,10 +173,12 @@ describe('util/uploads', () => {
     });
     describe('getFileAPIOptions()', () => {
         test('should return options when argument is UploadFileWithAPIOptions type', () => {
-            expect(getFileAPIOptions({
-                file: mockFile,
-                options,
-            })).toEqual(options);
+            expect(
+                getFileAPIOptions({
+                    file: mockFile,
+                    options,
+                }),
+            ).toEqual(options);
         });
         test('should return DEFAULT_API_OPTIONS when argument is UploadFile type', () => {
             expect(getFileAPIOptions(mockFile)).toEqual(DEFAULT_API_OPTIONS);
@@ -133,26 +186,29 @@ describe('util/uploads', () => {
     });
     describe('getDataTransferItemAPIOptions()', () => {
         test('should return options when argument is UploadDataTransferItemWithAPIOptions type', () => {
-            expect(getDataTransferItemAPIOptions({
-                item: mockItem,
-                options,
-            })).toEqual(options);
+            expect(
+                getDataTransferItemAPIOptions({
+                    item: mockItem,
+                    options,
+                }),
+            ).toEqual(options);
         });
         test('should return DEFAULT_API_OPTIONS when argument is DataTransferItem type', () => {
             expect(getDataTransferItemAPIOptions(mockItem)).toEqual(DEFAULT_API_OPTIONS);
         });
     });
     describe('getFileFromDataTransferItem()', () => {
-        test('should return file of UploadFileWithAPIOptions type when itemData is UploadDataTransferItemWithAPIOptions type', () => __awaiter(this, void 0, void 0, function* () {
-            const itemData = {
-                item: mockItem,
-                options,
-            };
-            expect(yield getFileFromDataTransferItem(itemData)).toEqual({
-                file: mockFile,
-                options,
-            });
-        }));
+        test('should return file of UploadFileWithAPIOptions type when itemData is UploadDataTransferItemWithAPIOptions type', () =>
+            __awaiter(this, void 0, void 0, function*() {
+                const itemData = {
+                    item: mockItem,
+                    options,
+                };
+                expect(yield getFileFromDataTransferItem(itemData)).toEqual({
+                    file: mockFile,
+                    options,
+                });
+            }));
     });
     describe('isDataTransferItemAFolder()', () => {
         test('should return true if item is a folder', () => {
@@ -244,4 +300,4 @@ describe('util/uploads', () => {
         });
     });
 });
-//# sourceMappingURL=uploads-test.js.map
+// # sourceMappingURL=uploads-test.js.map

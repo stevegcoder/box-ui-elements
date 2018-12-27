@@ -188,17 +188,20 @@ const createWorker = () => {
         };
     }
     /* eslint-enable */
-    const workerCodeBlob = new Blob([
-        // RushaCore loses its function name when uglified
-        `const RushaCore = ${RushaCore.toString()}`,
-        ';\n',
-        RushaString,
-        ';\n',
-        'var setupWorker = ',
-        workerBase.toString(),
-        ';\n',
-        'setupWorker();',
-    ], { type: 'text/javascript' });
+    const workerCodeBlob = new Blob(
+        [
+            // RushaCore loses its function name when uglified
+            `const RushaCore = ${RushaCore.toString()}`,
+            ';\n',
+            RushaString,
+            ';\n',
+            'var setupWorker = ',
+            workerBase.toString(),
+            ';\n',
+            'setupWorker();',
+        ],
+        { type: 'text/javascript' },
+    );
     const workerUrl = (window.URL || window.webkitURL).createObjectURL(workerCodeBlob);
     const worker = new Worker(workerUrl);
     worker.oldTerminate = worker.terminate;
@@ -209,4 +212,4 @@ const createWorker = () => {
     return worker;
 };
 export default createWorker;
-//# sourceMappingURL=uploadsSHA1Worker.js.map
+// # sourceMappingURL=uploadsSHA1Worker.js.map

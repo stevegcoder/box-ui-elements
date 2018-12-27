@@ -1,4 +1,5 @@
 import size from '../size';
+
 describe('util/size', () => {
     test('should return 0 bytes when undefined', () => {
         expect(size()).toBe('0 Byte');
@@ -25,4 +26,4 @@ describe('util/size', () => {
         expect(size(1024 * 1024 * 1024 * 1024 * 1024)).toBe('1 PB');
     });
 });
-//# sourceMappingURL=size-test.js.map
+// # sourceMappingURL=size-test.js.map

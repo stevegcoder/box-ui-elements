@@ -1,11 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 /**
  * @was-flow
  * @file Recursively create folder and upload files
@@ -15,6 +7,36 @@ import noop from 'lodash/noop';
 import FolderAPI from '../Folder';
 import { STATUS_COMPLETE, ERROR_CODE_ITEM_NAME_IN_USE } from '../../constants';
 import { getFileFromEntry } from '../../util/uploads';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+
 class FolderUploadNode {
     /**
      * [constructor]
@@ -34,12 +56,13 @@ class FolderUploadNode {
          * @param {Function} errorCallback
          * @returns {Promise}
          */
-        this.uploadChildFolders = (errorCallback) => __awaiter(this, void 0, void 0, function* () {
-            // $FlowFixMe
-            const folders = Object.values(this.folders);
-            const promises = folders.map(folder => folder.upload(this.folderId, errorCallback));
-            yield Promise.all(promises);
-        });
+        this.uploadChildFolders = errorCallback =>
+            __awaiter(this, void 0, void 0, function*() {
+                // $FlowFixMe
+                const folders = Object.values(this.folders);
+                const promises = folders.map(folder => folder.upload(this.folderId, errorCallback));
+                yield Promise.all(promises);
+            });
         /**
          * Create folder and add it to the upload queue
          *
@@ -48,45 +71,49 @@ class FolderUploadNode {
          * @param {boolean} isRoot
          * @returns {Promise}
          */
-        this.createAndUploadFolder = (errorCallback, isRoot) => __awaiter(this, void 0, void 0, function* () {
-            yield this.buildCurrentFolderFromEntry();
-            try {
-                const data = yield this.createFolder();
-                this.folderId = data.id;
-            }
-            catch (error) {
-                // @TODO: Handle 429
-                if (error.code !== ERROR_CODE_ITEM_NAME_IN_USE) {
-                    errorCallback(error);
+        this.createAndUploadFolder = (errorCallback, isRoot) =>
+            __awaiter(this, void 0, void 0, function*() {
+                yield this.buildCurrentFolderFromEntry();
+                try {
+                    const data = yield this.createFolder();
+                    this.folderId = data.id;
+                } catch (error) {
+                    // @TODO: Handle 429
+                    if (error.code !== ERROR_CODE_ITEM_NAME_IN_USE) {
+                        errorCallback(error);
+                        return;
+                    }
+                    this.folderId = error.context_info.conflicts[0].id;
+                }
+                // The root folder has already been added to the upload queue in ContentUploader
+                if (isRoot) {
                     return;
                 }
-                this.folderId = error.context_info.conflicts[0].id;
-            }
-            // The root folder has already been added to the upload queue in ContentUploader
-            if (isRoot) {
-                return;
-            }
-            this.addFolderToUploadQueue([
-                {
-                    extension: '',
-                    name: this.name,
-                    status: STATUS_COMPLETE,
-                    isFolder: true,
-                    size: 1,
-                    progress: 100,
-                },
-            ]);
-        });
+                this.addFolderToUploadQueue([
+                    {
+                        extension: '',
+                        name: this.name,
+                        status: STATUS_COMPLETE,
+                        isFolder: true,
+                        size: 1,
+                        progress: 100,
+                    },
+                ]);
+            });
         /**
          * Format files to Array<UploadFileWithAPIOptions> for upload
          *
          * @private
          * @returns {Array<UploadFileWithAPIOptions>}
          */
-        this.getFormattedFiles = () => this.files.map((file) => ({
-            file,
-            options: Object.assign({}, this.fileAPIOptions, { folderId: this.folderId, uploadInitTimestamp: Date.now() }),
-        }));
+        this.getFormattedFiles = () =>
+            this.files.map(file => ({
+                file,
+                options: Object.assign({}, this.fileAPIOptions, {
+                    folderId: this.folderId,
+                    uploadInitTimestamp: Date.now(),
+                }),
+            }));
         /**
          * Create FolderUploadNode instances from entries
          *
@@ -94,17 +121,29 @@ class FolderUploadNode {
          * @param {Array<FileSystemFileEntry>} entries
          * @returns {Promise<any>}
          */
-        this.createFolderUploadNodesFromEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
-            yield Promise.all(entries.map((entry) => __awaiter(this, void 0, void 0, function* () {
-                const { isFile, name } = entry;
-                if (isFile) {
-                    const file = yield getFileFromEntry(entry);
-                    this.files.push(file);
-                    return;
-                }
-                this.folders[name] = new FolderUploadNode(name, this.addFilesToUploadQueue, this.addFolderToUploadQueue, this.fileAPIOptions, Object.assign({}, this.baseAPIOptions, this.fileAPIOptions), entry);
-            })));
-        });
+        this.createFolderUploadNodesFromEntries = entries =>
+            __awaiter(this, void 0, void 0, function*() {
+                yield Promise.all(
+                    entries.map(entry =>
+                        __awaiter(this, void 0, void 0, function*() {
+                            const { isFile, name } = entry;
+                            if (isFile) {
+                                const file = yield getFileFromEntry(entry);
+                                this.files.push(file);
+                                return;
+                            }
+                            this.folders[name] = new FolderUploadNode(
+                                name,
+                                this.addFilesToUploadQueue,
+                                this.addFolderToUploadQueue,
+                                this.fileAPIOptions,
+                                Object.assign({}, this.baseAPIOptions, this.fileAPIOptions),
+                                entry,
+                            );
+                        }),
+                    ),
+                );
+            });
         /**
          * Recursively read an entry
          *
@@ -114,15 +153,19 @@ class FolderUploadNode {
          * @returns {void}
          */
         this.readEntry = (reader, resolve) => {
-            reader.readEntries((entries) => __awaiter(this, void 0, void 0, function* () {
-                // Quit recursing when there are no remaining entries.
-                if (!entries.length) {
-                    resolve();
-                    return;
-                }
-                yield this.createFolderUploadNodesFromEntries(entries);
-                this.readEntry(reader, resolve);
-            }), noop);
+            reader.readEntries(
+                entries =>
+                    __awaiter(this, void 0, void 0, function*() {
+                        // Quit recursing when there are no remaining entries.
+                        if (!entries.length) {
+                            resolve();
+                            return;
+                        }
+                        yield this.createFolderUploadNodesFromEntries(entries);
+                        this.readEntry(reader, resolve);
+                    }),
+                noop,
+            );
         };
         /**
          * Build current folder from entry
@@ -147,6 +190,7 @@ class FolderUploadNode {
         this.baseAPIOptions = baseAPIOptions;
         this.entry = entry;
     }
+
     /**
      * Upload a folder
      *
@@ -157,13 +201,14 @@ class FolderUploadNode {
      * @returns {Promise}
      */
     upload(parentFolderId, errorCallback, isRoot = false) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.parentFolderId = parentFolderId;
             yield this.createAndUploadFolder(errorCallback, isRoot);
             this.addFilesToUploadQueue(this.getFormattedFiles(), noop, true);
             yield this.uploadChildFolders(errorCallback);
         });
     }
+
     /**
      * Promisify create folder
      *
@@ -171,11 +216,13 @@ class FolderUploadNode {
      * @returns {Promise}
      */
     createFolder() {
-        const folderAPI = new FolderAPI(Object.assign({}, this.baseAPIOptions, { id: `folder_${this.parentFolderId}` }));
+        const folderAPI = new FolderAPI(
+            Object.assign({}, this.baseAPIOptions, { id: `folder_${this.parentFolderId}` }),
+        );
         return new Promise((resolve, reject) => {
             folderAPI.create(this.parentFolderId, this.name, resolve, reject);
         });
     }
 }
 export default FolderUploadNode;
-//# sourceMappingURL=FolderUploadNode.js.map
+// # sourceMappingURL=FolderUploadNode.js.map

@@ -6,5 +6,6 @@
 import makePopup from '../makePopup';
 import ContentPicker from './ContentPicker';
 import { CLIENT_NAME_CONTENT_PICKER } from '../../constants';
+
 export default makePopup(CLIENT_NAME_CONTENT_PICKER)(ContentPicker);
-//# sourceMappingURL=ContentPickerPopup.js.map
+// # sourceMappingURL=ContentPickerPopup.js.map

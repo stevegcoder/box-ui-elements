@@ -3,16 +3,43 @@
  * @file Folder upload bootstrapping
  * @author Box
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import FolderUploadNode from './FolderUploadNode';
-import { getEntryFromDataTransferItem, getFile, getFileAPIOptions, getDataTransferItem, getDataTransferItemAPIOptions, } from '../../util/uploads';
+import {
+    getEntryFromDataTransferItem,
+    getFile,
+    getFileAPIOptions,
+    getDataTransferItem,
+    getDataTransferItemAPIOptions,
+} from '../../util/uploads';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 const PATH_DELIMITER = '/';
 class FolderUpload {
     /**
@@ -31,6 +58,7 @@ class FolderUpload {
         this.addFolderToUploadQueue = addFolderToUploadQueue;
         this.baseAPIOptions = baseAPIOptions;
     }
+
     /**
      * Create a folder tree from fileList wekbkitRelativePath
      *
@@ -71,14 +99,14 @@ class FolderUpload {
                 if (index === pathArryAfterRoot.length - 1) {
                     // end of path, push the file
                     subTree[folderName].files.push(file);
-                }
-                else {
+                } else {
                     // walk the tree
                     subTree = subTree[folderName].folders;
                 }
             });
         });
     }
+
     /**
      * Build folder tree from dataTransferItem, which can only represent 1 folder tree
      *
@@ -86,7 +114,7 @@ class FolderUpload {
      * @returns {Promise<any>}
      */
     buildFolderTreeFromDataTransferItem(dataTransferItem) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             const item = getDataTransferItem(dataTransferItem);
             const apiOptions = getDataTransferItemAPIOptions(dataTransferItem);
             const entry = getEntryFromDataTransferItem(item);
@@ -94,6 +122,7 @@ class FolderUpload {
             this.folder = this.createFolderUploadNode(name, apiOptions, entry);
         });
     }
+
     /**
      * Create a FolderUploadNode instance
      *
@@ -103,8 +132,16 @@ class FolderUpload {
      * @returns {FolderUploadNode}
      */
     createFolderUploadNode(name, apiOptions, entry) {
-        return new FolderUploadNode(name, this.addFilesToUploadQueue, this.addFolderToUploadQueue, apiOptions, Object.assign({}, this.baseAPIOptions, apiOptions), entry);
+        return new FolderUploadNode(
+            name,
+            this.addFilesToUploadQueue,
+            this.addFolderToUploadQueue,
+            apiOptions,
+            Object.assign({}, this.baseAPIOptions, apiOptions),
+            entry,
+        );
     }
+
     /**
      * Upload folders
      *
@@ -113,8 +150,8 @@ class FolderUpload {
      * @param {Function} options.errorCallback
      * @returns {Promise<any>}
      */
-    upload({ errorCallback, successCallback, }) {
-        return __awaiter(this, void 0, void 0, function* () {
+    upload({ errorCallback, successCallback }) {
+        return __awaiter(this, void 0, void 0, function*() {
             yield this.folder.upload(this.destinationFolderId, errorCallback, true);
             // Simulate BoxItem
             successCallback([
@@ -124,12 +161,13 @@ class FolderUpload {
             ]);
         });
     }
+
     /**
      * Noop cancel
      *
      * @public
      */
-    cancel() { }
+    cancel() {}
 }
 export default FolderUpload;
-//# sourceMappingURL=FolderUpload.js.map
+// # sourceMappingURL=FolderUpload.js.map

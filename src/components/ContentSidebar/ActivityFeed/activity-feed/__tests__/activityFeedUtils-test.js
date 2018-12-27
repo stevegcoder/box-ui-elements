@@ -1,5 +1,6 @@
 import { collapseFeedState } from '../activityFeedUtils';
 import { PLACEHOLDER_USER } from '../../../../../constants';
+
 describe('collapseFeedState', () => {
     const mario = { id: '1', name: 'mario' };
     const luigi = { id: '2', name: 'luigi' };
@@ -84,4 +85,4 @@ describe('collapseFeedState', () => {
         expect(collapsedFeed).toEqual(expFeed);
     });
 });
-//# sourceMappingURL=activityFeedUtils-test.js.map
+// # sourceMappingURL=activityFeedUtils-test.js.map

@@ -1,4 +1,5 @@
 import OffsetBasedAPI from '../OffsetBasedAPI';
+
 const LIMIT = 1000;
 describe('api/OffsetBasedAPI', () => {
     let offsetBasedAPI;
@@ -43,9 +44,11 @@ describe('api/OffsetBasedAPI', () => {
         });
         test('should do two xhr calls and call successHandler once', () => {
             offsetBasedAPI.xhr = {
-                get: jest.fn().mockReturnValue(Promise.resolve({
-                    data: Object.assign({}, offsetBasedAPIResponse, { total_count: 1500 }),
-                })),
+                get: jest.fn().mockReturnValue(
+                    Promise.resolve({
+                        data: Object.assign({}, offsetBasedAPIResponse, { total_count: 1500 }),
+                    }),
+                ),
             };
             return offsetBasedAPI.offsetGetRequest('id', 0, 1000, true).then(() => {
                 expect(offsetBasedAPI.xhr.get).toHaveBeenCalledTimes(2);
@@ -55,9 +58,11 @@ describe('api/OffsetBasedAPI', () => {
         });
         test('should do one xhr call and call successHandler once', () => {
             offsetBasedAPI.xhr = {
-                get: jest.fn().mockReturnValue(Promise.resolve({
-                    data: offsetBasedAPIResponse,
-                })),
+                get: jest.fn().mockReturnValue(
+                    Promise.resolve({
+                        data: offsetBasedAPIResponse,
+                    }),
+                ),
             };
             return offsetBasedAPI.offsetGetRequest('id', 0, 1000, true).then(() => {
                 expect(offsetBasedAPI.xhr.get).toHaveBeenCalledTimes(1);
@@ -103,9 +108,11 @@ describe('api/OffsetBasedAPI', () => {
                 entries: [],
             };
             offsetBasedAPI.xhr = {
-                get: jest.fn().mockReturnValue(Promise.resolve({
-                    data: pagedCommentsResponse,
-                })),
+                get: jest.fn().mockReturnValue(
+                    Promise.resolve({
+                        data: pagedCommentsResponse,
+                    }),
+                ),
             };
             return offsetBasedAPI.offsetGet('id', successCb, errorCb, 50).catch(() => {
                 expect(successCb).not.toHaveBeenCalled();
@@ -133,4 +140,4 @@ describe('api/OffsetBasedAPI', () => {
         });
     });
 });
-//# sourceMappingURL=OffsetBasedAPI-test.js.map
+// # sourceMappingURL=OffsetBasedAPI-test.js.map

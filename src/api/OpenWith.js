@@ -5,6 +5,7 @@
  */
 import Base from './Base';
 import { HEADER_ACCEPT_LANGUAGE, DEFAULT_LOCALE, ERROR_CODE_FETCH_INTEGRATIONS } from '../constants';
+
 class OpenWith extends Base {
     /**
      * API URL for Open With
@@ -18,6 +19,7 @@ class OpenWith extends Base {
         }
         return `${this.getBaseApiUrl()}/files/${id}/open_with_integrations`;
     }
+
     /**
      * Gets Open With integration data
      *
@@ -44,6 +46,7 @@ class OpenWith extends Base {
             errorCallback,
         });
     }
+
     /**
      * Formats Open With data conveniently for the client
      *
@@ -52,23 +55,33 @@ class OpenWith extends Base {
      */
     formatOpenWithData(openWithIntegrations) {
         const { items, default_app_integration: defaultIntegration } = openWithIntegrations;
-        const integrations = items.map(({ app_integration, disabled_reasons, display_name, display_description, display_order, is_disabled, should_show_consent_popup, }) => {
-            const { id, type } = app_integration;
-            return {
-                appIntegrationId: id,
-                displayDescription: display_description,
-                disabledReasons: disabled_reasons,
-                displayOrder: display_order,
-                isDefault: !!defaultIntegration && id === defaultIntegration.id,
-                isDisabled: is_disabled,
-                displayName: display_name,
-                requiresConsent: should_show_consent_popup,
-                type,
-            };
-        });
+        const integrations = items.map(
+            ({
+                app_integration,
+                disabled_reasons,
+                display_name,
+                display_description,
+                display_order,
+                is_disabled,
+                should_show_consent_popup,
+            }) => {
+                const { id, type } = app_integration;
+                return {
+                    appIntegrationId: id,
+                    displayDescription: display_description,
+                    disabledReasons: disabled_reasons,
+                    displayOrder: display_order,
+                    isDefault: !!defaultIntegration && id === defaultIntegration.id,
+                    isDisabled: is_disabled,
+                    displayName: display_name,
+                    requiresConsent: should_show_consent_popup,
+                    type,
+                };
+            },
+        );
         // Sort integrations by displayOrder
         return integrations.sort((integrationA, integrationB) => integrationA.displayOrder - integrationB.displayOrder);
     }
 }
 export default OpenWith;
-//# sourceMappingURL=OpenWith.js.map
+// # sourceMappingURL=OpenWith.js.map

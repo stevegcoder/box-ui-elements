@@ -5,6 +5,7 @@
  */
 import MarkerBasedAPI from './MarkerBasedAPI';
 import { DEFAULT_MAX_COLLABORATORS } from '../constants';
+
 class FileCollaborators extends MarkerBasedAPI {
     constructor() {
         super(...arguments);
@@ -13,7 +14,7 @@ class FileCollaborators extends MarkerBasedAPI {
          *
          * @param {Object} data the response data
          */
-        this.successHandler = (data) => {
+        this.successHandler = data => {
             if (this.isDestroyed() || typeof this.successCallback !== 'function') {
                 return;
             }
@@ -29,6 +30,7 @@ class FileCollaborators extends MarkerBasedAPI {
             this.successCallback(Object.assign({}, data, { entries: collaborators }));
         };
     }
+
     /**
      * API URL for comments
      *
@@ -41,6 +43,7 @@ class FileCollaborators extends MarkerBasedAPI {
         }
         return `${this.getBaseApiUrl()}/files/${id}/collaborators`;
     }
+
     /**
      * API for fetching collaborators on a file
      *
@@ -62,4 +65,4 @@ class FileCollaborators extends MarkerBasedAPI {
     }
 }
 export default FileCollaborators;
-//# sourceMappingURL=FileCollaborators.js.map
+// # sourceMappingURL=FileCollaborators.js.map

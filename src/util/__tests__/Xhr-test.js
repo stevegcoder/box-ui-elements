@@ -1,5 +1,6 @@
 import noop from 'lodash/noop';
 import Xhr from '../Xhr';
+
 describe('util/Xhr', () => {
     let xhrInstance;
     beforeEach(() => {
@@ -17,17 +18,17 @@ describe('util/Xhr', () => {
             };
             return xhrInstance
                 .get({
-                url: 'url',
-                data: {},
-            })
+                    url: 'url',
+                    data: {},
+                })
                 .then(() => {
-                expect(xhrInstance.axios.get).toHaveBeenCalledWith('url', {
-                    cancelToken: xhrInstance.axiosSource.token,
-                    params: {},
-                    headers: {},
-                    parsedUrl: url,
+                    expect(xhrInstance.axios.get).toHaveBeenCalledWith('url', {
+                        cancelToken: xhrInstance.axiosSource.token,
+                        params: {},
+                        headers: {},
+                        parsedUrl: url,
+                    });
                 });
-            });
         });
     });
     describe('post()', () => {
@@ -38,18 +39,18 @@ describe('util/Xhr', () => {
             xhrInstance.axios = jest.fn().mockReturnValue({});
             return xhrInstance
                 .post({
-                url: 'url',
-                data: {},
-            })
-                .then(() => {
-                expect(xhrInstance.axios).toHaveBeenCalledWith({
                     url: 'url',
-                    method: 'POST',
-                    parsedUrl: url,
                     data: {},
-                    headers: {},
+                })
+                .then(() => {
+                    expect(xhrInstance.axios).toHaveBeenCalledWith({
+                        url: 'url',
+                        method: 'POST',
+                        parsedUrl: url,
+                        data: {},
+                        headers: {},
+                    });
                 });
-            });
         });
     });
     describe('put()', () => {
@@ -94,16 +95,16 @@ describe('util/Xhr', () => {
             xhrInstance.axios = jest.fn().mockReturnValue(Promise.resolve(response));
             return xhrInstance
                 .options({
-                successHandler,
-                errorHandler: noop,
-            })
+                    successHandler,
+                    errorHandler: noop,
+                })
                 .then(() => {
-                expect(xhrInstance.axios).toHaveBeenCalledWith({
-                    method: 'OPTIONS',
-                    headers: {},
+                    expect(xhrInstance.axios).toHaveBeenCalledWith({
+                        method: 'OPTIONS',
+                        headers: {},
+                    });
+                    expect(successHandler).toHaveBeenCalledWith(response);
                 });
-                expect(successHandler).toHaveBeenCalledWith(response);
-            });
         });
         test('should call errorHandler on axios error', () => {
             const error = { status: '' };
@@ -112,16 +113,16 @@ describe('util/Xhr', () => {
             xhrInstance.axios = jest.fn().mockReturnValue(Promise.reject(error));
             return xhrInstance
                 .options({
-                successHandler: noop,
-                errorHandler,
-            })
+                    successHandler: noop,
+                    errorHandler,
+                })
                 .then(() => {
-                expect(xhrInstance.axios).toHaveBeenCalledWith({
-                    method: 'OPTIONS',
-                    headers: {},
+                    expect(xhrInstance.axios).toHaveBeenCalledWith({
+                        method: 'OPTIONS',
+                        headers: {},
+                    });
+                    expect(errorHandler).toHaveBeenCalledWith(error);
                 });
-                expect(errorHandler).toHaveBeenCalledWith(error);
-            });
         });
         test('should call errorHandler on getHeaders error', () => {
             const error = { status: '' };
@@ -129,12 +130,12 @@ describe('util/Xhr', () => {
             xhrInstance.getHeaders = jest.fn().mockReturnValue(Promise.reject(error));
             return xhrInstance
                 .options({
-                successHandler: noop,
-                errorHandler,
-            })
+                    successHandler: noop,
+                    errorHandler,
+                })
                 .then(() => {
-                expect(errorHandler).toHaveBeenCalledWith(error);
-            });
+                    expect(errorHandler).toHaveBeenCalledWith(error);
+                });
         });
     });
     describe('uploadFile()', () => {
@@ -151,18 +152,18 @@ describe('util/Xhr', () => {
             const idleTimoutHandler = jest.fn();
             return xhrInstance
                 .uploadFile({
-                successHandler: noop,
-                errorHandler: noop,
-                progressHandler: noop,
-                withIdleTimeout: true,
-                idleTimeoutDuration: 100,
-                idleTimeoutHandler: idleTimoutHandler,
-            })
+                    successHandler: noop,
+                    errorHandler: noop,
+                    progressHandler: noop,
+                    withIdleTimeout: true,
+                    idleTimeoutDuration: 100,
+                    idleTimeoutHandler: idleTimoutHandler,
+                })
                 .then(() => {
-                jest.advanceTimersByTime(101); // 101ms should trigger idle timeout func that calls abort
-                expect(xhrInstance.abort).toHaveBeenCalled();
-                expect(idleTimoutHandler).toHaveBeenCalled();
-            });
+                    jest.advanceTimersByTime(101); // 101ms should trigger idle timeout func that calls abort
+                    expect(xhrInstance.abort).toHaveBeenCalled();
+                    expect(idleTimoutHandler).toHaveBeenCalled();
+                });
         });
         test('should not call abort if there is upload progress before idleTimeoutDuration', () => {
             const uploadHandler = jest.fn();
@@ -174,17 +175,17 @@ describe('util/Xhr', () => {
             xhrInstance.getHeaders = jest.fn().mockReturnValue(Promise.resolve({}));
             return xhrInstance
                 .uploadFile({
-                successHandler: noop,
-                errorHandler: noop,
-                progressHandler: uploadHandler,
-                withIdleTimeout: true,
-                idleTimeoutDuration: 100,
-            })
+                    successHandler: noop,
+                    errorHandler: noop,
+                    progressHandler: uploadHandler,
+                    withIdleTimeout: true,
+                    idleTimeoutDuration: 100,
+                })
                 .then(() => {
-                jest.advanceTimersByTime(51); // 50 + 51ms will original idle timeout func unless cancelled
-                expect(uploadHandler).toHaveBeenCalled();
-                expect(xhrInstance.abort).not.toHaveBeenCalled();
-            });
+                    jest.advanceTimersByTime(51); // 50 + 51ms will original idle timeout func unless cancelled
+                    expect(uploadHandler).toHaveBeenCalled();
+                    expect(xhrInstance.abort).not.toHaveBeenCalled();
+                });
         });
         test('should call successHandler and not call abort if upload succeeds', () => {
             const successHandler = jest.fn();
@@ -194,17 +195,17 @@ describe('util/Xhr', () => {
             xhrInstance.getHeaders = jest.fn().mockReturnValue(Promise.resolve({}));
             return xhrInstance
                 .uploadFile({
-                successHandler,
-                errorHandler: noop,
-                progressHandler: noop,
-                withIdleTimeout: true,
-                idleTimeoutDuration: 100,
-            })
+                    successHandler,
+                    errorHandler: noop,
+                    progressHandler: noop,
+                    withIdleTimeout: true,
+                    idleTimeoutDuration: 100,
+                })
                 .then(() => {
-                jest.advanceTimersByTime(101);
-                expect(xhrInstance.abort).not.toHaveBeenCalled();
-                expect(successHandler).toHaveBeenCalledWith(response);
-            });
+                    jest.advanceTimersByTime(101);
+                    expect(xhrInstance.abort).not.toHaveBeenCalled();
+                    expect(successHandler).toHaveBeenCalledWith(response);
+                });
         });
         test('should call errorHandler and not call abort if upload fails', () => {
             const errorHandler = jest.fn();
@@ -214,17 +215,17 @@ describe('util/Xhr', () => {
             xhrInstance.getHeaders = jest.fn().mockReturnValue(Promise.resolve({}));
             return xhrInstance
                 .uploadFile({
-                successHandler: noop,
-                errorHandler,
-                progressHandler: noop,
-                withIdleTimeout: true,
-                idleTimeoutDuration: 100,
-            })
+                    successHandler: noop,
+                    errorHandler,
+                    progressHandler: noop,
+                    withIdleTimeout: true,
+                    idleTimeoutDuration: 100,
+                })
                 .then(() => {
-                jest.advanceTimersByTime(101);
-                expect(xhrInstance.abort).not.toHaveBeenCalled();
-                expect(errorHandler).toHaveBeenCalledWith(error);
-            });
+                    jest.advanceTimersByTime(101);
+                    expect(xhrInstance.abort).not.toHaveBeenCalled();
+                    expect(errorHandler).toHaveBeenCalledWith(error);
+                });
         });
         test('should call errorHandler if getHeaders fails', () => {
             const errorHandler = jest.fn();
@@ -232,13 +233,13 @@ describe('util/Xhr', () => {
             xhrInstance.getHeaders = jest.fn().mockReturnValue(Promise.reject(error));
             return xhrInstance
                 .uploadFile({
-                successHandler: noop,
-                errorHandler,
-                progressHandler: noop,
-            })
+                    successHandler: noop,
+                    errorHandler,
+                    progressHandler: noop,
+                })
                 .then(() => {
-                expect(errorHandler).toHaveBeenCalledWith(error);
-            });
+                    expect(errorHandler).toHaveBeenCalledWith(error);
+                });
         });
     });
     describe('abort()', () => {
@@ -251,4 +252,4 @@ describe('util/Xhr', () => {
         });
     });
 });
-//# sourceMappingURL=Xhr-test.js.map
+// # sourceMappingURL=Xhr-test.js.map

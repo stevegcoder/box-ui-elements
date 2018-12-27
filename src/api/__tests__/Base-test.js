@@ -3,6 +3,7 @@ import Xhr from '../../util/Xhr';
 import Cache from '../../util/Cache';
 import { getBadItemError, getBadPermissionsError } from '../../util/error';
 import { HTTP_GET, HTTP_POST, HTTP_PUT } from '../../constants';
+
 let base;
 describe('api/Base', () => {
     const baseResponse = { total_count: 0, entries: [] };
@@ -54,24 +55,21 @@ describe('api/Base', () => {
         test('should throw a bad item error for a missing file ID or permissions object', () => {
             try {
                 base.checkApiCallValidity('can_edit', undefined, 'id');
-            }
-            catch (error) {
+            } catch (error) {
                 expect(error.message).toBe(badItemError.message);
             }
             try {
                 base.checkApiCallValidity('can_edit', { permissions: { can_edit: false } }, null);
-            }
-            catch (error) {
+            } catch (error) {
                 expect(error.message).toBe(badItemError.message);
             }
             try {
                 base.checkApiCallValidity('can_edit', { permissions: {} }, 'id');
-            }
-            catch (error) {
+            } catch (error) {
                 expect(error.message).toBe(permissionsError.message);
             }
         });
-        test('should throw a bad permissions error if the given permission is missing or false', () => { });
+        test('should throw a bad permissions error if the given permission is missing or false', () => {});
     });
     describe('getBaseApiUrl()', () => {
         test('should return correct api url', () => {
@@ -119,7 +117,14 @@ describe('api/Base', () => {
             base.makeRequest = jest.fn();
             base.getUrl = jest.fn(() => url);
             base.get({ id, successCallback, errorCallback, requestData });
-            expect(base.makeRequest).toHaveBeenCalledWith(HTTP_GET, id, url, successCallback, errorCallback, requestData);
+            expect(base.makeRequest).toHaveBeenCalledWith(
+                HTTP_GET,
+                id,
+                url,
+                successCallback,
+                errorCallback,
+                requestData,
+            );
         });
     });
     describe('makeRequest()', () => {
@@ -190,4 +195,4 @@ describe('api/Base', () => {
         });
     });
 });
-//# sourceMappingURL=Base-test.js.map
+// # sourceMappingURL=Base-test.js.map

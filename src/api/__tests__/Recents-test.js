@@ -1,6 +1,7 @@
 import Recents from '../Recents';
 import Cache from '../../util/Cache';
 import { FOLDER_FIELDS_TO_FETCH } from '../../util/fields';
+
 describe('api/Recents', () => {
     let recents;
     let cache;
@@ -279,4 +280,4 @@ describe('api/Recents', () => {
         });
     });
 });
-//# sourceMappingURL=Recents-test.js.map
+// # sourceMappingURL=Recents-test.js.map

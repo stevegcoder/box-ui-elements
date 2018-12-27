@@ -17,9 +17,9 @@ import { TYPE_FOLDER, TYPE_FILE, TYPE_WEBLINK } from '../constants';
  * @param {WebLink} weblinkAPI api for web links
  * @return {Array} list with items replaced with reference keys
  */
-export default function (list, folderAPI, fileAPI, weblinkAPI) {
+export default function(list, folderAPI, fileAPI, weblinkAPI) {
     const items = [];
-    list.forEach((item) => {
+    list.forEach(item => {
         const { id, type } = item;
         if (!id || !type) {
             throw getBadItemError();
@@ -42,12 +42,11 @@ export default function (list, folderAPI, fileAPI, weblinkAPI) {
         const key = api.getCacheKey(id);
         if (cache.has(key)) {
             cache.merge(key, item);
-        }
-        else {
+        } else {
             cache.set(key, item);
         }
         items.push(key);
     });
     return items;
 }
-//# sourceMappingURL=flatten.js.map
+// # sourceMappingURL=flatten.js.map

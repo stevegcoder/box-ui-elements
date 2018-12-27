@@ -1,13 +1,35 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { withData } from 'leche';
 import MultiputPart, { PART_STATE_UPLOADED } from '../MultiputPart';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+
 describe('api/uploads/MultiputPart', () => {
     const options = {};
     const index = 0;
@@ -20,7 +42,17 @@ describe('api/uploads/MultiputPart', () => {
     const getNumPartsUploading = jest.fn();
     let MultiputPartTest;
     beforeEach(() => {
-        MultiputPartTest = new MultiputPart(options, index, offset, partSize, fileSize, sessionId, sessionEndpoints, config, getNumPartsUploading);
+        MultiputPartTest = new MultiputPart(
+            options,
+            index,
+            offset,
+            partSize,
+            fileSize,
+            sessionId,
+            sessionEndpoints,
+            config,
+            getNumPartsUploading,
+        );
     });
     describe('upload()', () => {
         test('should throw error if sha256 is not available', () => {
@@ -130,71 +162,77 @@ describe('api/uploads/MultiputPart', () => {
             MultiputPartTest.retryUpload();
             expect(MultiputPartTest.onSuccess).not.toHaveBeenCalled();
         });
-        test('should call upload when upload is incomplete', () => __awaiter(this, void 0, void 0, function* () {
-            MultiputPartTest.destroyed = false;
-            MultiputPartTest.uploadedBytes = 1;
-            MultiputPartTest.size = 100;
-            MultiputPartTest.numUploadRetriesPerformed = 0;
-            MultiputPartTest.upload = jest.fn();
-            yield MultiputPartTest.retryUpload();
-            expect(MultiputPartTest.numUploadRetriesPerformed).toBe(1);
-        }));
-        test('should call uploadSuccessHandler when upload is already available on the server', () => __awaiter(this, void 0, void 0, function* () {
-            const part = {
-                offset: 1,
-                part_id: 1,
-            };
-            const parts = [part];
-            MultiputPartTest.destroyed = false;
-            MultiputPartTest.uploadedBytes = 100;
-            MultiputPartTest.size = 100;
-            MultiputPartTest.offset = 1;
-            MultiputPartTest.numUploadRetriesPerformed = 0;
-            MultiputPartTest.upload = jest.fn();
-            MultiputPartTest.uploadSuccessHandler = jest.fn();
-            MultiputPartTest.listParts = jest.fn().mockReturnValueOnce(Promise.resolve(parts));
-            yield MultiputPartTest.retryUpload();
-            expect(MultiputPartTest.upload).not.toHaveBeenCalled();
-            expect(MultiputPartTest.uploadSuccessHandler).toHaveBeenCalledWith({
-                data: { part },
-            });
-        }));
-        withData([
-            [
-                {
+        test('should call upload when upload is incomplete', () =>
+            __awaiter(this, void 0, void 0, function*() {
+                MultiputPartTest.destroyed = false;
+                MultiputPartTest.uploadedBytes = 1;
+                MultiputPartTest.size = 100;
+                MultiputPartTest.numUploadRetriesPerformed = 0;
+                MultiputPartTest.upload = jest.fn();
+                yield MultiputPartTest.retryUpload();
+                expect(MultiputPartTest.numUploadRetriesPerformed).toBe(1);
+            }));
+        test('should call uploadSuccessHandler when upload is already available on the server', () =>
+            __awaiter(this, void 0, void 0, function*() {
+                const part = {
                     offset: 1,
                     part_id: 1,
-                },
-                {
-                    offset: 1,
-                    part_id: 1,
-                },
-            ],
-            [
-                {
-                    offset: 1,
-                },
-            ],
-            [
-                {
-                    offset: 2,
-                    part_id: 1,
-                },
-            ],
-        ], parts => {
-            test('should call upload when upload is not available on the server', () => __awaiter(this, void 0, void 0, function* () {
+                };
+                const parts = [part];
                 MultiputPartTest.destroyed = false;
                 MultiputPartTest.uploadedBytes = 100;
                 MultiputPartTest.size = 100;
+                MultiputPartTest.offset = 1;
                 MultiputPartTest.numUploadRetriesPerformed = 0;
                 MultiputPartTest.upload = jest.fn();
                 MultiputPartTest.uploadSuccessHandler = jest.fn();
                 MultiputPartTest.listParts = jest.fn().mockReturnValueOnce(Promise.resolve(parts));
                 yield MultiputPartTest.retryUpload();
-                expect(MultiputPartTest.numUploadRetriesPerformed).toBe(1);
-                expect(MultiputPartTest.uploadSuccessHandler).not.toHaveBeenCalled();
+                expect(MultiputPartTest.upload).not.toHaveBeenCalled();
+                expect(MultiputPartTest.uploadSuccessHandler).toHaveBeenCalledWith({
+                    data: { part },
+                });
             }));
-        });
+        withData(
+            [
+                [
+                    {
+                        offset: 1,
+                        part_id: 1,
+                    },
+                    {
+                        offset: 1,
+                        part_id: 1,
+                    },
+                ],
+                [
+                    {
+                        offset: 1,
+                    },
+                ],
+                [
+                    {
+                        offset: 2,
+                        part_id: 1,
+                    },
+                ],
+            ],
+            parts => {
+                test('should call upload when upload is not available on the server', () =>
+                    __awaiter(this, void 0, void 0, function*() {
+                        MultiputPartTest.destroyed = false;
+                        MultiputPartTest.uploadedBytes = 100;
+                        MultiputPartTest.size = 100;
+                        MultiputPartTest.numUploadRetriesPerformed = 0;
+                        MultiputPartTest.upload = jest.fn();
+                        MultiputPartTest.uploadSuccessHandler = jest.fn();
+                        MultiputPartTest.listParts = jest.fn().mockReturnValueOnce(Promise.resolve(parts));
+                        yield MultiputPartTest.retryUpload();
+                        expect(MultiputPartTest.numUploadRetriesPerformed).toBe(1);
+                        expect(MultiputPartTest.uploadSuccessHandler).not.toHaveBeenCalled();
+                    }));
+            },
+        );
     });
     describe('cancel()', () => {
         test('should tear down properly', () => {
@@ -207,16 +245,17 @@ describe('api/uploads/MultiputPart', () => {
         });
     });
     describe('listParts()', () => {
-        test('should GET from correct endpoint and return entries', () => __awaiter(this, void 0, void 0, function* () {
-            const endpoint = 'www.box.com';
-            const entries = [1];
-            MultiputPart.updateQueryParameters = jest.fn().mockReturnValueOnce(endpoint);
-            MultiputPartTest.xhr = {
-                get: jest.fn().mockReturnValueOnce(Promise.resolve({ entries })),
-            };
-            const res = yield MultiputPartTest.listParts(1, 1);
-            expect(res).toBe(entries);
-        }));
+        test('should GET from correct endpoint and return entries', () =>
+            __awaiter(this, void 0, void 0, function*() {
+                const endpoint = 'www.box.com';
+                const entries = [1];
+                MultiputPart.updateQueryParameters = jest.fn().mockReturnValueOnce(endpoint);
+                MultiputPartTest.xhr = {
+                    get: jest.fn().mockReturnValueOnce(Promise.resolve({ entries })),
+                };
+                const res = yield MultiputPartTest.listParts(1, 1);
+                expect(res).toBe(entries);
+            }));
     });
 });
-//# sourceMappingURL=MultiputPart-test.js.map
+// # sourceMappingURL=MultiputPart-test.js.map

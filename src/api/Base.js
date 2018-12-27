@@ -3,20 +3,48 @@
  * @file Base class with utility methods for API calls
  * @author Box
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import noop from 'lodash/noop';
 import Xhr from '../util/Xhr';
 import Cache from '../util/Cache';
 import { getTypedFileId } from '../util/file';
 import { getBadItemError, getBadPermissionsError } from '../util/error';
-import { DEFAULT_HOSTNAME_API, DEFAULT_HOSTNAME_UPLOAD, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, } from '../constants';
+import {
+    DEFAULT_HOSTNAME_API,
+    DEFAULT_HOSTNAME_UPLOAD,
+    HTTP_GET,
+    HTTP_POST,
+    HTTP_PUT,
+    HTTP_DELETE,
+} from '../constants';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 class Base {
     /**
      * [constructor]
@@ -35,7 +63,7 @@ class Base {
          *
          * @param {Object} data - The response data
          */
-        this.successHandler = (data) => {
+        this.successHandler = data => {
             if (!this.isDestroyed() && typeof this.successCallback === 'function') {
                 this.successCallback(data);
             }
@@ -46,13 +74,12 @@ class Base {
          * @param {Object} data - The response data
          * @param {Function} errorCallback the error callback
          */
-        this.errorHandler = (error) => {
+        this.errorHandler = error => {
             if (!this.isDestroyed() && typeof this.errorCallback === 'function') {
                 const { response } = error;
                 if (response) {
                     this.errorCallback(response.data, this.errorCode);
-                }
-                else {
+                } else {
                     this.errorCallback(error, this.errorCode);
                 }
             }
@@ -71,6 +98,7 @@ class Base {
         this.consoleLog = !!options.consoleLog && !!window.console ? window.console.log || noop : noop;
         this.consoleError = !!options.consoleError && !!window.console ? window.console.error || noop : noop;
     }
+
     /**
      * [destructor]
      *
@@ -80,6 +108,7 @@ class Base {
         this.xhr.abort();
         this.destroyed = true;
     }
+
     /**
      * Asks the API if its destructor has been called
      *
@@ -88,6 +117,7 @@ class Base {
     isDestroyed() {
         return this.destroyed;
     }
+
     /**
      * Checks that our desired API call has sufficient permissions and an item ID
      *
@@ -105,6 +135,7 @@ class Base {
             throw getBadPermissionsError();
         }
     }
+
     /**
      * Base URL for api
      *
@@ -114,6 +145,7 @@ class Base {
         const suffix = this.apiHost.endsWith('/') ? '2.0' : '/2.0';
         return `${this.apiHost}${suffix}`;
     }
+
     /**
      * Base URL for api uploads
      *
@@ -123,6 +155,7 @@ class Base {
         const suffix = this.uploadHost.endsWith('/') ? 'api/2.0' : '/api/2.0';
         return `${this.uploadHost}${suffix}`;
     }
+
     /**
      * Gets the cache instance
      *
@@ -131,6 +164,7 @@ class Base {
     getCache() {
         return this.cache;
     }
+
     /**
      * Gets the URL for the API, meant to be overridden
      * @param {string} id - The item id
@@ -140,6 +174,7 @@ class Base {
         /* eslint-enable no-unused-vars */
         throw new Error('Implement me!');
     }
+
     /**
      * Formats an API entry for use in components
      * @param {string} entry - an API response entry
@@ -149,6 +184,7 @@ class Base {
         /* eslint-enable no-unused-vars */
         throw new Error('Implement me!');
     }
+
     /**
      * Generic API GET
      *
@@ -159,10 +195,11 @@ class Base {
      * @param {string} url - API url
      * @returns {Promise}
      */
-    get({ id, successCallback, errorCallback, requestData, url, }) {
+    get({ id, successCallback, errorCallback, requestData, url }) {
         const apiUrl = url || this.getUrl(id);
         return this.makeRequest(HTTP_GET, id, apiUrl, successCallback, errorCallback, requestData);
     }
+
     /**
      * Generic API POST
      *
@@ -172,9 +209,10 @@ class Base {
      * @param {Function} successCallback - The success callback
      * @param {Function} errorCallback - The error callback
      */
-    post({ id, url, data, successCallback, errorCallback, }) {
+    post({ id, url, data, successCallback, errorCallback }) {
         return this.makeRequest(HTTP_POST, id, url, successCallback, errorCallback, data);
     }
+
     /**
      * Generic API PUT
      *
@@ -184,9 +222,10 @@ class Base {
      * @param {Function} successCallback - The success callback
      * @param {Function} errorCallback - The error callback
      */
-    put({ id, url, data, successCallback, errorCallback, }) {
+    put({ id, url, data, successCallback, errorCallback }) {
         return this.makeRequest(HTTP_PUT, id, url, successCallback, errorCallback, data);
     }
+
     /**
      * Generic API DELETE
      *
@@ -196,9 +235,10 @@ class Base {
      * @param {Function} errorCallback - The error callback
      * @param {Object} data optional data to delete
      */
-    delete({ id, url, data, successCallback, errorCallback, }) {
+    delete({ id, url, data, successCallback, errorCallback }) {
         return this.makeRequest(HTTP_DELETE, id, url, successCallback, errorCallback, data);
     }
+
     /**
      * Generic API CRUD operations
      *
@@ -210,7 +250,7 @@ class Base {
      * @param {Object} requestData - Optional info to be added to the API call such as params or request body data
      */
     makeRequest(method, id, url, successCallback, errorCallback, requestData = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             if (this.isDestroyed()) {
                 return;
             }
@@ -221,12 +261,11 @@ class Base {
             try {
                 const { data } = yield xhrMethod(Object.assign({ id: getTypedFileId(id), url }, requestData));
                 this.successHandler(data);
-            }
-            catch (error) {
+            } catch (error) {
                 this.errorHandler(error);
             }
         });
     }
 }
 export default Base;
-//# sourceMappingURL=Base.js.map
+// # sourceMappingURL=Base.js.map

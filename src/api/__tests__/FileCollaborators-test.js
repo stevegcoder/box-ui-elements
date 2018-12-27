@@ -1,4 +1,5 @@
 import FileCollaborators from '../FileCollaborators';
+
 let fileCollaborators;
 describe('api/FileCollaborators', () => {
     beforeEach(() => {
@@ -26,7 +27,8 @@ describe('api/FileCollaborators', () => {
                 entries: [collaborator],
             };
             fileCollaborators.successCallback = jest.fn();
-            const formattedResponse = Object.assign({}, response, { entries: [
+            const formattedResponse = Object.assign({}, response, {
+                entries: [
                     {
                         id: 123,
                         name: 'Kanye West',
@@ -36,10 +38,11 @@ describe('api/FileCollaborators', () => {
                             email: 'kwest@box.com',
                         },
                     },
-                ] });
+                ],
+            });
             fileCollaborators.successHandler(response);
             expect(fileCollaborators.successCallback).toBeCalledWith(formattedResponse);
         });
     });
 });
-//# sourceMappingURL=FileCollaborators-test.js.map
+// # sourceMappingURL=FileCollaborators-test.js.map

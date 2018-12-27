@@ -1,5 +1,6 @@
 import OpenWith from '../OpenWith';
 import mockOpenWithData from './MockOpenWithData.json';
+
 let openWith;
 describe('api/ContentOpenWith', () => {
     beforeEach(() => {
@@ -47,4 +48,4 @@ describe('api/ContentOpenWith', () => {
         });
     });
 });
-//# sourceMappingURL=OpenWith-test.js.map
+// # sourceMappingURL=OpenWith-test.js.map

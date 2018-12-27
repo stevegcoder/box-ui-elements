@@ -1,4 +1,5 @@
 import FileAccessStats from '../FileAccessStats';
+
 let accessStats;
 describe('api/FileAccessStats', () => {
     beforeEach(() => {
@@ -15,4 +16,4 @@ describe('api/FileAccessStats', () => {
         });
     });
 });
-//# sourceMappingURL=FileAccessStats-test.js.map
+// # sourceMappingURL=FileAccessStats-test.js.map

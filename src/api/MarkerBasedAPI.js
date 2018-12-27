@@ -1,11 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 /**
  * @was-flow
  * @file class for Box marker based API's to inherit common functionality from
@@ -13,6 +5,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
  */
 import { getTypedFileId } from '../util/file';
 import Base from './Base';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+
 class MarkerBasedApi extends Base {
     /**
      * Determines if the API has more items to fetch
@@ -23,6 +45,7 @@ class MarkerBasedApi extends Base {
     hasMoreItems(marker) {
         return marker !== null && marker !== '';
     }
+
     /**
      * Helper for get
      *
@@ -34,15 +57,14 @@ class MarkerBasedApi extends Base {
      * @private
      */
     markerGetRequest(id, marker, limit, shouldFetchAll, requestData = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             if (this.isDestroyed()) {
                 return;
             }
             // Make the XHR request
             try {
                 const url = this.getUrl(id);
-                const queryParams = Object.assign({}, requestData, { marker,
-                    limit });
+                const queryParams = Object.assign({}, requestData, { marker, limit });
                 const { data } = yield this.xhr.get({
                     url,
                     id: getTypedFileId(id),
@@ -56,12 +78,12 @@ class MarkerBasedApi extends Base {
                     return;
                 }
                 this.successHandler(this.data);
-            }
-            catch (error) {
+            } catch (error) {
                 this.errorHandler(error);
             }
         });
     }
+
     /**
      * Marker based API get
      *
@@ -73,8 +95,8 @@ class MarkerBasedApi extends Base {
      * @param {Object} params the request query params
      * @param {boolean} shouldFetchAll true if should get all the pages before calling the sucessCallback
      */
-    markerGet({ id, successCallback, errorCallback, marker = '', limit = 1000, requestData, shouldFetchAll = true, }) {
-        return __awaiter(this, void 0, void 0, function* () {
+    markerGet({ id, successCallback, errorCallback, marker = '', limit = 1000, requestData, shouldFetchAll = true }) {
+        return __awaiter(this, void 0, void 0, function*() {
             this.successCallback = successCallback;
             this.errorCallback = errorCallback;
             return this.markerGetRequest(id, marker, limit, shouldFetchAll, requestData);
@@ -82,4 +104,4 @@ class MarkerBasedApi extends Base {
     }
 }
 export default MarkerBasedApi;
-//# sourceMappingURL=MarkerBasedAPI.js.map
+// # sourceMappingURL=MarkerBasedAPI.js.map

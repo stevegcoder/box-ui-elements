@@ -1,2 +1,2 @@
 export { default } from './EmptyState';
-//# sourceMappingURL=index.js.map
+// # sourceMappingURL=index.js.map

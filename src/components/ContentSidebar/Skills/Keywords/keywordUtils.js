@@ -7,7 +7,7 @@
     Pill;
 }
 from;
-'./flowTypes';
+('./flowTypes');
 /**
  * Converts skill card entries into pills
  *
@@ -15,10 +15,14 @@ from;
  * @param {Array<Object>} props - keyword entries
  * @return {Array<Object>} pills
  */
-const getPills = (keywords = []) => keywords.map((keyword, index) => ({
-    value: index,
-    text: ((keyword.text)), any
-}), string);
-;
+const getPills = (keywords = []) =>
+    keywords.map(
+        (keyword, index) => ({
+            value: index,
+            text: keyword.text,
+            any,
+        }),
+        string,
+    );
 export default getPills;
-//# sourceMappingURL=keywordUtils.js.map
+// # sourceMappingURL=keywordUtils.js.map

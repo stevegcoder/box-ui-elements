@@ -47,4 +47,4 @@ function getRandomValues(buffer) {
     return copy;
 }
 export { getCrypto, digest, getRandomValues };
-//# sourceMappingURL=webcrypto.js.map
+// # sourceMappingURL=webcrypto.js.map

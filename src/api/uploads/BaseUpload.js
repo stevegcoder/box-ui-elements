@@ -5,6 +5,7 @@
  */
 import Base from '../Base';
 import { DEFAULT_RETRY_DELAY_MS, MS_IN_S } from '../../constants';
+
 const MAX_RETRY = 5;
 class BaseUpload extends Base {
     constructor() {
@@ -44,7 +45,7 @@ class BaseUpload extends Base {
          * @param {Object} error - preflight error
          * @return {void}
          */
-        this.preflightErrorHandler = (error) => {
+        this.preflightErrorHandler = error => {
             if (this.isDestroyed()) {
                 return;
             }
@@ -58,8 +59,7 @@ class BaseUpload extends Base {
             if (this.retryCount >= MAX_RETRY) {
                 this.errorCallback(errorData);
                 // Automatically handle name conflict errors
-            }
-            else if (errorData && errorData.status === 409) {
+            } else if (errorData && errorData.status === 409) {
                 if (this.overwrite) {
                     const conflictFileId = errorData.context_info.conflicts.id;
                     if (!this.fileId && !!conflictFileId) {
@@ -67,21 +67,25 @@ class BaseUpload extends Base {
                     }
                     // Error response contains file ID to upload a new file version for
                     this.makePreflightRequest();
-                }
-                else {
+                } else {
                     // Otherwise, reupload and append timestamp
                     // 'test.jpg' becomes 'test-TIMESTAMP.jpg'
                     const extension = this.fileName.substr(this.fileName.lastIndexOf('.')) || '';
-                    this.fileName = `${this.fileName.substr(0, this.fileName.lastIndexOf('.'))}-${Date.now()}${extension}`;
+                    this.fileName = `${this.fileName.substr(
+                        0,
+                        this.fileName.lastIndexOf('.'),
+                    )}-${Date.now()}${extension}`;
                     this.makePreflightRequest();
                 }
                 this.retryCount += 1;
                 // When rate limited, retry after interval defined in header
-            }
-            else if (errorData && (errorData.status === 429 || errorData.code === 'too_many_requests')) {
+            } else if (errorData && (errorData.status === 429 || errorData.code === 'too_many_requests')) {
                 let retryAfterMs = DEFAULT_RETRY_DELAY_MS;
                 if (errorData.headers) {
-                    const retryAfterSec = parseInt(errorData.headers['retry-after'] || errorData.headers.get('Retry-After'), 10);
+                    const retryAfterSec = parseInt(
+                        errorData.headers['retry-after'] || errorData.headers.get('Retry-After'),
+                        10,
+                    );
                     if (!Number.isNaN(retryAfterSec)) {
                         retryAfterMs = retryAfterSec * MS_IN_S;
                     }
@@ -89,19 +93,20 @@ class BaseUpload extends Base {
                 this.retryTimeout = setTimeout(this.makePreflightRequest, retryAfterMs);
                 this.retryCount += 1;
                 // If another error status that isn't name conflict or rate limiting, fail upload
-            }
-            else if (errorData &&
+            } else if (
+                errorData &&
                 (errorData.status || errorData.message === 'Failed to fetch') &&
-                typeof this.errorCallback === 'function') {
+                typeof this.errorCallback === 'function'
+            ) {
                 this.errorCallback(errorData);
                 // Retry with exponential backoff for other failures since these are likely to be network errors
-            }
-            else {
+            } else {
                 this.retryTimeout = setTimeout(this.makePreflightRequest, Math.pow(2, this.retryCount) * MS_IN_S);
                 this.retryCount += 1;
             }
         };
     }
+
     /**
      * Read a blob with FileReader
      *
@@ -123,4 +128,4 @@ class BaseUpload extends Base {
     }
 }
 export default BaseUpload;
-//# sourceMappingURL=BaseUpload.js.map
+// # sourceMappingURL=BaseUpload.js.map

@@ -1,4 +1,5 @@
 import { getBadItemError, getBadPermissionsError, isUserCorrectableError } from '../error';
+
 describe('util/error', () => {
     describe('getBadItemError()', () => {
         test('should set and get correctly', () => {
@@ -26,4 +27,4 @@ describe('util/error', () => {
         });
     });
 });
-//# sourceMappingURL=error-test.js.map
+// # sourceMappingURL=error-test.js.map

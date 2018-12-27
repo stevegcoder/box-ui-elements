@@ -23,6 +23,7 @@ import FeedAPI from './Feed';
 import AppIntegrationsAPI from './AppIntegrations';
 import OpenWithAPI from './OpenWith';
 import { DEFAULT_HOSTNAME_API, DEFAULT_HOSTNAME_UPLOAD, TYPE_FOLDER, TYPE_FILE, TYPE_WEBLINK } from '../constants';
+
 class APIFactory {
     /**
      * [constructor]
@@ -43,6 +44,7 @@ class APIFactory {
             cache: options.cache || new Cache(),
         });
     }
+
     /**
      * [destructor]
      *
@@ -118,17 +120,18 @@ class APIFactory {
             this.options.cache = new Cache();
         }
     }
+
     /**
      * Gets the cache instance
      *
      * @return {Cache} cache instance
      */
     getCache() {
-        return ((this.options.cache));
+        return this.options.cache;
         any;
         APICache;
-        ;
     }
+
     /**
      * Returns the API based on type of item
      *
@@ -153,6 +156,7 @@ class APIFactory {
         }
         return api;
     }
+
     /**
      * API for file
      *
@@ -163,6 +167,7 @@ class APIFactory {
         this.fileAPI = new FileAPI(this.options);
         return this.fileAPI;
     }
+
     /**
      * API for web links
      *
@@ -173,6 +178,7 @@ class APIFactory {
         this.weblinkAPI = new WebLinkAPI(this.options);
         return this.weblinkAPI;
     }
+
     /**
      * API for plain uploads
      *
@@ -183,6 +189,7 @@ class APIFactory {
         this.plainUploadAPI = new PlainUploadAPI(this.options);
         return this.plainUploadAPI;
     }
+
     /**
      * API for chunked uploads
      *
@@ -193,6 +200,7 @@ class APIFactory {
         this.chunkedUploadAPI = new ChunkedUploadAPI(this.options);
         return this.chunkedUploadAPI;
     }
+
     /**
      * API for folder
      *
@@ -203,6 +211,7 @@ class APIFactory {
         this.folderAPI = new FolderAPI(this.options);
         return this.folderAPI;
     }
+
     /**
      * API for search
      *
@@ -213,6 +222,7 @@ class APIFactory {
         this.searchAPI = new SearchAPI(this.options);
         return this.searchAPI;
     }
+
     /**
      * API for recents
      *
@@ -223,6 +233,7 @@ class APIFactory {
         this.recentsAPI = new RecentsAPI(this.options);
         return this.recentsAPI;
     }
+
     /**
      * API for metadata
      *
@@ -236,6 +247,7 @@ class APIFactory {
         this.metadataAPI = new MetadataAPI(this.options);
         return this.metadataAPI;
     }
+
     /**
      * API for versions
      *
@@ -249,6 +261,7 @@ class APIFactory {
         this.versionsAPI = new VersionsAPI(this.options);
         return this.versionsAPI;
     }
+
     /**
      * API for comments
      *
@@ -262,6 +275,7 @@ class APIFactory {
         this.commentsAPI = new CommentsAPI(this.options);
         return this.commentsAPI;
     }
+
     /**
      * API for tasks
      *
@@ -275,6 +289,7 @@ class APIFactory {
         this.tasksAPI = new TasksAPI(this.options);
         return this.tasksAPI;
     }
+
     /**
      * API for tasks
      *
@@ -288,6 +303,7 @@ class APIFactory {
         this.taskAssignmentsAPI = new TaskAssignmentsAPI(this.options);
         return this.taskAssignmentsAPI;
     }
+
     /**
      * API for file access stats
      *
@@ -301,6 +317,7 @@ class APIFactory {
         this.fileAccessStatsAPI = new FileAccessStatsAPI(this.options);
         return this.fileAccessStatsAPI;
     }
+
     /**
      * API for file collaborators
      *
@@ -314,6 +331,7 @@ class APIFactory {
         this.fileCollaboratorsAPI = new FileCollaboratorsAPI(this.options);
         return this.fileCollaboratorsAPI;
     }
+
     /**
      * API for Users
      *
@@ -327,6 +345,7 @@ class APIFactory {
         this.usersAPI = new UsersAPI(this.options);
         return this.usersAPI;
     }
+
     /**
      * API for Feed Items
      *
@@ -340,6 +359,7 @@ class APIFactory {
         this.feedItemsAPI = new FeedAPI(this.options);
         return this.feedItemsAPI;
     }
+
     /**
      * API for Open With
      *
@@ -353,6 +373,7 @@ class APIFactory {
         this.openWithAPI = new OpenWithAPI(this.options);
         return this.openWithAPI;
     }
+
     /**
      * API for the App Integrations endpoint
      *
@@ -368,4 +389,4 @@ class APIFactory {
     }
 }
 export default APIFactory;
-//# sourceMappingURL=APIFactory.js.map
+// # sourceMappingURL=APIFactory.js.map

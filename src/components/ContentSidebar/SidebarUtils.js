@@ -4,11 +4,12 @@
  * @author Box
  */
 import { hasSkills as hasSkillsData } from './Skills/skillUtils';
+
 {
     MetadataSidebarProps;
 }
 from;
-'./MetadataSidebar';
+('./MetadataSidebar');
 class SidebarUtils {
     /**
      * Determines if we can render the details sidebar.
@@ -21,6 +22,7 @@ class SidebarUtils {
         const { hasProperties, hasAccessStats, hasClassification, hasVersions, hasNotices } = detailsSidebarProps;
         return !!hasProperties || !!hasAccessStats || !!hasClassification || !!hasVersions || !!hasNotices;
     }
+
     /**
      * Determines if we can render the metadata sidebar.
      * Only relies on props.
@@ -31,6 +33,7 @@ class SidebarUtils {
     static canHaveMetadataSidebar(props) {
         return !!props.hasMetadata;
     }
+
     /**
      * Determines if we can render the activity sidebar.
      * Only relies on props.
@@ -41,6 +44,7 @@ class SidebarUtils {
     static canHaveActivitySidebar(props) {
         return !!props.hasActivityFeed;
     }
+
     /**
      * Determines if we can render the skills sidebar.
      * Only relies on props.
@@ -51,6 +55,7 @@ class SidebarUtils {
     static canHaveSkillsSidebar(props) {
         return !!props.hasSkills;
     }
+
     /**
      * Determines if we can render the sidebar.
      * Only relies on props.
@@ -59,11 +64,14 @@ class SidebarUtils {
      * @return {Boolean} true if we should have a sidebar
      */
     static canHaveSidebar(props) {
-        return (SidebarUtils.canHaveDetailsSidebar(props) ||
+        return (
+            SidebarUtils.canHaveDetailsSidebar(props) ||
             SidebarUtils.canHaveActivitySidebar(props) ||
             SidebarUtils.canHaveSkillsSidebar(props) ||
-            SidebarUtils.canHaveMetadataSidebar(props));
+            SidebarUtils.canHaveMetadataSidebar(props)
+        );
     }
+
     /**
      * Determines if we should bother rendering the skills sidebar.
      * Relies on props and file data.
@@ -76,6 +84,7 @@ class SidebarUtils {
     static shouldRenderSkillsSidebar(props, file) {
         return !!file && SidebarUtils.canHaveSkillsSidebar(props) && hasSkillsData(file);
     }
+
     /**
      * Determines if we should bother rendering the metadata sidebar.
      * Relies on props and metadata data and feature enabled or not.
@@ -89,9 +98,12 @@ class SidebarUtils {
     static shouldRenderMetadataSidebar(props, editors) {
         const { metadataSidebarProps = {} } = props;
         const { isFeatureEnabled = true } = metadataSidebarProps;
-        return (SidebarUtils.canHaveMetadataSidebar(props) &&
-            (isFeatureEnabled || (Array.isArray(editors) && editors.length > 0)));
+        return (
+            SidebarUtils.canHaveMetadataSidebar(props) &&
+            (isFeatureEnabled || (Array.isArray(editors) && editors.length > 0))
+        );
     }
+
     /**
      * Determines if we should bother rendering the sidebar.
      * Relies on props and file data.
@@ -101,12 +113,14 @@ class SidebarUtils {
      * @return {Boolean} true if we should fetch or render
      */
     static shouldRenderSidebar(props, file, editors) {
-        return (!!file &&
+        return (
+            !!file &&
             (SidebarUtils.canHaveDetailsSidebar(props) ||
                 SidebarUtils.shouldRenderSkillsSidebar(props, file) ||
                 SidebarUtils.canHaveActivitySidebar(props) ||
-                SidebarUtils.shouldRenderMetadataSidebar(props, editors)));
+                SidebarUtils.shouldRenderMetadataSidebar(props, editors))
+        );
     }
 }
 export default SidebarUtils;
-//# sourceMappingURL=SidebarUtils.js.map
+// # sourceMappingURL=SidebarUtils.js.map

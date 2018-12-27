@@ -1,17 +1,20 @@
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
-            t[p[i]] = s[p[i]];
-    return t;
-};
 import Feed from '../Feed';
 import messages from '../../components/messages';
 import { IS_ERROR_DISPLAYED } from '../../constants';
 import * as sorter from '../../util/sorter';
 import * as error from '../../util/error';
+
+const __rest =
+    (this && this.__rest) ||
+    function(s, e) {
+        const t = {};
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+        if (s != null && typeof Object.getOwnPropertySymbols === 'function')
+            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++)
+                if (e.indexOf(p[i]) < 0) t[p[i]] = s[p[i]];
+        return t;
+    };
+
 jest.mock('lodash/uniqueId', () => () => 'uniqueId');
 jest.mock('../Tasks', () => {
     const task = {
@@ -59,50 +62,56 @@ jest.mock('../Tasks', () => {
         }),
     }));
 });
-jest.mock('../TaskAssignments', () => jest.fn().mockImplementation(() => ({
-    updateTaskAssignment: jest.fn().mockImplementation(({ successCallback }) => {
-        successCallback();
-    }),
-    createTaskAssignment: jest.fn().mockImplementation(({ successCallback }) => {
-        successCallback();
-    }),
-})));
-jest.mock('../Comments', () => jest.fn().mockImplementation(() => ({
-    getComments: jest.fn().mockReturnValue({
-        total_count: 1,
-        entries: [
-            {
-                type: 'comment',
-                id: '123',
-                created_at: 'Thu Sep 26 33658 19:46:39 GMT-0600 (CST)',
-                tagged_message: 'test @[123:Jeezy] @[10:Kanye West]',
-                created_by: { name: 'Akon', id: 11 },
-            },
-        ],
-    }),
-    deleteComment: jest.fn().mockImplementation(({ successCallback }) => {
-        successCallback();
-    }),
-    createComment: jest.fn().mockImplementation(({ successCallback }) => {
-        successCallback();
-    }),
-})));
-jest.mock('../Versions', () => jest.fn().mockImplementation(() => ({
-    getVersions: jest.fn().mockReturnValue({
-        total_count: 1,
-        entries: [
-            {
-                action: 'upload',
-                type: 'file_version',
-                id: 123,
-                created_at: 'Thu Sep 20 33658 19:45:39 GMT-0600 (CST)',
-                trashed_at: 1234567891,
-                modified_at: 1234567891,
-                modified_by: { name: 'Akon', id: 11 },
-            },
-        ],
-    }),
-})));
+jest.mock('../TaskAssignments', () =>
+    jest.fn().mockImplementation(() => ({
+        updateTaskAssignment: jest.fn().mockImplementation(({ successCallback }) => {
+            successCallback();
+        }),
+        createTaskAssignment: jest.fn().mockImplementation(({ successCallback }) => {
+            successCallback();
+        }),
+    })),
+);
+jest.mock('../Comments', () =>
+    jest.fn().mockImplementation(() => ({
+        getComments: jest.fn().mockReturnValue({
+            total_count: 1,
+            entries: [
+                {
+                    type: 'comment',
+                    id: '123',
+                    created_at: 'Thu Sep 26 33658 19:46:39 GMT-0600 (CST)',
+                    tagged_message: 'test @[123:Jeezy] @[10:Kanye West]',
+                    created_by: { name: 'Akon', id: 11 },
+                },
+            ],
+        }),
+        deleteComment: jest.fn().mockImplementation(({ successCallback }) => {
+            successCallback();
+        }),
+        createComment: jest.fn().mockImplementation(({ successCallback }) => {
+            successCallback();
+        }),
+    })),
+);
+jest.mock('../Versions', () =>
+    jest.fn().mockImplementation(() => ({
+        getVersions: jest.fn().mockReturnValue({
+            total_count: 1,
+            entries: [
+                {
+                    action: 'upload',
+                    type: 'file_version',
+                    id: 123,
+                    created_at: 'Thu Sep 20 33658 19:45:39 GMT-0600 (CST)',
+                    trashed_at: 1234567891,
+                    modified_at: 1234567891,
+                    modified_by: { name: 'Akon', id: 11 },
+                },
+            ],
+        }),
+    })),
+);
 describe('api/Feed', () => {
     let feed;
     const comments = {
@@ -369,8 +378,14 @@ describe('api/Feed', () => {
             const updatedState = 'completed';
             const successCb = jest.fn();
             const taskId = '1234';
-            feed.updateTaskAssignmentSuccessCallback(taskId, Object.assign({}, tasks.entries[0].task_assignment_collection.entries[0], { message: updatedState }), successCb);
-            expect(feed.updateFeedItem.mock.calls[0][0].task_assignment_collection.entries[0].resolution_state).toBe(updatedState);
+            feed.updateTaskAssignmentSuccessCallback(
+                taskId,
+                Object.assign({}, tasks.entries[0].task_assignment_collection.entries[0], { message: updatedState }),
+                successCb,
+            );
+            expect(feed.updateFeedItem.mock.calls[0][0].task_assignment_collection.entries[0].resolution_state).toBe(
+                updatedState,
+            );
             expect(successCb).toBeCalled();
         });
     });
@@ -398,7 +413,8 @@ describe('api/Feed', () => {
         test('should call the success callback', () => {
             const task = tasks.entries[0];
             feed.updateTaskSuccessCallback(task, successCb);
-            const { task_assignment_collection } = task, rest = __rest(task, ["task_assignment_collection"]);
+            const { task_assignment_collection } = task,
+                rest = __rest(task, ['task_assignment_collection']);
             expect(feed.updateFeedItem).toBeCalledWith(Object.assign({}, rest, { isPending: false }), task.id);
             expect(successCb).toBeCalled();
         });
@@ -624,7 +640,9 @@ describe('api/Feed', () => {
         });
     });
     describe('fetchTaskAssignments()', () => {
-        const tasksEntriesWithAssignments = Object.assign({}, tasks.entries[0], { task_assignment_collection: Object.assign({}, taskAssignments) });
+        const tasksEntriesWithAssignments = Object.assign({}, tasks.entries[0], {
+            task_assignment_collection: Object.assign({}, taskAssignments),
+        });
         beforeEach(() => {
             feed.appendAssignmentsToTask = jest.fn().mockReturnValue(tasksEntriesWithAssignments);
             feed.errorCallback = jest.fn();
@@ -633,7 +651,9 @@ describe('api/Feed', () => {
             feed.fetchTaskAssignments(tasks).then(tasksWithAssignments => {
                 expect(feed.taskAssignmentsAPI.pop().getAssignments).toHaveBeenCalledTimes(tasks.entries.length);
                 expect(feed.appendAssignmentsToTask).toHaveBeenCalledTimes(tasks.entries.length);
-                expect(tasksWithAssignments).toEqual(Object.assign({}, tasks, { entries: [tasksEntriesWithAssignments] }));
+                expect(tasksWithAssignments).toEqual(
+                    Object.assign({}, tasks, { entries: [tasksEntriesWithAssignments] }),
+                );
                 done();
             });
         });
@@ -928,4 +948,4 @@ describe('api/Feed', () => {
         });
     });
 });
-//# sourceMappingURL=Feed-test.js.map
+// # sourceMappingURL=Feed-test.js.map

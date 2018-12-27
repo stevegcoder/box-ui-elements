@@ -3,20 +3,57 @@
  * @file Helper for the box metadata related API
  * @author Box
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import getProp from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
 import File from './File';
 import { getBadItemError, getBadPermissionsError, isUserCorrectableError } from '../util/error';
 import { getTypedFileId } from '../util/file';
-import { ERROR_CODE_FETCH_CLASSIFICATION, HEADER_CONTENT_TYPE, METADATA_SCOPE_ENTERPRISE, METADATA_SCOPE_GLOBAL, METADATA_TEMPLATE_PROPERTIES, METADATA_TEMPLATE_CLASSIFICATION, METADATA_TEMPLATE_SKILLS, FIELD_METADATA_SKILLS, CACHE_PREFIX_METADATA, ERROR_CODE_UPDATE_SKILLS, ERROR_CODE_UPDATE_METADATA, ERROR_CODE_CREATE_METADATA, ERROR_CODE_DELETE_METADATA, ERROR_CODE_FETCH_EDITORS, ERROR_CODE_FETCH_SKILLS, } from '../constants';
+import {
+    ERROR_CODE_FETCH_CLASSIFICATION,
+    HEADER_CONTENT_TYPE,
+    METADATA_SCOPE_ENTERPRISE,
+    METADATA_SCOPE_GLOBAL,
+    METADATA_TEMPLATE_PROPERTIES,
+    METADATA_TEMPLATE_CLASSIFICATION,
+    METADATA_TEMPLATE_SKILLS,
+    FIELD_METADATA_SKILLS,
+    CACHE_PREFIX_METADATA,
+    ERROR_CODE_UPDATE_SKILLS,
+    ERROR_CODE_UPDATE_METADATA,
+    ERROR_CODE_CREATE_METADATA,
+    ERROR_CODE_DELETE_METADATA,
+    ERROR_CODE_FETCH_EDITORS,
+    ERROR_CODE_FETCH_SKILLS,
+} from '../constants';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 class Metadata extends File {
     /**
      * Creates a key for the metadata cache
@@ -27,6 +64,7 @@ class Metadata extends File {
     getMetadataCacheKey(id) {
         return `${CACHE_PREFIX_METADATA}${id}`;
     }
+
     /**
      * Creates a key for the skills cache
      *
@@ -36,6 +74,7 @@ class Metadata extends File {
     getSkillsCacheKey(id) {
         return `${this.getMetadataCacheKey(id)}_skills`;
     }
+
     /**
      * Creates a key for the classification cache
      *
@@ -45,6 +84,7 @@ class Metadata extends File {
     getClassificationCacheKey(id) {
         return `${this.getMetadataCacheKey(id)}_classification`;
     }
+
     /**
      * API URL for metadata
      *
@@ -59,6 +99,7 @@ class Metadata extends File {
         }
         return baseUrl;
     }
+
     /**
      * API URL for metadata templates
      *
@@ -68,6 +109,7 @@ class Metadata extends File {
     getMetadataTemplateUrl(scope) {
         return `${this.getBaseApiUrl()}/metadata_templates/${scope}`;
     }
+
     /**
      * Returns the custom properties template
      *
@@ -81,6 +123,7 @@ class Metadata extends File {
             hidden: false,
         };
     }
+
     /**
      * Utility to create editors from metadata instances
      * and metadata templates.
@@ -106,6 +149,7 @@ class Metadata extends File {
             },
         };
     }
+
     /**
      * Gets metadata templates for enterprise
      *
@@ -114,23 +158,25 @@ class Metadata extends File {
      * @return {Object} array of metadata templates
      */
     getTemplates(id, scope) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             let templates = {};
             try {
                 templates = yield this.xhr.get({
                     url: this.getMetadataTemplateUrl(scope),
                     id: getTypedFileId(id),
                 });
-            }
-            catch (e) {
+            } catch (e) {
                 const { status } = e;
                 if (isUserCorrectableError(status)) {
                     throw e;
                 }
             }
-            return getProp(templates, 'data.entries', []).filter(template => !template.hidden && template.templateKey !== METADATA_TEMPLATE_CLASSIFICATION);
+            return getProp(templates, 'data.entries', []).filter(
+                template => !template.hidden && template.templateKey !== METADATA_TEMPLATE_CLASSIFICATION,
+            );
         });
     }
+
     /**
      * Gets metadata instances for file
      *
@@ -138,13 +184,18 @@ class Metadata extends File {
      * @return {Object} array of metadata instances
      */
     getInstances(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return getProp(yield this.xhr.get({
-                url: this.getMetadataUrl(id),
-                id: getTypedFileId(id),
-            }), 'data.entries', []);
+        return __awaiter(this, void 0, void 0, function*() {
+            return getProp(
+                yield this.xhr.get({
+                    url: this.getMetadataUrl(id),
+                    id: getTypedFileId(id),
+                }),
+                'data.entries',
+                [],
+            );
         });
     }
+
     /**
      * Gets skills for file
      *
@@ -152,7 +203,7 @@ class Metadata extends File {
      * @return {Object} array of metadata instances
      */
     getSkills(file, successCallback, errorCallback, forceFetch = false) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.errorCode = ERROR_CODE_FETCH_SKILLS;
             const { id } = file;
             if (!id) {
@@ -188,12 +239,12 @@ class Metadata extends File {
                     cache.set(key, cards);
                     this.successHandler(cards);
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     /**
      * API for patching skills on a file
      *
@@ -205,7 +256,7 @@ class Metadata extends File {
      * @return {Promise}
      */
     updateSkills(file, operations, successCallback, errorCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.errorCode = ERROR_CODE_UPDATE_SKILLS;
             const { id, permissions } = file;
             if (!id || !permissions) {
@@ -233,12 +284,12 @@ class Metadata extends File {
                     this.getCache().set(this.getSkillsCacheKey(id), cards);
                     this.successHandler(cards);
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     /**
      * Gets classification for a file.
      *
@@ -250,7 +301,7 @@ class Metadata extends File {
      * @return {Promise}
      */
     getClassification(file, successCallback, errorCallback, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             const { id } = file;
             this.successCallback = successCallback;
             this.errorCallback = errorCallback;
@@ -281,12 +332,12 @@ class Metadata extends File {
                     cache.set(key, classification.data);
                     this.successHandler(cache.get(key));
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     /**
      * API for patching metadata on file
      *
@@ -298,7 +349,7 @@ class Metadata extends File {
      * @return {Promise}
      */
     updateMetadata(file, template, operations, successCallback, errorCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.errorCode = ERROR_CODE_UPDATE_METADATA;
             const { id, permissions } = file;
             if (!id || !permissions) {
@@ -326,15 +377,19 @@ class Metadata extends File {
                     const key = this.getMetadataCacheKey(id);
                     const cachedMetadata = cache.get(key);
                     const editor = this.createEditor(metadata.data, template, canEdit);
-                    cachedMetadata.editors.splice(cachedMetadata.editors.findIndex(({ instance }) => instance.id === editor.instance.id), 1, editor);
+                    cachedMetadata.editors.splice(
+                        cachedMetadata.editors.findIndex(({ instance }) => instance.id === editor.instance.id),
+                        1,
+                        editor,
+                    );
                     this.successHandler(editor);
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     /**
      * API for creating metadata on file
      *
@@ -345,7 +400,7 @@ class Metadata extends File {
      * @return {Promise}
      */
     createMetadata(file, template, successCallback, errorCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.errorCode = ERROR_CODE_CREATE_METADATA;
             if (!file || !template) {
                 errorCallback(getBadItemError(), this.errorCode);
@@ -357,7 +412,8 @@ class Metadata extends File {
                 return;
             }
             const canEdit = !!permissions.can_upload;
-            const isProperties = template.templateKey === METADATA_TEMPLATE_PROPERTIES && template.scope === METADATA_SCOPE_GLOBAL;
+            const isProperties =
+                template.templateKey === METADATA_TEMPLATE_PROPERTIES && template.scope === METADATA_SCOPE_GLOBAL;
             if (!canEdit || (is_externally_owned && !isProperties)) {
                 errorCallback(getBadPermissionsError(), this.errorCode);
                 return;
@@ -378,12 +434,12 @@ class Metadata extends File {
                     cachedMetadata.editors.push(editor);
                     this.successHandler(editor);
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     /**
      * API for deleting metadata on file
      *
@@ -395,7 +451,7 @@ class Metadata extends File {
      * @return {Promise}
      */
     deleteMetadata(file, template, successCallback, errorCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.errorCode = ERROR_CODE_DELETE_METADATA;
             if (!file || !template) {
                 errorCallback(getBadItemError(), this.errorCode);
@@ -422,15 +478,20 @@ class Metadata extends File {
                     const cache = this.getCache();
                     const key = this.getMetadataCacheKey(id);
                     const metadata = cache.get(key);
-                    metadata.editors.splice(metadata.editors.findIndex(editor => editor.template.scope === scope && editor.template.templateKey === templateKey), 1);
+                    metadata.editors.splice(
+                        metadata.editors.findIndex(
+                            editor => editor.template.scope === scope && editor.template.templateKey === templateKey,
+                        ),
+                        1,
+                    );
                     this.successHandler();
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     /**
      * API for getting metadata editors
      *
@@ -440,7 +501,7 @@ class Metadata extends File {
      * @return {Promise}
      */
     getEditors(file, successCallback, errorCallback, getMetadata, hasMetadataFeature, forceFetch = false) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function*() {
             this.errorCode = ERROR_CODE_FETCH_EDITORS;
             const { id, permissions, is_externally_owned } = file;
             if (!id || !permissions) {
@@ -508,12 +569,12 @@ class Metadata extends File {
                 };
                 cache.set(key, metadata);
                 this.successHandler(metadata);
-            }
-            catch (e) {
+            } catch (e) {
                 this.errorHandler(e);
             }
         });
     }
+
     createTemplateFromLegacy(legacyInstances, templateKey, scope) {
         const fields = [];
         const legacyInstance = legacyInstances.find(instance => {
@@ -548,4 +609,4 @@ class Metadata extends File {
     }
 }
 export default Metadata;
-//# sourceMappingURL=Metadata.js.map
+// # sourceMappingURL=Metadata.js.map

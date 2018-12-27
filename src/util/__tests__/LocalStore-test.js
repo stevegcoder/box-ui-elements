@@ -1,5 +1,6 @@
 import { withData } from 'leche';
 import LocalStore from '../LocalStore';
+
 const localStorageMock = (() => {
     const store = {};
     return {
@@ -79,4 +80,4 @@ describe('util/LocalStore', () => {
         });
     });
 });
-//# sourceMappingURL=LocalStore-test.js.map
+// # sourceMappingURL=LocalStore-test.js.map

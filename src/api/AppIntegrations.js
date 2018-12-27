@@ -5,6 +5,7 @@
  */
 import Base from './Base';
 import { TYPE_FILE, ERROR_CODE_EXECUTE_INTEGRATION } from '../constants';
+
 class AppIntegrations extends Base {
     /**
      * API URL for Open With
@@ -18,6 +19,7 @@ class AppIntegrations extends Base {
         }
         return `${this.getBaseApiUrl()}/app_integrations/${integrationId}`;
     }
+
     /**
      * API endpoint to execute an integration, given an ID
      *
@@ -52,4 +54,4 @@ class AppIntegrations extends Base {
     }
 }
 export default AppIntegrations;
-//# sourceMappingURL=AppIntegrations.js.map
+// # sourceMappingURL=AppIntegrations.js.map

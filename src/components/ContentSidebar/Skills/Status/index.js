@@ -1,3 +1,3 @@
 // @was-flow
 export { default } from './Status';
-//# sourceMappingURL=index.js.map
+// # sourceMappingURL=index.js.map

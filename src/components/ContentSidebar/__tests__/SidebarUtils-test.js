@@ -1,5 +1,6 @@
 import SidebarUtils from '../SidebarUtils';
 import * as skillUtils from '../Skills/skillUtils';
+
 describe('components/ContentSidebar/SidebarUtil', () => {
     describe('canHaveSidebar()', () => {
         test('should return false when nothing is wanted in the sidebar', () => {
@@ -9,35 +10,45 @@ describe('components/ContentSidebar/SidebarUtil', () => {
             expect(SidebarUtils.canHaveSidebar({ hasSkills: true })).toBeTruthy();
         });
         test('should return true when properties should render', () => {
-            expect(SidebarUtils.canHaveSidebar({
-                detailsSidebarProps: { hasProperties: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveSidebar({
+                    detailsSidebarProps: { hasProperties: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when access stats should render', () => {
-            expect(SidebarUtils.canHaveSidebar({
-                detailsSidebarProps: { hasAccessStats: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveSidebar({
+                    detailsSidebarProps: { hasAccessStats: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when metadata should render', () => {
             expect(SidebarUtils.canHaveSidebar({ hasMetadata: true })).toBeTruthy();
         });
         test('should return true when classification should render', () => {
-            expect(SidebarUtils.canHaveSidebar({
-                detailsSidebarProps: { hasClassification: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveSidebar({
+                    detailsSidebarProps: { hasClassification: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when activity feed should render', () => {
             expect(SidebarUtils.canHaveSidebar({ hasActivityFeed: true })).toBeTruthy();
         });
         test('should return true when versions should render', () => {
-            expect(SidebarUtils.canHaveSidebar({
-                detailsSidebarProps: { hasVersions: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveSidebar({
+                    detailsSidebarProps: { hasVersions: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when notices should render', () => {
-            expect(SidebarUtils.canHaveSidebar({
-                detailsSidebarProps: { hasNotices: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveSidebar({
+                    detailsSidebarProps: { hasNotices: true },
+                }),
+            ).toBeTruthy();
         });
     });
     describe('canHaveDetailsSidebar()', () => {
@@ -45,29 +56,39 @@ describe('components/ContentSidebar/SidebarUtil', () => {
             expect(SidebarUtils.canHaveDetailsSidebar({})).toBeFalsy();
         });
         test('should return true when properties should render', () => {
-            expect(SidebarUtils.canHaveDetailsSidebar({
-                detailsSidebarProps: { hasProperties: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveDetailsSidebar({
+                    detailsSidebarProps: { hasProperties: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when access stats should render', () => {
-            expect(SidebarUtils.canHaveDetailsSidebar({
-                detailsSidebarProps: { hasAccessStats: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveDetailsSidebar({
+                    detailsSidebarProps: { hasAccessStats: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when classification should render', () => {
-            expect(SidebarUtils.canHaveDetailsSidebar({
-                detailsSidebarProps: { hasClassification: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveDetailsSidebar({
+                    detailsSidebarProps: { hasClassification: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when versions should render', () => {
-            expect(SidebarUtils.canHaveDetailsSidebar({
-                detailsSidebarProps: { hasVersions: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveDetailsSidebar({
+                    detailsSidebarProps: { hasVersions: true },
+                }),
+            ).toBeTruthy();
         });
         test('should return true when notices should render', () => {
-            expect(SidebarUtils.canHaveDetailsSidebar({
-                detailsSidebarProps: { hasNotices: true },
-            })).toBeTruthy();
+            expect(
+                SidebarUtils.canHaveDetailsSidebar({
+                    detailsSidebarProps: { hasNotices: true },
+                }),
+            ).toBeTruthy();
         });
     });
     describe('shouldRenderSkillsSidebar()', () => {
@@ -112,9 +133,11 @@ describe('components/ContentSidebar/SidebarUtil', () => {
             expect(SidebarUtils.shouldRenderMetadataSidebar({})).toBeFalsy();
         });
         test('should return false when nothing is wanted in the metadata sidebar', () => {
-            expect(SidebarUtils.shouldRenderMetadataSidebar({
-                hasMetadata: false,
-            })).toBeFalsy();
+            expect(
+                SidebarUtils.shouldRenderMetadataSidebar({
+                    hasMetadata: false,
+                }),
+            ).toBeFalsy();
         });
         test('should return true by default when we dont know availability of metadata feature', () => {
             expect(SidebarUtils.shouldRenderMetadataSidebar({ hasMetadata: true })).toBeTruthy();
@@ -123,28 +146,48 @@ describe('components/ContentSidebar/SidebarUtil', () => {
             expect(SidebarUtils.shouldRenderMetadataSidebar({ hasMetadata: false }, ['foo'])).toBeFalsy();
         });
         test('should return false when hasMetadata is false', () => {
-            expect(SidebarUtils.shouldRenderMetadataSidebar({
-                hasMetadata: false,
-                metadataSidebarProps: { isFeatureEnabled: true },
-            }, ['foo'])).toBeFalsy();
+            expect(
+                SidebarUtils.shouldRenderMetadataSidebar(
+                    {
+                        hasMetadata: false,
+                        metadataSidebarProps: { isFeatureEnabled: true },
+                    },
+                    ['foo'],
+                ),
+            ).toBeFalsy();
         });
         test('should return false when no metadata and no feature', () => {
-            expect(SidebarUtils.shouldRenderMetadataSidebar({
-                hasMetadata: true,
-                metadataSidebarProps: { isFeatureEnabled: false },
-            }, [])).toBeFalsy();
+            expect(
+                SidebarUtils.shouldRenderMetadataSidebar(
+                    {
+                        hasMetadata: true,
+                        metadataSidebarProps: { isFeatureEnabled: false },
+                    },
+                    [],
+                ),
+            ).toBeFalsy();
         });
         test('should return true when no metadata and feature enabled', () => {
-            expect(SidebarUtils.shouldRenderMetadataSidebar({
-                hasMetadata: true,
-                metadataSidebarProps: { isFeatureEnabled: true },
-            }, [])).toBeTruthy();
+            expect(
+                SidebarUtils.shouldRenderMetadataSidebar(
+                    {
+                        hasMetadata: true,
+                        metadataSidebarProps: { isFeatureEnabled: true },
+                    },
+                    [],
+                ),
+            ).toBeTruthy();
         });
         test('should return true when metadata and feature is not enabled', () => {
-            expect(SidebarUtils.shouldRenderMetadataSidebar({
-                hasMetadata: true,
-                metadataSidebarProps: { isFeatureEnabled: false },
-            }, ['foo'])).toBeTruthy();
+            expect(
+                SidebarUtils.shouldRenderMetadataSidebar(
+                    {
+                        hasMetadata: true,
+                        metadataSidebarProps: { isFeatureEnabled: false },
+                    },
+                    ['foo'],
+                ),
+            ).toBeTruthy();
         });
     });
     describe('shouldRenderSidebar()', () => {
@@ -188,4 +231,4 @@ describe('components/ContentSidebar/SidebarUtil', () => {
         });
     });
 });
-//# sourceMappingURL=SidebarUtils-test.js.map
+// # sourceMappingURL=SidebarUtils-test.js.map

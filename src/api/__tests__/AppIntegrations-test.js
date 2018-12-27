@@ -1,4 +1,5 @@
 import AppIntegrations from '../AppIntegrations';
+
 let appIntegrations;
 describe('api/AppIntegrations', () => {
     beforeEach(() => {
@@ -17,10 +18,10 @@ describe('api/AppIntegrations', () => {
     describe('execute()', () => {
         test('should throw an error if the integration ID or file ID is missing', () => {
             expect(() => {
-                appIntegrations.execute(null, '1234', () => { });
+                appIntegrations.execute(null, '1234', () => {});
             }).toThrow();
             expect(() => {
-                appIntegrations.execute('1234', null, () => { });
+                appIntegrations.execute('1234', null, () => {});
             }).toThrow();
         });
         test('should make a POST request with the correct data', () => {
@@ -48,4 +49,4 @@ describe('api/AppIntegrations', () => {
         });
     });
 });
-//# sourceMappingURL=AppIntegrations-test.js.map
+// # sourceMappingURL=AppIntegrations-test.js.map

@@ -1,3 +1,3 @@
 // @was-flow
 export { default } from './ContentOpenWith';
-//# sourceMappingURL=index.js.map
+// # sourceMappingURL=index.js.map

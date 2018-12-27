@@ -30,4 +30,4 @@ export function getTypedFolderId(id) {
 export function isBoxNote(file) {
     return file.extension === FILE_EXTENSION_BOX_NOTE;
 }
-//# sourceMappingURL=file.js.map
+// # sourceMappingURL=file.js.map

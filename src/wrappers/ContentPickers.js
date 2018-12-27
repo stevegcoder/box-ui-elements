@@ -5,8 +5,9 @@
 import FilePicker from './FilePicker';
 import FolderPicker from './FolderPicker';
 import ContentPicker from './ContentPicker';
+
 global.Box = global.Box || {};
 global.Box.FilePicker = FilePicker;
 global.Box.FolderPicker = FolderPicker;
 global.Box.ContentPicker = ContentPicker;
-//# sourceMappingURL=ContentPickers.js.map
+// # sourceMappingURL=ContentPickers.js.map

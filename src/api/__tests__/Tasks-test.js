@@ -1,5 +1,6 @@
 import Tasks from '../Tasks';
 import { PERMISSION_CAN_COMMENT } from '../../constants';
+
 let tasks;
 describe('api/Tasks', () => {
     beforeEach(() => {
@@ -172,4 +173,4 @@ describe('api/Tasks', () => {
         });
     });
 });
-//# sourceMappingURL=Tasks-test.js.map
+// # sourceMappingURL=Tasks-test.js.map

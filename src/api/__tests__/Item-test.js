@@ -1,6 +1,7 @@
 import noop from 'lodash/noop';
 import Item from '../Item';
 import Cache from '../../util/Cache';
+
 let item;
 let file;
 let folder;
@@ -528,4 +529,4 @@ describe('api/Item', () => {
         });
     });
 });
-//# sourceMappingURL=Item-test.js.map
+// # sourceMappingURL=Item-test.js.map

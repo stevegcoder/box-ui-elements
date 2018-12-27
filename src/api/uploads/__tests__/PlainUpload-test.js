@@ -1,5 +1,6 @@
 import PlainUpload from '../PlainUpload';
 import * as crypto from '../../../util/webcrypto';
+
 let upload;
 describe('api/uploads/PlainUpload', () => {
     beforeEach(() => {
@@ -199,9 +200,9 @@ describe('api/uploads/PlainUpload', () => {
         test('should set properties and make preflight request', () => {
             const folderId = '123';
             const file = {};
-            const successCallback = () => { };
-            const errorCallback = () => { };
-            const progressCallback = () => { };
+            const successCallback = () => {};
+            const errorCallback = () => {};
+            const progressCallback = () => {};
             const overwrite = true;
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.makePreflightRequest = jest.fn();
@@ -248,4 +249,4 @@ describe('api/uploads/PlainUpload', () => {
         });
     });
 });
-//# sourceMappingURL=PlainUpload-test.js.map
+// # sourceMappingURL=PlainUpload-test.js.map

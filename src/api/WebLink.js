@@ -5,6 +5,7 @@
  */
 import Item from './Item';
 import { CACHE_PREFIX_WEBLINK } from '../constants';
+
 class WebLink extends Item {
     /**
      * Creates a key for the cache
@@ -15,6 +16,7 @@ class WebLink extends Item {
     getCacheKey(id) {
         return `${CACHE_PREFIX_WEBLINK}${id}`;
     }
+
     /**
      * URL for weblink api
      *
@@ -27,4 +29,4 @@ class WebLink extends Item {
     }
 }
 export default WebLink;
-//# sourceMappingURL=WebLink.js.map
+// # sourceMappingURL=WebLink.js.map

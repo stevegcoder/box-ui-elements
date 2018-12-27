@@ -4,6 +4,7 @@
  * @author Box
  */
 import BaseUpload from './BaseUpload';
+
 const DEFAULT_MULTIPUT_CONFIG = {
     digestReadahead: 5,
     initialRetryDelayMs: 5000,
@@ -47,4 +48,4 @@ class BaseMultiput extends BaseUpload {
     }
 }
 export default BaseMultiput;
-//# sourceMappingURL=BaseMultiput.js.map
+// # sourceMappingURL=BaseMultiput.js.map

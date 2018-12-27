@@ -1,4 +1,5 @@
 import WebLink from '../WebLink';
+
 let webLink;
 describe('api/WebLink', () => {
     beforeEach(() => {
@@ -18,4 +19,4 @@ describe('api/WebLink', () => {
         });
     });
 });
-//# sourceMappingURL=WebLink-test.js.map
+// # sourceMappingURL=WebLink-test.js.map

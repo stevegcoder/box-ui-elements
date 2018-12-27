@@ -1,11 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 /**
  * @was-flow
  * @file Multiput upload part
@@ -16,6 +8,36 @@ import BaseMultiput from './BaseMultiput';
 import { updateQueryParameters } from '../../util/url';
 import { HTTP_PUT } from '../../constants';
 import { getBoundedExpBackoffRetryDelay } from '../../util/uploads';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+
 const PART_STATE_NOT_STARTED = 0;
 const PART_STATE_COMPUTING_DIGEST = 1;
 const PART_STATE_DIGEST_READY = 2;
@@ -38,19 +60,33 @@ class MultiputPart extends BaseMultiput {
      * @param {Function} [onError]
      * @return {void}
      */
-    constructor(options, index, offset, partSize, fileSize, sessionId, sessionEndpoints, config, getNumPartsUploading, onSuccess, onProgress, onError) {
+    constructor(
+        options,
+        index,
+        offset,
+        partSize,
+        fileSize,
+        sessionId,
+        sessionEndpoints,
+        config,
+        getNumPartsUploading,
+        onSuccess,
+        onProgress,
+        onError,
+    ) {
         super(options, sessionEndpoints, config);
-        this.toJSON = () => JSON.stringify({
-            index: this.index,
-            offset: this.offset,
-            partSize: this.partSize,
-            state: this.state,
-            uploadedBytes: this.uploadedBytes,
-            numUploadRetriesPerformed: this.numUploadRetriesPerformed,
-            numDigestRetriesPerformed: this.numDigestRetriesPerformed,
-            sha256: this.sha256,
-            timing: this.timing,
-        });
+        this.toJSON = () =>
+            JSON.stringify({
+                index: this.index,
+                offset: this.offset,
+                partSize: this.partSize,
+                state: this.state,
+                uploadedBytes: this.uploadedBytes,
+                numUploadRetriesPerformed: this.numUploadRetriesPerformed,
+                numDigestRetriesPerformed: this.numDigestRetriesPerformed,
+                sha256: this.sha256,
+                timing: this.timing,
+            });
         /**
          * Returns file part information from the server after part upload is successful
          *
@@ -122,7 +158,7 @@ class MultiputPart extends BaseMultiput {
          * @param {ProgressEvent} data
          * @return {void}
          */
-        this.uploadProgressHandler = (event) => {
+        this.uploadProgressHandler = event => {
             if (this.isDestroyed()) {
                 return;
             }
@@ -137,11 +173,13 @@ class MultiputPart extends BaseMultiput {
          * @param {Error} error
          * @return {void}
          */
-        this.uploadErrorHandler = (error) => {
+        this.uploadErrorHandler = error => {
             if (this.isDestroyed()) {
                 return;
             }
-            this.consoleLog(`Upload failure ${error.message} for part ${this.toJSON()}. XHR state: ${this.xhr.xhr.readyState}.`);
+            this.consoleLog(
+                `Upload failure ${error.message} for part ${this.toJSON()}. XHR state: ${this.xhr.xhr.readyState}.`,
+            );
             const eventInfo = {
                 message: error.message,
                 part: {
@@ -159,7 +197,11 @@ class MultiputPart extends BaseMultiput {
                 this.onError(error, eventInfoString);
                 return;
             }
-            const retryDelayMs = getBoundedExpBackoffRetryDelay(this.config.initialRetryDelayMs, this.config.maxRetryDelayMs, this.numUploadRetriesPerformed);
+            const retryDelayMs = getBoundedExpBackoffRetryDelay(
+                this.config.initialRetryDelayMs,
+                this.config.maxRetryDelayMs,
+                this.numUploadRetriesPerformed,
+            );
             this.numUploadRetriesPerformed += 1;
             this.consoleLog(`Retrying uploading part ${this.toJSON()} in ${retryDelayMs} ms`);
             this.retryTimeout = setTimeout(this.retryUpload, retryDelayMs);
@@ -169,38 +211,38 @@ class MultiputPart extends BaseMultiput {
          *
          * @return {Promise}
          */
-        this.retryUpload = () => __awaiter(this, void 0, void 0, function* () {
-            if (this.isDestroyed()) {
-                return;
-            }
-            try {
-                if (this.uploadedBytes < this.partSize) {
-                    // Not all bytes were uploaded to the server. So upload part again.
-                    throw new Error('Incomplete part.');
-                }
-                const parts = yield this.listParts(this.index, 1);
-                if (parts && parts.length === 1 && parts[0].offset === this.offset && parts[0].part_id) {
-                    this.consoleLog(`Part ${this.toJSON()} is available on server. Not re-uploading.`);
-                    this.id = parts[0].part_id;
-                    this.uploadSuccessHandler({
-                        data: {
-                            part: parts[0],
-                        },
-                    });
+        this.retryUpload = () =>
+            __awaiter(this, void 0, void 0, function*() {
+                if (this.isDestroyed()) {
                     return;
                 }
-                this.consoleLog(`Part ${this.toJSON()} is not available on server. Re-uploading.`);
-                throw new Error('Part not found on the server');
-            }
-            catch (error) {
-                const { response } = error;
-                if (response && response.status) {
-                    this.consoleLog(`Error ${response.status} while listing part ${this.toJSON()}. Re-uploading.`);
+                try {
+                    if (this.uploadedBytes < this.partSize) {
+                        // Not all bytes were uploaded to the server. So upload part again.
+                        throw new Error('Incomplete part.');
+                    }
+                    const parts = yield this.listParts(this.index, 1);
+                    if (parts && parts.length === 1 && parts[0].offset === this.offset && parts[0].part_id) {
+                        this.consoleLog(`Part ${this.toJSON()} is available on server. Not re-uploading.`);
+                        this.id = parts[0].part_id;
+                        this.uploadSuccessHandler({
+                            data: {
+                                part: parts[0],
+                            },
+                        });
+                        return;
+                    }
+                    this.consoleLog(`Part ${this.toJSON()} is not available on server. Re-uploading.`);
+                    throw new Error('Part not found on the server');
+                } catch (error) {
+                    const { response } = error;
+                    if (response && response.status) {
+                        this.consoleLog(`Error ${response.status} while listing part ${this.toJSON()}. Re-uploading.`);
+                    }
+                    this.numUploadRetriesPerformed += 1;
+                    this.upload();
                 }
-                this.numUploadRetriesPerformed += 1;
-                this.upload();
-            }
-        });
+            });
         /**
          * List specified parts
          *
@@ -208,17 +250,18 @@ class MultiputPart extends BaseMultiput {
          * @param {number} limit - Number of parts to be listed. Optional.
          * @return {Promise<Array<Object>>} Array of parts
          */
-        this.listParts = (partIndex, limit) => __awaiter(this, void 0, void 0, function* () {
-            const params = {
-                offset: partIndex,
-                limit,
-            };
-            const endpoint = updateQueryParameters(this.sessionEndpoints.listParts, params);
-            const response = yield this.xhr.get({
-                url: endpoint,
+        this.listParts = (partIndex, limit) =>
+            __awaiter(this, void 0, void 0, function*() {
+                const params = {
+                    offset: partIndex,
+                    limit,
+                };
+                const endpoint = updateQueryParameters(this.sessionEndpoints.listParts, params);
+                const response = yield this.xhr.get({
+                    url: endpoint,
+                });
+                return response.entries;
             });
-            return response.entries;
-        });
         this.index = index;
         this.numDigestRetriesPerformed = 0;
         this.numUploadRetriesPerformed = 0;
@@ -239,6 +282,7 @@ class MultiputPart extends BaseMultiput {
         this.onProgress = onProgress || noop;
         this.getNumPartsUploading = getNumPartsUploading;
     }
+
     /**
      * Cancels upload for this Part.
      *
@@ -252,5 +296,11 @@ class MultiputPart extends BaseMultiput {
     }
 }
 export default MultiputPart;
-export { PART_STATE_NOT_STARTED, PART_STATE_COMPUTING_DIGEST, PART_STATE_DIGEST_READY, PART_STATE_UPLOADING, PART_STATE_UPLOADED, };
-//# sourceMappingURL=MultiputPart.js.map
+export {
+    PART_STATE_NOT_STARTED,
+    PART_STATE_COMPUTING_DIGEST,
+    PART_STATE_DIGEST_READY,
+    PART_STATE_UPLOADING,
+    PART_STATE_UPLOADED,
+};
+// # sourceMappingURL=MultiputPart.js.map

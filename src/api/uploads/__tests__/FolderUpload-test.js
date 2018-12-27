@@ -1,16 +1,44 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import noop from 'lodash/noop';
 import FolderUpload from '../FolderUpload';
+
+const __awaiter =
+    (this && this.__awaiter) ||
+    function(thisArg, _arguments, P, generator) {
+        return new (P || (P = Promise))((resolve, reject) => {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator.throw(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : new P(resolve => {
+                          resolve(result.value);
+                      }).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+
 let folderUploadInstance;
 const destinationFolderID = '123';
-jest.mock('../../../util/uploads', () => (Object.assign({}, require.requireActual('../../../util/uploads'), { getDataTransferItem: jest.fn(item => item.item || item), getEntryFromDataTransferItem: jest.fn(item => item), getDataTransferItemAPIOptions: jest.fn(item => item.options || {}) })));
+jest.mock('../../../util/uploads', () =>
+    Object.assign({}, require.requireActual('../../../util/uploads'), {
+        getDataTransferItem: jest.fn(item => item.item || item),
+        getEntryFromDataTransferItem: jest.fn(item => item),
+        getDataTransferItemAPIOptions: jest.fn(item => item.options || {}),
+    }),
+);
 describe('api/uploads/FolderUpload', () => {
     beforeEach(() => {
         folderUploadInstance = new FolderUpload(noop, destinationFolderID, noop, true, {});
@@ -108,17 +136,18 @@ describe('api/uploads/FolderUpload', () => {
         });
     });
     describe('buildFolderTreeFromDataTransferItem()', () => {
-        test('should construct folders correctly', () => __awaiter(this, void 0, void 0, function* () {
-            const createFolderUploadNodeMock = jest.fn();
-            folderUploadInstance.createFolderUploadNode = createFolderUploadNodeMock;
-            yield folderUploadInstance.buildFolderTreeFromDataTransferItem([
-                {
-                    item: { name: 'f1', webkitRelativePath: 'a/f1' },
-                    options: {},
-                },
-            ]);
-            expect(createFolderUploadNodeMock).toHaveBeenCalledTimes(1);
-        }));
+        test('should construct folders correctly', () =>
+            __awaiter(this, void 0, void 0, function*() {
+                const createFolderUploadNodeMock = jest.fn();
+                folderUploadInstance.createFolderUploadNode = createFolderUploadNodeMock;
+                yield folderUploadInstance.buildFolderTreeFromDataTransferItem([
+                    {
+                        item: { name: 'f1', webkitRelativePath: 'a/f1' },
+                        options: {},
+                    },
+                ]);
+                expect(createFolderUploadNodeMock).toHaveBeenCalledTimes(1);
+            }));
     });
     describe('createFolderUploadNode()', () => {
         test('should create FolderUploadNode correctly', () => {
@@ -132,4 +161,4 @@ describe('api/uploads/FolderUpload', () => {
         });
     });
 });
-//# sourceMappingURL=FolderUpload-test.js.map
+// # sourceMappingURL=FolderUpload-test.js.map

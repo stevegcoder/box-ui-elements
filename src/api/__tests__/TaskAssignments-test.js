@@ -1,5 +1,6 @@
 import TaskAssignments from '../TaskAssignments';
 import { PERMISSION_CAN_COMMENT } from '../../constants';
+
 let taskAssignments;
 describe('api/TaskAssignments', () => {
     beforeEach(() => {
@@ -40,7 +41,11 @@ describe('api/TaskAssignments', () => {
                     successCallback,
                     errorCallback,
                 });
-                expect(taskAssignments.checkApiCallValidity).toBeCalledWith(PERMISSION_CAN_COMMENT, file.permissions, file.id);
+                expect(taskAssignments.checkApiCallValidity).toBeCalledWith(
+                    PERMISSION_CAN_COMMENT,
+                    file.permissions,
+                    file.id,
+                );
             });
             test('should post a well formed task to the tasks endpoint', () => {
                 const requestData = {
@@ -80,7 +85,11 @@ describe('api/TaskAssignments', () => {
                     successCallback,
                     errorCallback,
                 });
-                expect(taskAssignments.checkApiCallValidity).toBeCalledWith(PERMISSION_CAN_COMMENT, file.permissions, file.id);
+                expect(taskAssignments.checkApiCallValidity).toBeCalledWith(
+                    PERMISSION_CAN_COMMENT,
+                    file.permissions,
+                    file.id,
+                );
             });
             test('should put a well formed task update to the tasks endpoint', () => {
                 const requestData = {
@@ -110,7 +119,11 @@ describe('api/TaskAssignments', () => {
                     successCallback,
                     errorCallback,
                 });
-                expect(taskAssignments.checkApiCallValidity).toBeCalledWith(PERMISSION_CAN_COMMENT, file.permissions, file.id);
+                expect(taskAssignments.checkApiCallValidity).toBeCalledWith(
+                    PERMISSION_CAN_COMMENT,
+                    file.permissions,
+                    file.id,
+                );
             });
             test('should delete a task from the tasks endpoint', () => {
                 taskAssignments.deleteTaskAssignment({
@@ -129,4 +142,4 @@ describe('api/TaskAssignments', () => {
         });
     });
 });
-//# sourceMappingURL=TaskAssignments-test.js.map
+// # sourceMappingURL=TaskAssignments-test.js.map
