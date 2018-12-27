@@ -1,11 +1,13 @@
 /**
- * @flow
+ * @was-flow
  * @file Utilities for keywords skill
  * @author Box
  */
-
-import type { Pill } from './flowTypes';
-
+{
+    Pill;
+}
+from;
+'./flowTypes';
 /**
  * Converts skill card entries into pills
  *
@@ -13,12 +15,10 @@ import type { Pill } from './flowTypes';
  * @param {Array<Object>} props - keyword entries
  * @return {Array<Object>} pills
  */
-const getPills = (keywords: Array<SkillCardEntry> = []): Array<Pill> =>
-    keywords.map(
-        (keyword: SkillCardEntry, index: number): Pill => ({
-            value: index,
-            text: ((keyword.text: any): string),
-        }),
-    );
-
+const getPills = (keywords = []) => keywords.map((keyword, index) => ({
+    value: index,
+    text: ((keyword.text)), any
+}), string);
+;
 export default getPills;
+//# sourceMappingURL=keywordUtils.js.map

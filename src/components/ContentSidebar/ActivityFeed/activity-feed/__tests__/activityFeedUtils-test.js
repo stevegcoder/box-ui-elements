@@ -1,21 +1,17 @@
 import { collapseFeedState } from '../activityFeedUtils';
 import { PLACEHOLDER_USER } from '../../../../../constants';
-
 describe('collapseFeedState', () => {
     const mario = { id: '1', name: 'mario' };
     const luigi = { id: '2', name: 'luigi' };
-
     const version1 = {
         type: 'file_version',
         action: 'upload',
         version_number: '2',
         modified_by: mario,
     };
-
     test('should return empty array if no input', () => {
         expect(collapseFeedState()).toEqual([]);
     });
-
     test('should keep file_version & comment distinct', () => {
         const origFeed = [
             {
@@ -27,10 +23,8 @@ describe('collapseFeedState', () => {
         ];
         const expFeed = origFeed;
         const collapsedFeed = collapseFeedState(origFeed);
-
         expect(collapsedFeed).toEqual(expFeed);
     });
-
     test('should collapse two file_version items into 1', () => {
         const version2 = {
             type: 'file_version',
@@ -38,7 +32,6 @@ describe('collapseFeedState', () => {
             version_number: '1',
             modified_by: luigi,
         };
-
         const origFeed = [version1, version2];
         const expFeed = [
             {
@@ -58,12 +51,9 @@ describe('collapseFeedState', () => {
                 versions: [version1, version2],
             },
         ];
-
         const collapsedFeed = collapseFeedState(origFeed);
-
         expect(collapsedFeed).toEqual(expFeed);
     });
-
     test('should collapse two file_version items and handle null users', () => {
         const version2 = {
             type: 'file_version',
@@ -71,7 +61,6 @@ describe('collapseFeedState', () => {
             version_number: '1',
             modified_by: null,
         };
-
         const origFeed = [version1, version2];
         const expFeed = [
             {
@@ -91,9 +80,8 @@ describe('collapseFeedState', () => {
                 versions: [version1, version2],
             },
         ];
-
         const collapsedFeed = collapseFeedState(origFeed);
-
         expect(collapsedFeed).toEqual(expFeed);
     });
 });
+//# sourceMappingURL=activityFeedUtils-test.js.map

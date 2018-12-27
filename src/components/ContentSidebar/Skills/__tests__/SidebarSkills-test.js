@@ -1,14 +1,9 @@
-import React from 'react';
 import { mount } from 'enzyme';
-import SidebarSkills from '../SidebarSkills';
 import SidebarSkillsCard from '../SidebarSkillsCard';
-
 jest.mock('../../SidebarSection', () => 'sidebar-section');
 jest.mock('../SidebarSkillsCard', () => 'sidebar-skills-card');
-
 describe('components/ContentSidebar/Skills/SidebarSkills', () => {
-    const getWrapper = props => mount(<SidebarSkills {...props} />);
-
+    const getWrapper = props => mount(Object.assign({}, props) /  > );
     test('should render the cards when there are valid skills', () => {
         const props = {
             file: {
@@ -52,7 +47,6 @@ describe('components/ContentSidebar/Skills/SidebarSkills', () => {
         expect(wrapper).toMatchSnapshot();
         expect(wrapper.find(SidebarSkillsCard)).toHaveLength(6);
     });
-
     test('should render only the valid cards', () => {
         const props = {
             file: {
@@ -75,7 +69,6 @@ describe('components/ContentSidebar/Skills/SidebarSkills', () => {
         expect(wrapper).toMatchSnapshot();
         expect(wrapper.find(SidebarSkillsCard)).toHaveLength(1);
     });
-
     test('should have no editable permission if can_upload is false', () => {
         const props = {
             file: {
@@ -96,3 +89,4 @@ describe('components/ContentSidebar/Skills/SidebarSkills', () => {
         expect(wrapper.find(SidebarSkillsCard)).toHaveLength(1);
     });
 });
+//# sourceMappingURL=SidebarSkills-test.js.map

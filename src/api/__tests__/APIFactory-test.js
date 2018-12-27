@@ -15,20 +15,16 @@ import MetadataAPI from '../Metadata';
 import FileCollaboratorsAPI from '../FileCollaborators';
 import UsersAPI from '../Users';
 import { DEFAULT_HOSTNAME_API, DEFAULT_HOSTNAME_UPLOAD } from '../../constants';
-
 let factory;
-
 describe('api/APIFactory', () => {
     beforeEach(() => {
         factory = new APIFactory({});
     });
-
     describe('getCache()', () => {
         test('should return a cache instance', () => {
             expect(factory.getCache()).toBeInstanceOf(Cache);
         });
     });
-
     describe('destroy()', () => {
         test('should destroy all APIs', () => {
             factory.fileAPI = { destroy: jest.fn() };
@@ -68,7 +64,6 @@ describe('api/APIFactory', () => {
             expect(factory.options.cache.get('foo')).toBeUndefined();
         });
     });
-
     describe('getAPI()', () => {
         test('should return file api when type is file', () => {
             expect(factory.getAPI('file')).toBeInstanceOf(FileAPI);
@@ -83,7 +78,6 @@ describe('api/APIFactory', () => {
             expect(factory.getAPI.bind(factory, 'foo')).toThrow(Error, /Unknown Type/);
         });
     });
-
     describe('getFileAPI()', () => {
         test('should call destroy and return file API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -95,7 +89,6 @@ describe('api/APIFactory', () => {
             expect(fileAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getWebLinkAPI()', () => {
         test('should call destroy and return web link API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -107,7 +100,6 @@ describe('api/APIFactory', () => {
             expect(webLinkAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getPlainUploadAPI()', () => {
         test('should call destroy and return plain upload API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -119,7 +111,6 @@ describe('api/APIFactory', () => {
             expect(plainUploadAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getChunkedUploadAPI()', () => {
         test('should call destroy and return chunked upload API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -131,7 +122,6 @@ describe('api/APIFactory', () => {
             expect(chunkedUploadAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getFolderAPI()', () => {
         test('should call destroy and return folder API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -143,7 +133,6 @@ describe('api/APIFactory', () => {
             expect(folderAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getSearchAPI()', () => {
         test('should call destroy and return search API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -155,7 +144,6 @@ describe('api/APIFactory', () => {
             expect(searchAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getRecentsAPI()', () => {
         test('should call destroy and return recents API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -167,7 +155,6 @@ describe('api/APIFactory', () => {
             expect(recentsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getVersionsAPI()', () => {
         test('should call destroy and return versions API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -178,7 +165,6 @@ describe('api/APIFactory', () => {
             expect(versionsAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(versionsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return versions API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const versionsAPI = factory.getVersionsAPI();
@@ -189,7 +175,6 @@ describe('api/APIFactory', () => {
             expect(versionsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getCommentsAPI()', () => {
         test('should call destroy and return comments API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -200,7 +185,6 @@ describe('api/APIFactory', () => {
             expect(commentsAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(commentsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return comments API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const commentsAPI = factory.getCommentsAPI();
@@ -211,7 +195,6 @@ describe('api/APIFactory', () => {
             expect(commentsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getTasksAPI()', () => {
         test('should call destroy and return tasks API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -222,7 +205,6 @@ describe('api/APIFactory', () => {
             expect(tasksAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(tasksAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return tasks API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const tasksAPI = factory.getTasksAPI();
@@ -233,7 +215,6 @@ describe('api/APIFactory', () => {
             expect(tasksAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getFileAccessStatsAPI()', () => {
         test('should call destroy and return versions API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -244,7 +225,6 @@ describe('api/APIFactory', () => {
             expect(fileAccessStatsAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(fileAccessStatsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return versions API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const fileAccessStatsAPI = factory.getFileAccessStatsAPI();
@@ -255,7 +235,6 @@ describe('api/APIFactory', () => {
             expect(fileAccessStatsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getMetadataAPI()', () => {
         test('should call destroy and return metadata API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -266,7 +245,6 @@ describe('api/APIFactory', () => {
             expect(metadataAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(metadataAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return metadata API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const metadataAPI = factory.getMetadataAPI();
@@ -277,7 +255,6 @@ describe('api/APIFactory', () => {
             expect(metadataAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getFileCollaboratorsAPI()', () => {
         test('should call destroy and return file collaborators API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -288,7 +265,6 @@ describe('api/APIFactory', () => {
             expect(fileCollaboratorsAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(fileCollaboratorsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return file collaborators API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const fileCollaboratorsAPI = factory.getFileCollaboratorsAPI();
@@ -299,7 +275,6 @@ describe('api/APIFactory', () => {
             expect(fileCollaboratorsAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
     });
-
     describe('getUsersAPI()', () => {
         test('should call destroy and return users API', () => {
             const spy = jest.spyOn(factory, 'destroy');
@@ -310,7 +285,6 @@ describe('api/APIFactory', () => {
             expect(usersAPI.options.apiHost).toBe(DEFAULT_HOSTNAME_API);
             expect(usersAPI.options.uploadHost).toBe(DEFAULT_HOSTNAME_UPLOAD);
         });
-
         test('should not call destroy and return users API', () => {
             const spy = jest.spyOn(factory, 'destroy');
             const usersAPI = factory.getUsersAPI();
@@ -322,3 +296,4 @@ describe('api/APIFactory', () => {
         });
     });
 });
+//# sourceMappingURL=APIFactory-test.js.map

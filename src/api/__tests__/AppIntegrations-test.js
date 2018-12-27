@@ -1,12 +1,9 @@
 import AppIntegrations from '../AppIntegrations';
-
 let appIntegrations;
-
 describe('api/AppIntegrations', () => {
     beforeEach(() => {
         appIntegrations = new AppIntegrations({});
     });
-
     describe('getUrl()', () => {
         test('should throw when version api url without id', () => {
             expect(() => {
@@ -17,18 +14,15 @@ describe('api/AppIntegrations', () => {
             expect(appIntegrations.getUrl('foo')).toBe('https://api.box.com/2.0/app_integrations/foo');
         });
     });
-
     describe('execute()', () => {
         test('should throw an error if the integration ID or file ID is missing', () => {
             expect(() => {
-                appIntegrations.execute(null, '1234', () => {});
+                appIntegrations.execute(null, '1234', () => { });
             }).toThrow();
-
             expect(() => {
-                appIntegrations.execute('1234', null, () => {});
+                appIntegrations.execute('1234', null, () => { });
             }).toThrow();
         });
-
         test('should make a POST request with the correct data', () => {
             const successCallback = jest.fn();
             const errorCallback = jest.fn();
@@ -43,7 +37,6 @@ describe('api/AppIntegrations', () => {
                 },
             };
             appIntegrations.post = jest.fn();
-
             appIntegrations.execute('5678', '1234', successCallback, errorCallback);
             expect(appIntegrations.post).toBeCalledWith({
                 id: fileID,
@@ -55,3 +48,4 @@ describe('api/AppIntegrations', () => {
         });
     });
 });
+//# sourceMappingURL=AppIntegrations-test.js.map

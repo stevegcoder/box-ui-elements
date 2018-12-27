@@ -1,33 +1,14 @@
 /**
- * @flow
+ * @was-flow
  * @file Status Skill Card component
  * @author Box
  */
-
-import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
 import messages from '../../../messages';
-import {
-    SKILLS_ERROR_EXTERNAL_AUTH,
-    SKILLS_ERROR_BILLING,
-    SKILLS_ERROR_UNKNOWN,
-    SKILLS_ERROR_INVOCATIONS,
-    SKILLS_ERROR_FILE_PROCESSING,
-    SKILLS_ERROR_INVALID_FILE_SIZE,
-    SKILLS_ERROR_INVALID_FILE_FORMAT,
-    SKILLS_STATUS_PENDING,
-    SKILLS_STATUS_INVOKED,
-} from '../../../../constants';
-
-type Props = {
-    card: SkillCard,
-};
-
-const Status = ({ card }: Props) => {
-    const { status = {} }: SkillCard = card;
-    const { code, message }: SkillCardLocalizableType = status;
+import { SKILLS_ERROR_EXTERNAL_AUTH, SKILLS_ERROR_BILLING, SKILLS_ERROR_UNKNOWN, SKILLS_ERROR_INVOCATIONS, SKILLS_ERROR_FILE_PROCESSING, SKILLS_ERROR_INVALID_FILE_SIZE, SKILLS_ERROR_INVALID_FILE_FORMAT, SKILLS_STATUS_PENDING, SKILLS_STATUS_INVOKED, } from '../../../../constants';
+const Status = ({ card }) => {
+    const { status = {} } = card;
+    const { code, message } = status;
     let localizedMessage = messages.skillUnknownError;
-
     switch (code) {
         case SKILLS_ERROR_INVALID_FILE_SIZE:
             localizedMessage = messages.skillInvalidFileSizeError;
@@ -55,8 +36,7 @@ const Status = ({ card }: Props) => {
                 return message;
             }
     }
-
-    return <FormattedMessage {...localizedMessage} />;
+    return Object.assign({}, localizedMessage) /  > ;
 };
-
 export default Status;
+//# sourceMappingURL=Status.js.map

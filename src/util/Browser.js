@@ -1,11 +1,9 @@
 /**
- * @flow
+ * @was-flow
  * @file Helper for some browser utilities
  * @author Box
  */
-
 let isDashSupported;
-
 class Browser {
     /**
      * Returns the user agent.
@@ -13,20 +11,18 @@ class Browser {
      *
      * @return {String} navigator userAgent
      */
-    static getUserAgent(): string {
+    static getUserAgent() {
         return global.navigator.userAgent;
     }
-
     /**
      * Returns whether browser is mobile.
      *
      * @return {boolean} Whether browser is mobile
      */
-    static isMobile(): boolean {
+    static isMobile() {
         // Relying on the user agent to avoid desktop browsers on machines with touch screens.
         return /iphone|ipad|ipod|android|blackberry|bb10|mini|windows\sce|palm/i.test(Browser.getUserAgent());
     }
-
     /**
      * Returns whether browser is IE.
      *
@@ -35,7 +31,6 @@ class Browser {
     static isIE() {
         return /Trident/i.test(Browser.getUserAgent());
     }
-
     /**
      * Checks the browser for Dash support using H264 high.
      * Dash requires MediaSource extensions to exist and be applicable
@@ -45,17 +40,16 @@ class Browser {
      * @param { boolean} recheck - recheck support
      * @return {boolean} true if dash is usable
      */
-    static canPlayDash(recheck: boolean = false) {
+    static canPlayDash(recheck = false) {
         if (typeof isDashSupported === 'undefined' || recheck) {
             const mse = global.MediaSource;
             isDashSupported =
                 !!mse &&
-                typeof mse.isTypeSupported === 'function' &&
-                mse.isTypeSupported('video/mp4; codecs="avc1.64001E"');
+                    typeof mse.isTypeSupported === 'function' &&
+                    mse.isTypeSupported('video/mp4; codecs="avc1.64001E"');
         }
-
         return isDashSupported;
     }
 }
-
 export default Browser;
+//# sourceMappingURL=Browser.js.map

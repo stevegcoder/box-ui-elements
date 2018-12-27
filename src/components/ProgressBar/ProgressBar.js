@@ -1,42 +1,56 @@
 /**
- * @flow
+ * @was-flow
  * @file Progress Bar component
  * @author Box
  */
-
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import './ProgressBar.scss';
-
-type Props = {
-    percent: number,
-};
-
-type State = {
-    percent: number,
-};
-
-class ProgressBar extends PureComponent<Props, State> {
-    props: Props;
-
-    state: State;
-
-    timeout: TimeoutID;
-
-    interval: IntervalID;
-
-    static defaultProps = { percent: 0 };
-
+class ProgressBar extends PureComponent {
     /**
      * [constructor]
      *
      * @return {ProgressBar}
      */
-    constructor(props: Props) {
+    constructor(props) {
         super(props);
-        const { percent }: State = props;
+        /**
+         * Increaments the progress or resets it
+         * depending upon the edge conditions.
+         *
+         * @return {void}
+         */
+        this.startProgress = () => {
+            const { percent } = this.state;
+            if (percent === 0) {
+                this.interval = setInterval(this.incrementProgress, 100);
+            }
+            else if (percent === 100) {
+                // Timeout helps transition of hiding the bar to finish
+                this.timeout = setTimeout(this.resetProgress, 600);
+            }
+        };
+        /**
+         * Increaments the progress very slowly
+         *
+         * @return {void}
+         */
+        this.incrementProgress = () => {
+            const { percent } = this.state;
+            this.setState({
+                percent: percent + 2 / (percent || 1),
+            });
+        };
+        /**
+         * Resets the progress to 0
+         *
+         * @return {void}
+         */
+        this.resetProgress = () => {
+            this.setState(ProgressBar.defaultProps);
+        };
+        const { percent } = props;
         this.state = { percent };
     }
-
     /**
      * Clears any timeouts and intervals
      *
@@ -46,18 +60,16 @@ class ProgressBar extends PureComponent<Props, State> {
         clearInterval(this.interval);
         clearTimeout(this.timeout);
     }
-
     /**
      * Updates state from new props
      *
      * @return {void}
      */
-    componentWillReceiveProps(nextProps: Props) {
+    componentWillReceiveProps(nextProps) {
         this.clearTimeoutAndInterval();
-        const { percent }: Props = nextProps;
+        const { percent } = nextProps;
         this.setState({ percent }, this.startProgress);
     }
-
     /**
      * Clears time out
      *
@@ -66,61 +78,30 @@ class ProgressBar extends PureComponent<Props, State> {
     componentWillUnmount() {
         this.clearTimeoutAndInterval();
     }
-
-    /**
-     * Increaments the progress or resets it
-     * depending upon the edge conditions.
-     *
-     * @return {void}
-     */
-    startProgress = () => {
-        const { percent }: State = this.state;
-        if (percent === 0) {
-            this.interval = setInterval(this.incrementProgress, 100);
-        } else if (percent === 100) {
-            // Timeout helps transition of hiding the bar to finish
-            this.timeout = setTimeout(this.resetProgress, 600);
-        }
-    };
-
-    /**
-     * Increaments the progress very slowly
-     *
-     * @return {void}
-     */
-    incrementProgress = () => {
-        const { percent } = this.state;
-        this.setState({
-            percent: percent + 2 / (percent || 1),
-        });
-    };
-
-    /**
-     * Resets the progress to 0
-     *
-     * @return {void}
-     */
-    resetProgress = () => {
-        this.setState(ProgressBar.defaultProps);
-    };
-
     /**
      * Renders the progress bar
      *
      * @return {void}
      */
     render() {
-        const { percent }: State = this.state;
+        const { percent } = this.state;
         const containerStyle = {
             opacity: percent > 0 && percent < 100 ? 1 : 0,
             transitionDelay: percent > 0 && percent < 100 ? '0' : '0.4s',
         };
-        return (
-            <div className="be-progress-container" style={containerStyle}>
-                <div className="be-progress" style={{ width: `${percent}%` }} />
-            </div>
-        );
+        return className = "be-progress-container";
+        style = { containerStyle } >
+            className;
+        "be-progress";
+        style = {};
+        {
+            width: `${percent}%`;
+        }
     }
 }
-
+ProgressBar.defaultProps = { percent: 0 };
+/>
+    < /div>;
+;
 export default ProgressBar;
+//# sourceMappingURL=ProgressBar.js.map

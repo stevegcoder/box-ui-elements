@@ -1,15 +1,11 @@
-import React from 'react';
 import { shallow } from 'enzyme';
-import IntegrationPortalContainer from '../IntegrationPortalContainer';
-
 describe('components/ContentOpenWith/IntegrationPortalContainer', () => {
-    const getWrapper = props => shallow(<IntegrationPortalContainer {...props} />);
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     it('should render an error mask if an error occurs', () => {
         const wrapper = getWrapper({
             hasError: true,
             integrationWindow: 'window',
         });
-
         expect(wrapper).toMatchSnapshot();
     });
     it('should render a loading indicator', () => {
@@ -17,7 +13,7 @@ describe('components/ContentOpenWith/IntegrationPortalContainer', () => {
             hasError: false,
             integrationWindow: 'window',
         });
-
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=IntegrationPortalContainer-test.js.map

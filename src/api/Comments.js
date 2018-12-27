@@ -1,85 +1,67 @@
 /**
- * @flow
+ * @was-flow
  * @file Helper for the box comments API
  * @author Box
  */
-
 import OffsetBasedAPI from './OffsetBasedAPI';
-import {
-    PERMISSION_CAN_COMMENT,
-    PERMISSION_CAN_DELETE,
-    PERMISSION_CAN_EDIT,
-    ERROR_CODE_CREATE_COMMENT,
-    ERROR_CODE_UPDATE_COMMENT,
-    ERROR_CODE_DELETE_COMMENT,
-    ERROR_CODE_FETCH_COMMENTS,
-} from '../constants';
+import { PERMISSION_CAN_COMMENT, PERMISSION_CAN_DELETE, PERMISSION_CAN_EDIT, ERROR_CODE_CREATE_COMMENT, ERROR_CODE_UPDATE_COMMENT, ERROR_CODE_DELETE_COMMENT, ERROR_CODE_FETCH_COMMENTS, } from '../constants';
 import { COMMENTS_FIELDS_TO_FETCH } from '../util/fields';
-
 class Comments extends OffsetBasedAPI {
+    constructor() {
+        super(...arguments);
+        /**
+         * Formats the comments api response to usable data
+         * @param {Object} data the api response data
+         */
+        this.successHandler = (data) => {
+            if (this.isDestroyed() || typeof this.successCallback !== 'function') {
+                return;
+            }
+            // There is no response data when deleting a comment
+            if (!data) {
+                this.successCallback();
+                return;
+            }
+            // We don't have entries when updating/creating a comment
+            if (!data.entries) {
+                this.successCallback(this.format(data));
+                return;
+            }
+            const comments = data.entries.map(this.format);
+            this.successCallback(Object.assign({}, data, { entries: comments }));
+        };
+    }
     /**
      * API URL for comments on a file
      *
      * @param {string} id - A box file id
      * @return {string} base url for files
      */
-    getUrl(id?: string): string {
+    getUrl(id) {
         if (!id) {
             throw new Error('Missing file id!');
         }
-
         return `${this.getBaseApiUrl()}/files/${id}/comments`;
     }
-
     /**
      * API URL for comments endpoint
      *
      * @param {string} [id] - A box comment id
      * @return {string} base url for comments
      */
-    commentsUrl(id?: string): string {
+    commentsUrl(id) {
         const baseUrl = `${this.getBaseApiUrl()}/comments`;
         return id ? `${baseUrl}/${id}` : baseUrl;
     }
-
     /**
      * Formats comment data for use in components.
      *
      * @param {string} [id] - An individual comment entry from the API
      * @return {Task} A task
      */
-    format(comment: Object): Comment {
-        return {
-            ...comment,
-            tagged_message: comment.tagged_message !== '' ? comment.tagged_message : comment.message,
-        };
+    format(comment) {
+        return Object.assign({}, comment, { tagged_message: comment.tagged_message !== '' ? comment.tagged_message : comment.message });
     }
-
-    /**
-     * Formats the comments api response to usable data
-     * @param {Object} data the api response data
-     */
-    successHandler = (data: Object): void => {
-        if (this.isDestroyed() || typeof this.successCallback !== 'function') {
-            return;
-        }
-
-        // There is no response data when deleting a comment
-        if (!data) {
-            this.successCallback();
-            return;
-        }
-
-        // We don't have entries when updating/creating a comment
-        if (!data.entries) {
-            this.successCallback(this.format(data));
-            return;
-        }
-
-        const comments = data.entries.map(this.format);
-        this.successCallback({ ...data, entries: comments });
-    };
-
     /**
      * API for creating a comment on a file
      *
@@ -90,29 +72,16 @@ class Comments extends OffsetBasedAPI {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    createComment({
-        file,
-        message,
-        taggedMessage,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        message?: string,
-        taggedMessage?: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    createComment({ file, message, taggedMessage, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_CREATE_COMMENT;
         const { id = '', permissions } = file;
-
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         const requestData = {
             data: {
                 item: {
@@ -126,7 +95,6 @@ class Comments extends OffsetBasedAPI {
                 fields: COMMENTS_FIELDS_TO_FETCH.toString(),
             },
         };
-
         this.post({
             id,
             url: this.commentsUrl(),
@@ -135,7 +103,6 @@ class Comments extends OffsetBasedAPI {
             errorCallback,
         });
     }
-
     /**
      * API for updating a comment on a file
      *
@@ -147,35 +114,19 @@ class Comments extends OffsetBasedAPI {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    updateComment({
-        file,
-        commentId,
-        message,
-        permissions,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        commentId: string,
-        message: string,
-        permissions: BoxItemPermission,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    updateComment({ file, commentId, message, permissions, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_UPDATE_COMMENT;
         const { id = '' } = file;
-
         try {
             this.checkApiCallValidity(PERMISSION_CAN_EDIT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         const requestData = {
             data: { message },
         };
-
         this.put({
             id,
             url: this.commentsUrl(commentId),
@@ -184,7 +135,6 @@ class Comments extends OffsetBasedAPI {
             errorCallback,
         });
     }
-
     /**
      * API for deleting a comment on a file
      *
@@ -195,29 +145,16 @@ class Comments extends OffsetBasedAPI {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    deleteComment({
-        file,
-        commentId,
-        permissions,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        commentId: string,
-        permissions: BoxItemPermission,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    deleteComment({ file, commentId, permissions, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_DELETE_COMMENT;
         const { id = '' } = file;
-
         try {
             this.checkApiCallValidity(PERMISSION_CAN_DELETE, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         this.delete({
             id,
             url: this.commentsUrl(commentId),
@@ -225,7 +162,6 @@ class Comments extends OffsetBasedAPI {
             errorCallback,
         });
     }
-
     /**
      * API for fetching comments on a file
      *
@@ -239,26 +175,17 @@ class Comments extends OffsetBasedAPI {
      * @param {boolean} shouldFetchAll - true if should get all the pages before calling the sucessCallback
      * @returns {void}
      */
-    getComments(
-        fileId: string,
-        permissions: BoxItemPermission,
-        successCallback: Function,
-        errorCallback: (e: ElementsXhrError, code: string) => void,
-        fields: Array<string> = COMMENTS_FIELDS_TO_FETCH,
-        offset?: number,
-        limit?: number,
-        shouldFetchAll?: boolean,
-    ): void {
+    getComments(fileId, permissions, successCallback, errorCallback, fields = COMMENTS_FIELDS_TO_FETCH, offset, limit, shouldFetchAll) {
         this.errorCode = ERROR_CODE_FETCH_COMMENTS;
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, fileId);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         this.offsetGet(fileId, successCallback, errorCallback, offset, limit, fields, shouldFetchAll);
     }
 }
-
 export default Comments;
+//# sourceMappingURL=Comments.js.map

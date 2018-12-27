@@ -1,12 +1,8 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import noop from 'lodash/noop';
 import Menu from 'box-react-ui/lib/components/menu/Menu';
-import OpenWithDropdownMenu from '../OpenWithDropdownMenu';
-
 describe('components/ContentOpenWith/OpenWithDropdownMenu', () => {
-    const getWrapper = props => shallow(<OpenWithDropdownMenu {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     test('should render a button and an menu item for each integration', () => {
         const integrations = [
             {
@@ -18,13 +14,12 @@ describe('components/ContentOpenWith/OpenWithDropdownMenu', () => {
                 displayName: 'Google Docs',
             },
         ];
-
         const wrapper = getWrapper({
             integrations,
             onClick: noop,
         });
         expect(wrapper.find(Menu).children()).toHaveLength(2);
-
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=OpenWithDropdownMenu-test.js.map

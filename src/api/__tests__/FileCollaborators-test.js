@@ -1,12 +1,9 @@
 import FileCollaborators from '../FileCollaborators';
-
 let fileCollaborators;
-
 describe('api/FileCollaborators', () => {
     beforeEach(() => {
         fileCollaborators = new FileCollaborators({});
     });
-
     describe('getUrl()', () => {
         test('should throw when collaborators api url without id', () => {
             expect(() => {
@@ -17,7 +14,6 @@ describe('api/FileCollaborators', () => {
             expect(fileCollaborators.getUrl('foo')).toBe('https://api.box.com/2.0/files/foo/collaborators');
         });
     });
-
     describe('successHandler()', () => {
         test('should return API response with properly formatted data', () => {
             const collaborator = {
@@ -29,12 +25,8 @@ describe('api/FileCollaborators', () => {
                 next_marker: null,
                 entries: [collaborator],
             };
-
             fileCollaborators.successCallback = jest.fn();
-
-            const formattedResponse = {
-                ...response,
-                entries: [
+            const formattedResponse = Object.assign({}, response, { entries: [
                     {
                         id: 123,
                         name: 'Kanye West',
@@ -44,12 +36,10 @@ describe('api/FileCollaborators', () => {
                             email: 'kwest@box.com',
                         },
                     },
-                ],
-            };
-
+                ] });
             fileCollaborators.successHandler(response);
-
             expect(fileCollaborators.successCallback).toBeCalledWith(formattedResponse);
         });
     });
 });
+//# sourceMappingURL=FileCollaborators-test.js.map

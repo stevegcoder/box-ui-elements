@@ -1,24 +1,18 @@
 /**
- * @flow
+ * @was-flow
  * @file Multiput upload base class
  * @author Box
  */
 import BaseUpload from './BaseUpload';
-
-const DEFAULT_MULTIPUT_CONFIG: MultiputConfig = {
-    digestReadahead: 5, // How many parts past those currently uploading to precompute digest for
-    initialRetryDelayMs: 5000, // Base for exponential backoff on retries
-    maxRetryDelayMs: 60000, // Upper bound for time between retries
-    parallelism: 5, // Maximum number of parts to upload at a time
-    requestTimeoutMs: 120000, // Idle timeout on part upload, overall request timeout on other requests
-    retries: 5, // How many times to retry requests such as upload part or commit. Note that total number of attempts will be retries + 1 in worst case where all attempts fail.
+const DEFAULT_MULTIPUT_CONFIG = {
+    digestReadahead: 5,
+    initialRetryDelayMs: 5000,
+    maxRetryDelayMs: 60000,
+    parallelism: 5,
+    requestTimeoutMs: 120000,
+    retries: 5,
 };
-
 class BaseMultiput extends BaseUpload {
-    config: MultiputConfig;
-
-    sessionEndpoints: Object;
-
     /**
      * [constructor]
      *
@@ -27,37 +21,30 @@ class BaseMultiput extends BaseUpload {
      * @param {MultiputConfig} [config]
      * @return {void}
      */
-    constructor(options: Options, sessionEndpoints: Object, config?: MultiputConfig): void {
+    constructor(options, sessionEndpoints, config) {
         super(options);
-
+        /**
+         * POST log event
+         *
+         * @param {string} eventType
+         * @param {string} [eventInfo]
+         * @return {Promise}
+         */
+        this.logEvent = (eventType, eventInfo) => {
+            const data = {
+                event_type: eventType,
+            };
+            if (eventInfo) {
+                data.event_info = eventInfo;
+            }
+            return this.xhr.post({
+                url: this.sessionEndpoints.logEvent,
+                data,
+            });
+        };
         this.config = config || DEFAULT_MULTIPUT_CONFIG;
         this.sessionEndpoints = sessionEndpoints;
     }
-
-    /**
-     * POST log event
-     *
-     * @param {string} eventType
-     * @param {string} [eventInfo]
-     * @return {Promise}
-     */
-    logEvent = (eventType: string, eventInfo?: string) => {
-        const data: {
-            event_type: string,
-            event_info?: string,
-        } = {
-            event_type: eventType,
-        };
-
-        if (eventInfo) {
-            data.event_info = eventInfo;
-        }
-
-        return this.xhr.post({
-            url: this.sessionEndpoints.logEvent,
-            data,
-        });
-    };
 }
-
 export default BaseMultiput;
+//# sourceMappingURL=BaseMultiput.js.map

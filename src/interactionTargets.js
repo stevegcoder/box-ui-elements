@@ -4,12 +4,10 @@ export const SIDEBAR_NAV_TARGETS = {
     SKILLS: 'sidebarskills',
     METADATA: 'sidebarmetadata',
 };
-
 export const SECTION_TARGETS = {
     FILE_PROPERTIES: 'fileproperties',
     ACCESS_STATS: 'accessstats',
 };
-
 export const DETAILS_TARGETS = {
     ACCESS_STATS: {
         COMMENTS: 'accessstats-comments',
@@ -24,7 +22,6 @@ export const DETAILS_TARGETS = {
     DESCRIPTION: 'description',
     VERSION_HISTORY: 'versionhistory',
 };
-
 export const ACTIVITY_TARGETS = {
     INLINE_EDIT: 'activityfeed-inlineedit',
     INLINE_DELETE: 'activityfeed-inlinedelete',
@@ -38,7 +35,6 @@ export const ACTIVITY_TARGETS = {
     TASK_APPROVE: 'activityfeed-taskapprove',
     TASK_REJECT: 'activityfeed-taskreject',
 };
-
 export const SKILLS_TARGETS = {
     FACES: {
         CARD: 'skill-facecard',
@@ -72,5 +68,5 @@ export const SKILLS_TARGETS = {
         PREVIOUS: 'skill-timelineprevious',
     },
 };
-
 export const INTERACTION_TARGET = 'data-resin-target';
+//# sourceMappingURL=interactionTargets.js.map

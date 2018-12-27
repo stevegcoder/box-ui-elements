@@ -1,7 +1,6 @@
 import Folder from '../Folder';
 import Cache from '../../util/Cache';
 import { FOLDER_FIELDS_TO_FETCH } from '../../util/fields';
-
 let folder;
 let cache;
 let item1;
@@ -9,19 +8,16 @@ let item2;
 let item3;
 let response;
 let folderResults;
-
 describe('api/Folder', () => {
     beforeEach(() => {
         folder = new Folder({});
         cache = new Cache();
     });
-
     describe('getCacheKey()', () => {
         test('should return correct key', () => {
             expect(folder.getCacheKey('foo')).toBe('folder_foo');
         });
     });
-
     describe('getUrl()', () => {
         test('should return correct folder api url', () => {
             expect(folder.getUrl()).toBe('https://api.box.com/2.0/folders');
@@ -30,19 +26,16 @@ describe('api/Folder', () => {
             expect(folder.getUrl('foo')).toBe('https://api.box.com/2.0/folders/foo');
         });
     });
-
     describe('isLoaded()', () => {
         test('should return false when no cache', () => {
             folder.key = 'key';
             expect(folder.isLoaded()).toBe(false);
         });
-
         test('should return false when no value', () => {
             folder.key = 'key';
             folder.getCache = jest.fn().mockReturnValueOnce(cache);
             expect(folder.isLoaded()).toBe(false);
         });
-
         test('should return true when loaded', () => {
             folder.key = 'key';
             cache.set('key', { item_collection: {} });
@@ -50,7 +43,6 @@ describe('api/Folder', () => {
             expect(folder.isLoaded()).toBe(true);
         });
     });
-
     describe('getFolder()', () => {
         test('should not do anything if destroyed', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -115,7 +107,6 @@ describe('api/Folder', () => {
             expect(folder.offset).toBe(0);
         });
     });
-
     describe('folderRequest()', () => {
         beforeEach(() => {
             folder.id = 'id';
@@ -128,7 +119,6 @@ describe('api/Folder', () => {
             folder.offset = 0;
             folder.query = 'query';
         });
-
         test('should not do anything if destroyed', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
             folder.xhr = null;
@@ -181,7 +171,6 @@ describe('api/Folder', () => {
             });
         });
     });
-
     describe('folderSuccessHandler()', () => {
         beforeEach(() => {
             item1 = {
@@ -220,14 +209,12 @@ describe('api/Folder', () => {
                 },
             };
         });
-
         test('should not do anything if destroyed', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
             folder.finish = jest.fn();
             folder.folderSuccessHandler('foo');
             expect(folder.finish).not.toHaveBeenCalled();
         });
-
         test('should parse the response, flatten the collection and call finish', () => {
             folder.options = { cache };
             folder.id = 'id';
@@ -235,7 +222,6 @@ describe('api/Folder', () => {
             folder.finish = jest.fn();
             folder.getCache = jest.fn().mockReturnValueOnce(cache);
             folder.folderSuccessHandler(response);
-
             expect(cache.get('key')).toEqual({
                 id: 'id',
                 item_collection: {
@@ -249,7 +235,6 @@ describe('api/Folder', () => {
             expect(cache.get('file_item2')).toBe(item2);
             expect(cache.get('file_item3')).toBe(item3);
         });
-
         test('should parse the response, append the collection and call finish', () => {
             folder.options = { cache };
             folder.id = 'id';
@@ -257,10 +242,8 @@ describe('api/Folder', () => {
             folder.finish = jest.fn();
             folder.getCache = jest.fn().mockReturnValueOnce(cache);
             folder.itemCache = ['foo', 'bar'];
-
             response.data.item_collection.total_count = 5;
             folder.folderSuccessHandler(response);
-
             expect(cache.get('key')).toEqual({
                 id: 'id',
                 item_collection: {
@@ -274,62 +257,48 @@ describe('api/Folder', () => {
             expect(cache.get('file_item2')).toBe(item2);
             expect(cache.get('file_item3')).toBe(item3);
         });
-
         test('should throw bad item error when item collection is missing', () => {
             folder.finish = jest.fn();
             expect(folder.folderSuccessHandler.bind(folder, {})).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection entries is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: { total_count: 1, offset: 0, limit: 100 },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: { total_count: 1, offset: 0, limit: 100 },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection total count is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: { entries: [], offset: 0, limit: 100 },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: { entries: [], offset: 0, limit: 100 },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection offset is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: {
-                        entries: [],
-                        total_count: 0,
-                        limit: 100,
-                    },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: {
+                    entries: [],
+                    total_count: 0,
+                    limit: 100,
+                },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection limit is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: {
-                        entries: [],
-                        total_count: 0,
-                        offset: 100,
-                    },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: {
+                    entries: [],
+                    total_count: 0,
+                    offset: 100,
+                },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
     });
-
     describe('finish()', () => {
         beforeEach(() => {
             item1 = {
@@ -370,20 +339,17 @@ describe('api/Folder', () => {
                     entries: ['file_item1', 'file_item2', 'file_item3'],
                 },
             };
-
             cache.set('file_item1', item1);
             cache.set('file_item2', item2);
             cache.set('file_item3', item3);
             cache.set('key', folderResults);
         });
-
         test('should not do anything if destroyed', () => {
             folder.successCallback = jest.fn();
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
             folder.finish();
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should call success callback with proper collection', () => {
             folder.key = 'key';
             folder.sortBy = 'name';
@@ -405,7 +371,6 @@ describe('api/Folder', () => {
                 totalCount: 3,
             });
         });
-
         test('should call success callback with 100% percent loaded when item collection is loaded', () => {
             folder.id = 'id';
             folder.key = 'key';
@@ -413,7 +378,6 @@ describe('api/Folder', () => {
             folder.sortDirection = 'ASC';
             folder.getCache = jest.fn().mockReturnValueOnce(cache);
             folder.successCallback = jest.fn();
-
             folderResults.item_collection.entries = ['file_item1', 'file_item2'];
             cache.set('key', folderResults);
             folder.finish();
@@ -431,7 +395,6 @@ describe('api/Folder', () => {
                 totalCount: 3,
             });
         });
-
         test('should call success callback with 100% percent loaded when item collection total count is 0', () => {
             folder.id = 'id';
             folder.key = 'key';
@@ -439,7 +402,6 @@ describe('api/Folder', () => {
             folder.sortDirection = 'ASC';
             folder.getCache = jest.fn().mockReturnValueOnce(cache);
             folder.successCallback = jest.fn();
-
             folderResults.item_collection.entries = ['file_item1', 'file_item2'];
             folderResults.item_collection.total_count = 0;
             cache.set('key', folderResults);
@@ -458,7 +420,6 @@ describe('api/Folder', () => {
                 totalCount: 0,
             });
         });
-
         test('should throw bad item error when item collection is missing', () => {
             cache.set('key', { path_collection: 'foo' });
             folder.id = 'id';
@@ -470,7 +431,6 @@ describe('api/Folder', () => {
             expect(folder.finish.bind(folder)).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when path collection is missing', () => {
             cache.set('key', { item_collection: 'foo' });
             folder.id = 'id';
@@ -482,7 +442,6 @@ describe('api/Folder', () => {
             expect(folder.finish.bind(folder)).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection is missing entries', () => {
             cache.set('key', {
                 path_collection: 'foo',
@@ -497,7 +456,6 @@ describe('api/Folder', () => {
             expect(folder.finish.bind(folder)).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection is missing total_count', () => {
             cache.set('key', {
                 path_collection: 'foo',
@@ -513,7 +471,6 @@ describe('api/Folder', () => {
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
     });
-
     describe('create()', () => {
         test('should not do anything if destroyed', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -536,7 +493,6 @@ describe('api/Folder', () => {
             expect(folder.key).toBe('key');
         });
     });
-
     describe('folderCreateRequest()', () => {
         beforeEach(() => {
             folder.id = 'id';
@@ -544,7 +500,6 @@ describe('api/Folder', () => {
             folder.errorCallback = 'fail';
             folder.key = 'key';
         });
-
         test('should not do anything if destroyed', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
             folder.xhr = null;
@@ -592,7 +547,6 @@ describe('api/Folder', () => {
             });
         });
     });
-
     describe('createSuccessHandler()', () => {
         beforeEach(() => {
             item1 = {
@@ -611,28 +565,24 @@ describe('api/Folder', () => {
                 },
             });
         });
-
         test('should not do anything if destroyed', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(true);
             folder.successCallback = jest.fn();
             folder.createSuccessHandler(response);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should not do anything if new child folder doesnt have an id', () => {
             folder.isDestroyed = jest.fn().mockReturnValueOnce(false);
             folder.successCallback = jest.fn();
             folder.createSuccessHandler({ data: {} });
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should insert the response item inside the parent folder', () => {
             folder.id = 'id';
             folder.key = 'key';
             folder.successCallback = jest.fn();
             folder.getCache = jest.fn().mockReturnValueOnce(cache);
             folder.createSuccessHandler({ data: item1 });
-
             expect(cache.get('key')).toEqual({
                 id: 'id',
                 item_collection: {
@@ -640,11 +590,9 @@ describe('api/Folder', () => {
                     entries: ['folder_item1', 'file_item2', 'file_item3'],
                 },
             });
-
             expect(cache.get('folder_item1')).toBe(item1);
             expect(folder.successCallback).toHaveBeenCalledWith(item1);
         });
-
         test('should throw bad item error when item collection is missing', () => {
             folder.id = 'id';
             folder.key = 'key';
@@ -656,7 +604,6 @@ describe('api/Folder', () => {
             expect(folder.createSuccessHandler.bind(folder, { id: 'foo' })).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection entries is missing', () => {
             folder.id = 'id';
             folder.key = 'key';
@@ -671,7 +618,6 @@ describe('api/Folder', () => {
             expect(folder.createSuccessHandler.bind(folder, { id: 'foo' })).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when total count is missing', () => {
             folder.id = 'id';
             folder.key = 'key';
@@ -683,13 +629,12 @@ describe('api/Folder', () => {
                     entries: [],
                 },
             });
-            expect(
-                folder.createSuccessHandler.bind(folder, {
-                    id: 'foo',
-                    item_collection: { entries: [] },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.createSuccessHandler.bind(folder, {
+                id: 'foo',
+                item_collection: { entries: [] },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
     });
 });
+//# sourceMappingURL=Folder-test.js.map

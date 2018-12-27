@@ -1,31 +1,20 @@
 /**
- * @flow
+ * @was-flow
  * @file Wraps a component in an IntlProvider
  * @author Box
  */
-
-import React, { Children } from 'react';
-import { IntlProvider } from 'react-intl';
-
-type Props = {
-    language?: string,
-    messages?: StringMap,
-    children?: any,
-};
-
-const Internationalize = ({ language, messages, children }: Props) => {
-    const shouldInternationalize: boolean = !!language && !!messages;
-
+const Internationalize = ({ language, messages, children }) => {
+    const shouldInternationalize = !!language && !!messages;
     if (shouldInternationalize) {
         const locale = language && language.substr(0, language.indexOf('-'));
-        return (
-            <IntlProvider locale={locale} messages={messages}>
-                {children}
-            </IntlProvider>
-        );
+        return locale = { locale };
+        messages = { messages } >
+            { children }
+            < /IntlProvider>;
     }
-
-    return Children.only(children);
 };
-
+;
+return Children.only(children);
+;
 export default Internationalize;
+//# sourceMappingURL=Internationalize.js.map

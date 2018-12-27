@@ -1,41 +1,20 @@
 /**
- * @flow
+ * @was-flow
  * @file Details sidebar component
  * @author Box
  */
-
-import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
 import uniqueId from 'lodash/uniqueId';
 import messages from '../../messages';
-import SidebarSection from '../SidebarSection';
 import { isValidSkillsCard } from './skillUtils';
-import SidebarSkillsCard from './SidebarSkillsCard';
 import { SKILLS_TARGETS } from '../../../interactionTargets';
-import {
-    SKILLS_TRANSCRIPT,
-    SKILLS_KEYWORD,
-    SKILLS_TIMELINE,
-    SKILLS_FACE,
-    SKILLS_STATUS,
-    SKILLS_ERROR_UNKNOWN,
-} from '../../../constants';
-
-type Props = {
-    file: BoxItem,
-    cards: Array<SkillCard>,
-    errors: NumberBooleanMap,
-    getViewer: Function,
-    onSkillChange: Function,
-};
-
+import { SKILLS_TRANSCRIPT, SKILLS_KEYWORD, SKILLS_TIMELINE, SKILLS_FACE, SKILLS_STATUS, SKILLS_ERROR_UNKNOWN, } from '../../../constants';
 /**
  * Get ths skill interaction target based on card type
  *
  * @param {Object} card - skill card
  * @return {string} - interaction target
  */
-const getCardInteractionTarget = ({ skill_card_type }: SkillCard): string => {
+const getCardInteractionTarget = ({ skill_card_type }) => {
     switch (skill_card_type) {
         case SKILLS_KEYWORD:
             return SKILLS_TARGETS.KEYWORDS.CARD;
@@ -48,39 +27,35 @@ const getCardInteractionTarget = ({ skill_card_type }: SkillCard): string => {
             return '';
     }
 };
-
 /**
  * Get ths string skill title based on card title
  *
  * @param {Object} card - skill card
  * @return {string} - skill title
  */
-const getCardTitle = ({ skill_card_type, skill_card_title = {} }: SkillCard): string | React.Node => {
-    const { code, message }: SkillCardLocalizableType = skill_card_title;
+const getCardTitle = ({ skill_card_type, skill_card_title = {} }) => {
+    const { code, message } = skill_card_title;
     const defaultKey = `${skill_card_type}Skill`;
     const defaultMessage = messages[defaultKey] || messages.defaultSkill;
-
     switch (code) {
         case 'skills_faces':
-            return <FormattedMessage {...messages.faceSkill} />;
+            return Object.assign({}, messages.faceSkill) /  > ;
         case 'skills_transcript':
-            return <FormattedMessage {...messages.transcriptSkill} />;
+            return Object.assign({}, messages.transcriptSkill) /  > ;
         case 'skills_topics':
-            return <FormattedMessage {...messages.topicsSkill} />;
+            return Object.assign({}, messages.topicsSkill) /  > ;
         case 'skills_status':
-            return <FormattedMessage {...messages.statusSkill} />;
+            return Object.assign({}, messages.statusSkill) /  > ;
         case 'skills_error':
-            return <FormattedMessage {...messages.errorSkill} />;
+            return Object.assign({}, messages.errorSkill) /  > ;
         default:
-            return message || <FormattedMessage {...defaultMessage} />;
+            return message || Object.assign({}, defaultMessage) /  > ;
     }
 };
-
-const SidebarSkills = ({ file, cards, errors, getViewer, onSkillChange }: Props): Array<React.Node> => {
-    const { permissions = {} }: BoxItem = file;
+const SidebarSkills = ({ file, cards, errors, getViewer, onSkillChange }) => {
+    const { permissions = {} } = file;
     const isSkillEditable = !!permissions.can_upload;
-
-    return cards.map((card: SkillCard, index: number) => {
+    return cards.map((card, index) => {
         if (card.error && !card.status) {
             card.skill_card_type = SKILLS_STATUS;
             card.status = {
@@ -88,27 +63,30 @@ const SidebarSkills = ({ file, cards, errors, getViewer, onSkillChange }: Props)
             };
             delete card.error;
         }
-
         const { id } = card;
         const cardId = id || uniqueId('card_');
         const isValid = isValidSkillsCard(file, card);
         const interactionTarget = getCardInteractionTarget(card);
         const title = getCardTitle(card);
         const hasEntries = Array.isArray(card.entries) ? card.entries.length > 0 : isValid;
-
-        return isValid ? (
-            <SidebarSection key={cardId} isOpen={hasEntries} interactionTarget={interactionTarget} title={title}>
-                <SidebarSkillsCard
-                    card={card}
-                    cards={cards}
-                    hasError={!!errors[index]}
-                    isEditable={isSkillEditable}
-                    getViewer={getViewer}
-                    onSkillChange={(...args) => onSkillChange(index, ...args)}
-                />
-            </SidebarSection>
-        ) : null;
-    });
+        return isValid ? key = { cardId } : ;
+        isOpen = { hasEntries };
+        interactionTarget = { interactionTarget };
+        title = { title } >
+            card;
+        {
+            card;
+        }
+        cards = { cards };
+        hasError = {};
+        errors[index];
+    }, isEditable = { isSkillEditable }, getViewer = { getViewer }, onSkillChange = {}(...args));
 };
-
+onSkillChange(index, ...args);
+/>
+    < /SidebarSection>;
+null;
+;
+;
 export default SidebarSkills;
+//# sourceMappingURL=SidebarSkills.js.map

@@ -1,68 +1,53 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import Metadata from '../Metadata';
 import Cache from '../../util/Cache';
 import * as ErrorUtil from '../../util/error';
-import {
-    KEY_CLASSIFICATION_TYPE,
-    METADATA_TEMPLATE_CLASSIFICATION,
-    METADATA_SCOPE_ENTERPRISE,
-    METADATA_SCOPE_GLOBAL,
-    METADATA_TEMPLATE_PROPERTIES,
-    ERROR_CODE_DELETE_METADATA,
-    ERROR_CODE_CREATE_METADATA,
-    ERROR_CODE_UPDATE_METADATA,
-    ERROR_CODE_UPDATE_SKILLS,
-    ERROR_CODE_FETCH_SKILLS,
-    ERROR_CODE_FETCH_CLASSIFICATION,
-} from '../../constants';
-
+import { KEY_CLASSIFICATION_TYPE, METADATA_TEMPLATE_CLASSIFICATION, METADATA_SCOPE_ENTERPRISE, METADATA_SCOPE_GLOBAL, METADATA_TEMPLATE_PROPERTIES, ERROR_CODE_DELETE_METADATA, ERROR_CODE_CREATE_METADATA, ERROR_CODE_UPDATE_METADATA, ERROR_CODE_UPDATE_SKILLS, ERROR_CODE_FETCH_SKILLS, ERROR_CODE_FETCH_CLASSIFICATION, } from '../../constants';
 let metadata;
-
 describe('api/Metadata', () => {
     beforeEach(() => {
         metadata = new Metadata({});
     });
-
     describe('getCacheKey()', () => {
         test('should return correct key', () => {
             expect(metadata.getCacheKey('foo')).toBe('file_foo');
         });
     });
-
     describe('getMetadataCacheKey()', () => {
         test('should return correct key', () => {
             expect(metadata.getMetadataCacheKey('foo')).toBe('metadata_foo');
         });
     });
-
     describe('getSkillsCacheKey()', () => {
         test('should return correct key', () => {
             expect(metadata.getSkillsCacheKey('foo')).toBe('metadata_foo_skills');
         });
     });
-
     describe('getClassificationCacheKey()', () => {
         test('should return correct key', () => {
             expect(metadata.getClassificationCacheKey('foo')).toBe('metadata_foo_classification');
         });
     });
-
     describe('getMetadataUrl()', () => {
         test('should return correct api url', () => {
             expect(metadata.getMetadataUrl('foo')).toBe('https://api.box.com/2.0/files/foo/metadata');
         });
         test('should return correct api url with scope and template', () => {
-            expect(metadata.getMetadataUrl('foo', 'scope', 'template')).toBe(
-                'https://api.box.com/2.0/files/foo/metadata/scope/template',
-            );
+            expect(metadata.getMetadataUrl('foo', 'scope', 'template')).toBe('https://api.box.com/2.0/files/foo/metadata/scope/template');
         });
     });
-
     describe('getMetadataTemplateUrl()', () => {
         test('should return correct api url', () => {
             expect(metadata.getMetadataTemplateUrl('scope')).toBe('https://api.box.com/2.0/metadata_templates/scope');
         });
     });
-
     describe('getCustomPropertiesTemplate()', () => {
         test('should return correct properties template', () => {
             expect(metadata.getCustomPropertiesTemplate()).toEqual({
@@ -73,21 +58,14 @@ describe('api/Metadata', () => {
             });
         });
     });
-
     describe('createEditor()', () => {
         test('should return an uneditable editor', () => {
-            expect(
-                metadata.createEditor(
-                    {
-                        $id: 'id',
-                        $foo: 'bar',
-                        foo: 'bar',
-                        $canEdit: true,
-                    },
-                    'template',
-                    false,
-                ),
-            ).toEqual({
+            expect(metadata.createEditor({
+                $id: 'id',
+                $foo: 'bar',
+                foo: 'bar',
+                $canEdit: true,
+            }, 'template', false)).toEqual({
                 template: 'template',
                 instance: {
                     id: 'id',
@@ -98,20 +76,13 @@ describe('api/Metadata', () => {
                 },
             });
         });
-
         test('should return an editable editor', () => {
-            expect(
-                metadata.createEditor(
-                    {
-                        $id: 'id',
-                        $foo: 'bar',
-                        foo: 'bar',
-                        $canEdit: true,
-                    },
-                    'template',
-                    true,
-                ),
-            ).toEqual({
+            expect(metadata.createEditor({
+                $id: 'id',
+                $foo: 'bar',
+                foo: 'bar',
+                $canEdit: true,
+            }, 'template', true)).toEqual({
                 template: 'template',
                 instance: {
                     id: 'id',
@@ -123,9 +94,8 @@ describe('api/Metadata', () => {
             });
         });
     });
-
     describe('getTemplates()', () => {
-        test('should return unhidden templates that are not classification', async () => {
+        test('should return unhidden templates that are not classification', () => __awaiter(this, void 0, void 0, function* () {
             metadata.getMetadataTemplateUrl = jest.fn().mockReturnValueOnce('template_url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({
                 data: {
@@ -147,23 +117,24 @@ describe('api/Metadata', () => {
                     ],
                 },
             });
-            const templates = await metadata.getTemplates('id', 'scope');
+            const templates = yield metadata.getTemplates('id', 'scope');
             expect(templates).toEqual([{ id: 1, hidden: false }, { id: 3, hidden: false }, { id: 4, hidden: false }]);
             expect(metadata.getMetadataTemplateUrl).toHaveBeenCalledWith('scope');
             expect(metadata.xhr.get).toHaveBeenCalledWith({
                 url: 'template_url',
                 id: 'file_id',
             });
-        });
-        test('should return empty array of templates when error is 400', async () => {
+        }));
+        test('should return empty array of templates when error is 400', () => __awaiter(this, void 0, void 0, function* () {
             const error = new Error();
             error.status = 400;
             metadata.getMetadataTemplateUrl = jest.fn().mockReturnValueOnce('template_url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce(Promise.reject(error));
             let templates;
             try {
-                templates = await metadata.getTemplates('id', 'scope');
-            } catch (e) {
+                templates = yield metadata.getTemplates('id', 'scope');
+            }
+            catch (e) {
                 expect(e.status).toEqual(400);
             }
             expect(templates).toEqual([]);
@@ -172,16 +143,17 @@ describe('api/Metadata', () => {
                 url: 'template_url',
                 id: 'file_id',
             });
-        });
-        test('should throw error when error is not 400', async () => {
+        }));
+        test('should throw error when error is not 400', () => __awaiter(this, void 0, void 0, function* () {
             const error = new Error();
             error.status = 401;
             metadata.getMetadataTemplateUrl = jest.fn().mockReturnValueOnce('template_url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce(Promise.reject(error));
             let templates;
             try {
-                templates = await metadata.getTemplates('id', 'scope');
-            } catch (e) {
+                templates = yield metadata.getTemplates('id', 'scope');
+            }
+            catch (e) {
                 expect(e.status).toEqual(401);
             }
             expect(templates).toBeUndefined();
@@ -190,27 +162,25 @@ describe('api/Metadata', () => {
                 url: 'template_url',
                 id: 'file_id',
             });
-        });
+        }));
     });
-
     describe('getInstances()', () => {
-        test('should return instances', async () => {
+        test('should return instances', () => __awaiter(this, void 0, void 0, function* () {
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('instance_url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({
                 data: {
                     entries: [{ id: 1 }, { id: 2 }],
                 },
             });
-            const templates = await metadata.getInstances('id');
+            const templates = yield metadata.getInstances('id');
             expect(templates).toEqual([{ id: 1 }, { id: 2 }]);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith('id');
             expect(metadata.xhr.get).toHaveBeenCalledWith({
                 url: 'instance_url',
                 id: 'file_id',
             });
-        });
+        }));
     });
-
     describe('getSkills()', () => {
         test('should call error callback with a bad item error when no id', () => {
             ErrorUtil.getBadItemError = jest.fn().mockReturnValueOnce('error');
@@ -221,7 +191,7 @@ describe('api/Metadata', () => {
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadItemError).toBeCalled();
         });
-        test('should not make request but get skills from cache and call success handler', async () => {
+        test('should not make request but get skills from cache and call success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -239,7 +209,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_skills', ['card1', 'card2']);
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { cards: 'cards' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -248,9 +217,7 @@ describe('api/Metadata', () => {
             metadata.getSkillsCacheKey = jest.fn().mockReturnValueOnce('cache_id_skills');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getSkills(file, success, error);
-
+            yield metadata.getSkills(file, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).not.toHaveBeenCalled();
@@ -259,8 +226,8 @@ describe('api/Metadata', () => {
             expect(metadata.getSkillsCacheKey).toHaveBeenCalledWith(file.id);
             expect(metadata.successHandler).toHaveBeenCalledWith(['card1', 'card2']);
             expect(metadata.errorHandler).not.toHaveBeenCalled();
-        });
-        test('should not make request but get skills from file and call success handler and ignore cache', async () => {
+        }));
+        test('should not make request but get skills from file and call success handler and ignore cache', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -278,7 +245,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_skills', ['card1', 'card2']);
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { cards: 'cards' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -287,9 +253,7 @@ describe('api/Metadata', () => {
             metadata.getSkillsCacheKey = jest.fn().mockReturnValueOnce('cache_id_skills');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getSkills(file, success, error, true);
-
+            yield metadata.getSkills(file, success, error, true);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).not.toHaveBeenCalled();
@@ -299,8 +263,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).toHaveBeenCalledWith(['card3', 'card4']);
             expect(metadata.errorHandler).not.toHaveBeenCalled();
             expect(cache.get('cache_id_skills')).toEqual(['card3', 'card4']);
-        });
-        test('should make request and update cache and success handler', async () => {
+        }));
+        test('should make request and update cache and success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -311,7 +275,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_skills', ['card1', 'card2']);
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { cards: ['card3', 'card4'] } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -319,9 +282,7 @@ describe('api/Metadata', () => {
             metadata.getSkillsCacheKey = jest.fn().mockReturnValueOnce('cache_id_skills');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getSkills(file, success, error, true);
-
+            yield metadata.getSkills(file, success, error, true);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'global', 'boxSkillsCards');
@@ -335,8 +296,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).toHaveBeenCalledWith(['card3', 'card4']);
             expect(metadata.errorHandler).not.toHaveBeenCalled();
             expect(cache.get('cache_id_skills')).toEqual(['card3', 'card4']);
-        });
-        test('should make request but update cache or call success handler when destroyed', async () => {
+        }));
+        test('should make request but update cache or call success handler when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -347,7 +308,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_skills', ['card1', 'card2']);
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { cards: ['card3', 'card4'] } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -355,9 +315,7 @@ describe('api/Metadata', () => {
             metadata.getSkillsCacheKey = jest.fn().mockReturnValueOnce('cache_id_skills');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getSkills(file, success, error, true);
-
+            yield metadata.getSkills(file, success, error, true);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'global', 'boxSkillsCards');
@@ -370,8 +328,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).not.toHaveBeenCalled();
             expect(metadata.errorHandler).not.toHaveBeenCalled();
             expect(cache.get('cache_id_skills')).toBeUndefined();
-        });
-        test('should make request and call error handler for error', async () => {
+        }));
+        test('should make request and call error handler for error', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -383,7 +341,6 @@ describe('api/Metadata', () => {
             const cache = new Cache();
             cache.set('cache_id_skills', ['card1', 'card2']);
             const xhrError = new Error('error');
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce(Promise.reject(xhrError));
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -391,9 +348,7 @@ describe('api/Metadata', () => {
             metadata.getSkillsCacheKey = jest.fn().mockReturnValueOnce('cache_id_skills');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getSkills(file, success, error, true);
-
+            yield metadata.getSkills(file, success, error, true);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'global', 'boxSkillsCards');
@@ -406,9 +361,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).not.toHaveBeenCalled();
             expect(metadata.errorHandler).toHaveBeenCalledWith(xhrError);
             expect(cache.get('cache_id_skills')).toBeUndefined();
-        });
+        }));
     });
-
     describe('updateSkills()', () => {
         test('should call error callback with a bad item error when no id', () => {
             ErrorUtil.getBadItemError = jest.fn().mockReturnValueOnce('error');
@@ -437,7 +391,7 @@ describe('api/Metadata', () => {
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadPermissionsError).toBeCalled();
         });
-        test('should make request and call merge and success handler', async () => {
+        test('should make request and call merge and success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -448,7 +402,6 @@ describe('api/Metadata', () => {
             };
             const ops = [{ op: 'add' }, { op: 'test' }];
             const cacheSet = jest.fn();
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.put = jest.fn().mockReturnValueOnce({ data: { cards: 'cards' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -458,9 +411,7 @@ describe('api/Metadata', () => {
             metadata.merge = jest.fn().mockReturnValueOnce('file');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.updateSkills(file, ops, success, error);
-
+            yield metadata.updateSkills(file, ops, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'global', 'boxSkillsCards');
@@ -474,15 +425,14 @@ describe('api/Metadata', () => {
             expect(metadata.isDestroyed).toHaveBeenCalled();
             expect(metadata.getCache).toHaveBeenCalled();
             expect(metadata.getCacheKey).toHaveBeenCalledWith(file.id);
-
             expect(metadata.getSkillsCacheKey).toHaveBeenCalledWith(file.id);
             expect(metadata.merge).toHaveBeenCalledWith('cache_id', 'metadata.global.boxSkillsCards', {
                 cards: 'cards',
             });
             expect(metadata.successHandler).toHaveBeenCalledWith('cards');
             expect(metadata.errorHandler).not.toHaveBeenCalled();
-        });
-        test('should make request but not merge or call success handler when destroyed', async () => {
+        }));
+        test('should make request but not merge or call success handler when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -493,7 +443,6 @@ describe('api/Metadata', () => {
             };
             const ops = [{ op: 'add' }, { op: 'test' }];
             const cacheSet = jest.fn();
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.put = jest.fn().mockReturnValueOnce({ data: { cards: 'cards' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -503,9 +452,7 @@ describe('api/Metadata', () => {
             metadata.merge = jest.fn().mockReturnValueOnce('file');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.updateSkills(file, ops, success, error);
-
+            yield metadata.updateSkills(file, ops, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'global', 'boxSkillsCards');
@@ -519,13 +466,12 @@ describe('api/Metadata', () => {
             expect(metadata.isDestroyed).toHaveBeenCalled();
             expect(metadata.getCache).not.toHaveBeenCalled();
             expect(metadata.getCacheKey).not.toHaveBeenCalled();
-
             expect(metadata.getSkillsCacheKey).not.toHaveBeenCalled();
             expect(metadata.merge).not.toHaveBeenCalled();
             expect(metadata.successHandler).not.toHaveBeenCalled();
             expect(metadata.errorHandler).not.toHaveBeenCalled();
-        });
-        test('should make request and call error handler for error', async () => {
+        }));
+        test('should make request and call error handler for error', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -537,7 +483,6 @@ describe('api/Metadata', () => {
             const ops = [{ op: 'add' }, { op: 'test' }];
             const cacheSet = jest.fn();
             const xhrError = new Error('error');
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.put = jest.fn().mockReturnValueOnce(Promise.reject(xhrError));
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -547,9 +492,7 @@ describe('api/Metadata', () => {
             metadata.merge = jest.fn().mockReturnValueOnce('file');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.updateSkills(file, ops, success, error);
-
+            yield metadata.updateSkills(file, ops, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'global', 'boxSkillsCards');
@@ -563,14 +506,12 @@ describe('api/Metadata', () => {
             expect(metadata.isDestroyed).not.toHaveBeenCalled();
             expect(metadata.getCache).not.toHaveBeenCalled();
             expect(metadata.getCacheKey).not.toHaveBeenCalled();
-
             expect(metadata.getSkillsCacheKey).not.toHaveBeenCalled();
             expect(metadata.merge).not.toHaveBeenCalled();
             expect(metadata.successHandler).not.toHaveBeenCalled();
             expect(metadata.errorHandler).toHaveBeenCalledWith(xhrError);
-        });
+        }));
     });
-
     describe('getClassification()', () => {
         test('should call error callback with a bad item error, and code, when no id', () => {
             ErrorUtil.getBadItemError = jest.fn().mockReturnValueOnce('error');
@@ -581,7 +522,7 @@ describe('api/Metadata', () => {
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadItemError).toBeCalled();
         });
-        test('should not make request but get classification from cache and call success handler', async () => {
+        test('should not make request but get classification from cache and call success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -592,7 +533,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_classification', { [KEY_CLASSIFICATION_TYPE]: 'Test' });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { [KEY_CLASSIFICATION_TYPE]: 'Test' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -601,9 +541,7 @@ describe('api/Metadata', () => {
             metadata.getClassificationCacheKey = jest.fn().mockReturnValueOnce('cache_id_classification');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getClassification(file, success, error);
-
+            yield metadata.getClassification(file, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).not.toHaveBeenCalled();
@@ -612,8 +550,8 @@ describe('api/Metadata', () => {
             expect(metadata.getClassificationCacheKey).toHaveBeenCalledWith(file.id);
             expect(metadata.successHandler).toHaveBeenCalledWith({ [KEY_CLASSIFICATION_TYPE]: 'Test' });
             expect(metadata.errorHandler).not.toHaveBeenCalled();
-        });
-        test('should get classification from cache and call success handler, and then refresh the cache by making a request', async () => {
+        }));
+        test('should get classification from cache and call success handler, and then refresh the cache by making a request', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -624,7 +562,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_classification', { [KEY_CLASSIFICATION_TYPE]: 'Test' });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { [KEY_CLASSIFICATION_TYPE]: 'Test' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -633,9 +570,7 @@ describe('api/Metadata', () => {
             metadata.getClassificationCacheKey = jest.fn().mockReturnValueOnce('cache_id_classification');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getClassification(file, success, error, { refreshCache: true });
-
+            yield metadata.getClassification(file, success, error, { refreshCache: true });
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalled();
@@ -644,8 +579,8 @@ describe('api/Metadata', () => {
             expect(metadata.getClassificationCacheKey).toHaveBeenCalledWith(file.id);
             expect(metadata.successHandler).toHaveBeenCalledWith({ [KEY_CLASSIFICATION_TYPE]: 'Test' });
             expect(metadata.errorHandler).not.toHaveBeenCalled();
-        });
-        test('should make request and update cache and success handler', async () => {
+        }));
+        test('should make request and update cache and success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -656,7 +591,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_classification', { [KEY_CLASSIFICATION_TYPE]: 'Test' });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { [KEY_CLASSIFICATION_TYPE]: 'Foo' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -664,16 +598,10 @@ describe('api/Metadata', () => {
             metadata.getClassificationCacheKey = jest.fn().mockReturnValueOnce('cache_id_classification');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getClassification(file, success, error, { forceFetch: true });
-
+            yield metadata.getClassification(file, success, error, { forceFetch: true });
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
-            expect(metadata.getMetadataUrl).toHaveBeenCalledWith(
-                file.id,
-                METADATA_SCOPE_ENTERPRISE,
-                METADATA_TEMPLATE_CLASSIFICATION,
-            );
+            expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, METADATA_SCOPE_ENTERPRISE, METADATA_TEMPLATE_CLASSIFICATION);
             expect(metadata.xhr.get).toHaveBeenCalledWith({
                 url: 'url',
                 id: 'file_id',
@@ -684,8 +612,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).toHaveBeenCalledWith({ [KEY_CLASSIFICATION_TYPE]: 'Foo' });
             expect(metadata.errorHandler).not.toHaveBeenCalled();
             expect(cache.get('cache_id_classification')).toEqual({ [KEY_CLASSIFICATION_TYPE]: 'Foo' });
-        });
-        test('should make request but update cache or call success handler when destroyed', async () => {
+        }));
+        test('should make request but update cache or call success handler when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -696,7 +624,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             cache.set('cache_id_classification', { [KEY_CLASSIFICATION_TYPE]: 'test' });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce({ data: { [KEY_CLASSIFICATION_TYPE]: 'test' } });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -704,16 +631,10 @@ describe('api/Metadata', () => {
             metadata.getClassificationCacheKey = jest.fn().mockReturnValueOnce('cache_id_classification');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getClassification(file, success, error, { forceFetch: true });
-
+            yield metadata.getClassification(file, success, error, { forceFetch: true });
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
-            expect(metadata.getMetadataUrl).toHaveBeenCalledWith(
-                file.id,
-                METADATA_SCOPE_ENTERPRISE,
-                METADATA_TEMPLATE_CLASSIFICATION,
-            );
+            expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, METADATA_SCOPE_ENTERPRISE, METADATA_TEMPLATE_CLASSIFICATION);
             expect(metadata.xhr.get).toHaveBeenCalledWith({
                 url: 'url',
                 id: 'file_id',
@@ -723,8 +644,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).not.toHaveBeenCalled();
             expect(metadata.errorHandler).not.toHaveBeenCalled();
             expect(cache.get('cache_id_classification')).toBeUndefined();
-        });
-        test('should make request and call error handler for error', async () => {
+        }));
+        test('should make request and call error handler for error', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -736,7 +657,6 @@ describe('api/Metadata', () => {
             const cache = new Cache();
             cache.set('cache_id_classification', { [KEY_CLASSIFICATION_TYPE]: 'test' });
             const xhrError = new Error('error');
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.get = jest.fn().mockReturnValueOnce(Promise.reject(xhrError));
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -744,16 +664,10 @@ describe('api/Metadata', () => {
             metadata.getClassificationCacheKey = jest.fn().mockReturnValueOnce('cache_id_classification');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.getClassification(file, success, error, { forceFetch: true });
-
+            yield metadata.getClassification(file, success, error, { forceFetch: true });
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
-            expect(metadata.getMetadataUrl).toHaveBeenCalledWith(
-                file.id,
-                METADATA_SCOPE_ENTERPRISE,
-                METADATA_TEMPLATE_CLASSIFICATION,
-            );
+            expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, METADATA_SCOPE_ENTERPRISE, METADATA_TEMPLATE_CLASSIFICATION);
             expect(metadata.xhr.get).toHaveBeenCalledWith({
                 url: 'url',
                 id: 'file_id',
@@ -763,9 +677,8 @@ describe('api/Metadata', () => {
             expect(metadata.successHandler).not.toHaveBeenCalled();
             expect(metadata.errorHandler).toHaveBeenCalledWith(xhrError);
             expect(cache.get('cache_id_classificiation')).toBeUndefined();
-        });
+        }));
     });
-
     describe('updateMetadata()', () => {
         test('should call error callback with a bad item error when no id', () => {
             ErrorUtil.getBadItemError = jest.fn().mockReturnValueOnce('error');
@@ -798,18 +711,12 @@ describe('api/Metadata', () => {
             ErrorUtil.getBadPermissionsError = jest.fn().mockReturnValueOnce('error');
             const successCallback = jest.fn();
             const errorCallback = jest.fn();
-            metadata.updateMetadata(
-                { id: 'id', permissions: { can_upload: false } },
-                {},
-                {},
-                successCallback,
-                errorCallback,
-            );
+            metadata.updateMetadata({ id: 'id', permissions: { can_upload: false } }, {}, {}, successCallback, errorCallback);
             expect(errorCallback).toBeCalledWith('error', ERROR_CODE_UPDATE_METADATA);
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadPermissionsError).toBeCalled();
         });
-        test('should make request and update cache and call success handler', async () => {
+        test('should make request and update cache and call success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -821,7 +728,6 @@ describe('api/Metadata', () => {
             const ops = [{ op: 'add' }, { op: 'test' }];
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
-
             const priorMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -830,7 +736,6 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             const updatedMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -839,11 +744,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.put = jest.fn().mockReturnValueOnce({ data: 'foo' });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -854,9 +757,7 @@ describe('api/Metadata', () => {
             metadata.createEditor = jest.fn().mockReturnValueOnce(updatedMetadata);
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.updateMetadata(file, template, ops, success, error);
-
+            yield metadata.updateMetadata(file, template, ops, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -875,8 +776,8 @@ describe('api/Metadata', () => {
             expect(cache.get('metadata_id')).toEqual({
                 editors: [updatedMetadata],
             });
-        });
-        test('should make request but not update cache or call success handler when destroyed', async () => {
+        }));
+        test('should make request but not update cache or call success handler when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -888,7 +789,6 @@ describe('api/Metadata', () => {
             const ops = [{ op: 'add' }, { op: 'test' }];
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
-
             const priorMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -897,7 +797,6 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             const updatedMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -906,11 +805,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.put = jest.fn().mockReturnValueOnce({ data: 'foo' });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -920,9 +817,7 @@ describe('api/Metadata', () => {
             metadata.createEditor = jest.fn().mockReturnValueOnce(updatedMetadata);
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.updateMetadata(file, template, ops, success, error);
-
+            yield metadata.updateMetadata(file, template, ops, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -941,8 +836,8 @@ describe('api/Metadata', () => {
             expect(cache.get('metadata_id')).toEqual({
                 editors: [priorMetadata],
             });
-        });
-        test('should make request and call error handler for error', async () => {
+        }));
+        test('should make request and call error handler for error', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -955,7 +850,6 @@ describe('api/Metadata', () => {
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
             const xhrError = new Error('error');
-
             const priorMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -964,7 +858,6 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             const updatedMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -973,11 +866,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.put = jest.fn().mockReturnValueOnce(Promise.reject(xhrError));
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -987,9 +878,7 @@ describe('api/Metadata', () => {
             metadata.createEditor = jest.fn().mockReturnValueOnce(updatedMetadata);
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.updateMetadata(file, template, ops, success, error);
-
+            yield metadata.updateMetadata(file, template, ops, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1008,9 +897,8 @@ describe('api/Metadata', () => {
                 editors: [priorMetadata],
             });
             expect(metadata.errorHandler).toHaveBeenCalledWith(xhrError);
-        });
+        }));
     });
-
     describe('createMetadata()', () => {
         test('should call error callback with a bad item error when no id', () => {
             ErrorUtil.getBadItemError = jest.fn().mockReturnValueOnce('error');
@@ -1043,12 +931,7 @@ describe('api/Metadata', () => {
             ErrorUtil.getBadPermissionsError = jest.fn().mockReturnValueOnce('error');
             const successCallback = jest.fn();
             const errorCallback = jest.fn();
-            metadata.createMetadata(
-                { id: 'id', permissions: { can_upload: false } },
-                {},
-                successCallback,
-                errorCallback,
-            );
+            metadata.createMetadata({ id: 'id', permissions: { can_upload: false } }, {}, successCallback, errorCallback);
             expect(errorCallback).toBeCalledWith('error', ERROR_CODE_CREATE_METADATA);
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadPermissionsError).toBeCalled();
@@ -1057,16 +940,11 @@ describe('api/Metadata', () => {
             ErrorUtil.getBadPermissionsError = jest.fn().mockReturnValueOnce('error');
             const successCallback = jest.fn();
             const errorCallback = jest.fn();
-            metadata.createMetadata(
-                {
-                    id: 'id',
-                    permissions: { can_upload: true },
-                    is_externally_owned: true,
-                },
-                { scope: 'global', template: 'foo' },
-                successCallback,
-                errorCallback,
-            );
+            metadata.createMetadata({
+                id: 'id',
+                permissions: { can_upload: true },
+                is_externally_owned: true,
+            }, { scope: 'global', template: 'foo' }, successCallback, errorCallback);
             expect(errorCallback).toBeCalledWith('error', ERROR_CODE_CREATE_METADATA);
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadPermissionsError).toBeCalled();
@@ -1075,21 +953,16 @@ describe('api/Metadata', () => {
             ErrorUtil.getBadPermissionsError = jest.fn().mockReturnValueOnce('error');
             const successCallback = jest.fn();
             const errorCallback = jest.fn();
-            metadata.createMetadata(
-                {
-                    id: 'id',
-                    permissions: { can_upload: true },
-                    is_externally_owned: true,
-                },
-                { scope: 'blah', template: 'properties' },
-                successCallback,
-                errorCallback,
-            );
+            metadata.createMetadata({
+                id: 'id',
+                permissions: { can_upload: true },
+                is_externally_owned: true,
+            }, { scope: 'blah', template: 'properties' }, successCallback, errorCallback);
             expect(errorCallback).toBeCalledWith('error', ERROR_CODE_CREATE_METADATA);
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadPermissionsError).toBeCalled();
         });
-        test('should make request and update cache and call success handler', async () => {
+        test('should make request and update cache and call success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -1100,7 +973,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
-
             const priorMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -1109,7 +981,6 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             const updatedMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -1118,11 +989,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.post = jest.fn().mockReturnValueOnce({ data: 'foo' });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -1133,9 +1002,7 @@ describe('api/Metadata', () => {
             metadata.createEditor = jest.fn().mockReturnValueOnce(updatedMetadata);
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.createMetadata(file, template, success, error);
-
+            yield metadata.createMetadata(file, template, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1153,8 +1020,8 @@ describe('api/Metadata', () => {
             expect(cache.get('metadata_id')).toEqual({
                 editors: [priorMetadata, updatedMetadata],
             });
-        });
-        test('should make request but not update cache or call success handler when destroyed', async () => {
+        }));
+        test('should make request but not update cache or call success handler when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -1165,7 +1032,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
-
             const priorMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -1174,7 +1040,6 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             const updatedMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -1183,11 +1048,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.post = jest.fn().mockReturnValueOnce({ data: 'foo' });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -1198,9 +1061,7 @@ describe('api/Metadata', () => {
             metadata.createEditor = jest.fn().mockReturnValueOnce(updatedMetadata);
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.createMetadata(file, template, success, error);
-
+            yield metadata.createMetadata(file, template, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1218,8 +1079,8 @@ describe('api/Metadata', () => {
             expect(cache.get('metadata_id')).toEqual({
                 editors: [priorMetadata],
             });
-        });
-        test('should make request and call error handler for error', async () => {
+        }));
+        test('should make request and call error handler for error', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -1239,7 +1100,6 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             const updatedMetadata = {
                 instance: {
                     id: 'instance_id',
@@ -1248,11 +1108,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.post = jest.fn().mockReturnValueOnce(Promise.reject(xhrError));
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -1263,9 +1121,7 @@ describe('api/Metadata', () => {
             metadata.createEditor = jest.fn().mockReturnValueOnce(updatedMetadata);
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.createMetadata(file, template, success, error);
-
+            yield metadata.createMetadata(file, template, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1283,9 +1139,8 @@ describe('api/Metadata', () => {
                 editors: [priorMetadata],
             });
             expect(metadata.errorHandler).toHaveBeenCalledWith(xhrError);
-        });
+        }));
     });
-
     describe('deleteMetadata()', () => {
         test('should call error callback with a bad item error when no id', () => {
             ErrorUtil.getBadItemError = jest.fn().mockReturnValueOnce('error');
@@ -1318,17 +1173,12 @@ describe('api/Metadata', () => {
             ErrorUtil.getBadPermissionsError = jest.fn().mockReturnValueOnce('error');
             const successCallback = jest.fn();
             const errorCallback = jest.fn();
-            metadata.deleteMetadata(
-                { id: 'id', permissions: { can_upload: false } },
-                {},
-                successCallback,
-                errorCallback,
-            );
+            metadata.deleteMetadata({ id: 'id', permissions: { can_upload: false } }, {}, successCallback, errorCallback);
             expect(errorCallback).toBeCalledWith('error', ERROR_CODE_DELETE_METADATA);
             expect(successCallback).not.toBeCalled();
             expect(ErrorUtil.getBadPermissionsError).toBeCalled();
         });
-        test('should make request and update cache and call success handler', async () => {
+        test('should make request and update cache and call success handler', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -1339,7 +1189,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
-
             const priorMetadata = {
                 template,
                 instance: {
@@ -1349,11 +1198,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.delete = jest.fn().mockReturnValueOnce({ data: 'foo' });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -1363,9 +1210,7 @@ describe('api/Metadata', () => {
             metadata.merge = jest.fn().mockReturnValueOnce('file');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.deleteMetadata(file, template, success, error);
-
+            yield metadata.deleteMetadata(file, template, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1381,8 +1226,8 @@ describe('api/Metadata', () => {
             expect(cache.get('metadata_id')).toEqual({
                 editors: [],
             });
-        });
-        test('should make request but not update cache or call success handler when destroyed', async () => {
+        }));
+        test('should make request but not update cache or call success handler when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -1393,7 +1238,6 @@ describe('api/Metadata', () => {
             };
             const cache = new Cache();
             const template = { scope: 'scope', templateKey: 'templateKey' };
-
             const priorMetadata = {
                 template,
                 instance: {
@@ -1403,11 +1247,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.delete = jest.fn().mockReturnValueOnce({ data: 'foo' });
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -1417,9 +1259,7 @@ describe('api/Metadata', () => {
             metadata.merge = jest.fn().mockReturnValueOnce('file');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.deleteMetadata(file, template, success, error);
-
+            yield metadata.deleteMetadata(file, template, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1435,8 +1275,8 @@ describe('api/Metadata', () => {
             expect(cache.get('metadata_id')).toEqual({
                 editors: [priorMetadata],
             });
-        });
-        test('should make request and call error handler for error', async () => {
+        }));
+        test('should make request and call error handler for error', () => __awaiter(this, void 0, void 0, function* () {
             const success = jest.fn();
             const error = jest.fn();
             const file = {
@@ -1457,11 +1297,9 @@ describe('api/Metadata', () => {
                     },
                 },
             };
-
             cache.set('metadata_id', {
                 editors: [priorMetadata],
             });
-
             metadata.getMetadataUrl = jest.fn().mockReturnValueOnce('url');
             metadata.xhr.delete = jest.fn().mockReturnValueOnce(Promise.reject(xhrError));
             metadata.isDestroyed = jest.fn().mockReturnValueOnce(false);
@@ -1471,9 +1309,7 @@ describe('api/Metadata', () => {
             metadata.merge = jest.fn().mockReturnValueOnce('file');
             metadata.successHandler = jest.fn();
             metadata.errorHandler = jest.fn();
-
-            await metadata.deleteMetadata(file, template, success, error);
-
+            yield metadata.deleteMetadata(file, template, success, error);
             expect(metadata.successCallback).toBe(success);
             expect(metadata.errorCallback).toBe(error);
             expect(metadata.getMetadataUrl).toHaveBeenCalledWith(file.id, 'scope', 'templateKey');
@@ -1489,6 +1325,7 @@ describe('api/Metadata', () => {
                 editors: [priorMetadata],
             });
             expect(metadata.errorHandler).toHaveBeenCalledWith(xhrError);
-        });
+        }));
     });
 });
+//# sourceMappingURL=Metadata-test.js.map

@@ -1,13 +1,9 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import SharedLinkExpirationNotice from 'box-react-ui/lib/features/item-details/SharedLinkExpirationNotice';
 import ItemExpirationNotice from 'box-react-ui/lib/features/item-details/ItemExpirationNotice';
-import SidebarNotices from '../SidebarNotices';
-
 describe('components/ContentSidebar/SidebarNotices', () => {
     describe('render()', () => {
-        const getWrapper = props => shallow(<SidebarNotices {...props} />);
-
+        const getWrapper = props => shallow(Object.assign({}, props) /  > );
         test('should render an item expiration if present', () => {
             const props = {
                 file: {
@@ -17,14 +13,11 @@ describe('components/ContentSidebar/SidebarNotices', () => {
                     },
                 },
             };
-
             const wrapper = getWrapper(props);
-
             expect(wrapper.find(ItemExpirationNotice)).toHaveLength(1);
             expect(wrapper.find(SharedLinkExpirationNotice)).toHaveLength(0);
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should render a shared link expiration if present', () => {
             const props = {
                 file: {
@@ -34,15 +27,14 @@ describe('components/ContentSidebar/SidebarNotices', () => {
                 },
             };
             const wrapper = getWrapper(props);
-
             expect(wrapper.find(SharedLinkExpirationNotice)).toHaveLength(1);
             expect(wrapper.find(ItemExpirationNotice)).toHaveLength(0);
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should correctly render the empty state', () => {
             const wrapper = getWrapper({});
             expect(wrapper).toMatchSnapshot();
         });
     });
 });
+//# sourceMappingURL=SidebarNotices-test.js.map

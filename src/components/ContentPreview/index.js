@@ -1,3 +1,9 @@
-// @flow
+// @was-flow
 export { default } from './ContentPreview';
-export type { ContentPreviewProps } from './ContentPreview';
+type;
+{
+    ContentPreviewProps;
+}
+from;
+'./ContentPreview';
+//# sourceMappingURL=index.js.map

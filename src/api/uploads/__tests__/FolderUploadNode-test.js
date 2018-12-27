@@ -1,20 +1,21 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import noop from 'lodash/noop';
 import FolderUploadNode from '../FolderUploadNode';
 import FolderAPI from '../../Folder';
 import { ERROR_CODE_ITEM_NAME_IN_USE, STATUS_COMPLETE } from '../../../constants';
-
 jest.mock('../../../api/Folder');
-jest.mock('../../../util/uploads', () => ({
-    ...require.requireActual('../../../util/uploads'),
-    getFileFromEntry: jest.fn(entry => entry),
-}));
-
+jest.mock('../../../util/uploads', () => (Object.assign({}, require.requireActual('../../../util/uploads'), { getFileFromEntry: jest.fn(entry => entry) })));
 let folderUploadNodeInstance;
 let folderCreateMock;
-
 describe('api/uploads/FolderUploadNode', () => {
     const name = 'hi';
-
     beforeEach(() => {
         folderUploadNodeInstance = new FolderUploadNode(name, noop, noop, {}, {});
         folderCreateMock = jest.fn((a, b, resolve) => {
@@ -25,9 +26,8 @@ describe('api/uploads/FolderUploadNode', () => {
             create: folderCreateMock,
         }));
     });
-
     describe('upload()', () => {
-        test('should call createAndUploadFolder(), addFilesToUploadQueue() and uploadChildFolders()', async () => {
+        test('should call createAndUploadFolder(), addFilesToUploadQueue() and uploadChildFolders()', () => __awaiter(this, void 0, void 0, function* () {
             const errorCallback = () => 'errorCallback';
             const parentFolderId = '0';
             const isRoot = true;
@@ -36,21 +36,14 @@ describe('api/uploads/FolderUploadNode', () => {
             folderUploadNodeInstance.addFilesToUploadQueue = jest.fn();
             folderUploadNodeInstance.uploadChildFolders = jest.fn();
             folderUploadNodeInstance.getFormattedFiles = jest.fn(() => files);
-
-            await folderUploadNodeInstance.upload(parentFolderId, errorCallback, isRoot);
-
+            yield folderUploadNodeInstance.upload(parentFolderId, errorCallback, isRoot);
             expect(folderUploadNodeInstance.createAndUploadFolder).toHaveBeenCalledWith(errorCallback, isRoot);
-            expect(folderUploadNodeInstance.addFilesToUploadQueue).toHaveBeenCalledWith(
-                files,
-                expect.any(Function),
-                true,
-            );
+            expect(folderUploadNodeInstance.addFilesToUploadQueue).toHaveBeenCalledWith(files, expect.any(Function), true);
             expect(folderUploadNodeInstance.uploadChildFolders).toHaveBeenCalledWith(errorCallback);
-        });
+        }));
     });
-
     describe('uploadChildFolders()', () => {
-        test('should upload all child folders', async () => {
+        test('should upload all child folders', () => __awaiter(this, void 0, void 0, function* () {
             const errorCallback = () => 'errorCallback';
             const upload1 = jest.fn();
             const upload2 = jest.fn();
@@ -63,15 +56,12 @@ describe('api/uploads/FolderUploadNode', () => {
                 },
             };
             folderUploadNodeInstance.folderId = '123';
-
-            await folderUploadNodeInstance.uploadChildFolders(errorCallback);
-
+            yield folderUploadNodeInstance.uploadChildFolders(errorCallback);
             expect(upload1).toHaveBeenCalledWith(folderUploadNodeInstance.folderId, errorCallback);
-        });
+        }));
     });
-
     describe('createAndUploadFolder()', () => {
-        test('should create folder', async () => {
+        test('should create folder', () => __awaiter(this, void 0, void 0, function* () {
             const folderId = '1';
             const errorCallback = () => 'errorCallback';
             const isRoot = true;
@@ -79,26 +69,20 @@ describe('api/uploads/FolderUploadNode', () => {
                 id: folderId,
             }));
             folderUploadNodeInstance.addFolderToUploadQueue = jest.fn();
-
-            await folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
-
+            yield folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
             expect(folderUploadNodeInstance.createFolder).toHaveBeenCalledWith();
             expect(folderUploadNodeInstance.folderId).toBe(folderId);
-        });
-
-        test('should call errorCallback when create folder fails and error code is not ITEM_NAME_IN_USE', async () => {
+        }));
+        test('should call errorCallback when create folder fails and error code is not ITEM_NAME_IN_USE', () => __awaiter(this, void 0, void 0, function* () {
             const errorCallback = jest.fn();
             const isRoot = true;
             const error = { code: 'random' };
             folderUploadNodeInstance.createFolder = jest.fn(() => Promise.reject(error));
             folderUploadNodeInstance.addFolderToUploadQueue = jest.fn();
-
-            await folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
-
+            yield folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
             expect(errorCallback).toHaveBeenCalledWith(error);
-        });
-
-        test('should recovery correctly from ITEM_NAME_IN_USE', async () => {
+        }));
+        test('should recovery correctly from ITEM_NAME_IN_USE', () => __awaiter(this, void 0, void 0, function* () {
             const errorCallback = jest.fn();
             const folderId = '1';
             const isRoot = true;
@@ -108,14 +92,11 @@ describe('api/uploads/FolderUploadNode', () => {
             };
             folderUploadNodeInstance.createFolder = jest.fn(() => Promise.reject(error));
             folderUploadNodeInstance.addFolderToUploadQueue = jest.fn();
-
-            await folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
-
+            yield folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
             expect(errorCallback).not.toHaveBeenCalledWith(error);
             expect(folderUploadNodeInstance.folderId).toBe(folderId);
-        });
-
-        test('should call addFolderToUploadQueue when folder is created successfully for non-root folder', async () => {
+        }));
+        test('should call addFolderToUploadQueue when folder is created successfully for non-root folder', () => __awaiter(this, void 0, void 0, function* () {
             const folderId = '1';
             const errorCallback = () => 'errorCallback';
             const isRoot = false;
@@ -124,9 +105,7 @@ describe('api/uploads/FolderUploadNode', () => {
                 id: folderId,
             }));
             folderUploadNodeInstance.addFolderToUploadQueue = jest.fn();
-
-            await folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
-
+            yield folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
             expect(folderUploadNodeInstance.addFolderToUploadQueue).toHaveBeenCalledWith([
                 {
                     extension: '',
@@ -137,9 +116,8 @@ describe('api/uploads/FolderUploadNode', () => {
                     progress: 100,
                 },
             ]);
-        });
-
-        test('should not addFolderToUploadQueue() when folder is created successfully for root folder', async () => {
+        }));
+        test('should not addFolderToUploadQueue() when folder is created successfully for root folder', () => __awaiter(this, void 0, void 0, function* () {
             const folderId = '1';
             const errorCallback = () => 'errorCallback';
             const isRoot = true;
@@ -148,13 +126,10 @@ describe('api/uploads/FolderUploadNode', () => {
                 id: folderId,
             }));
             folderUploadNodeInstance.addFolderToUploadQueue = jest.fn();
-
-            await folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
-
+            yield folderUploadNodeInstance.createAndUploadFolder(errorCallback, isRoot);
             expect(folderUploadNodeInstance.addFolderToUploadQueue).not.toHaveBeenCalled();
-        });
+        }));
     });
-
     describe('getFormattedFiles()', () => {
         test('should return correctly formatted file', () => {
             const now = Date.now();
@@ -162,94 +137,71 @@ describe('api/uploads/FolderUploadNode', () => {
             const file1 = { name: 1 };
             const file2 = { name: 2 };
             folderUploadNodeInstance.files = [file1, file2];
-
             folderUploadNodeInstance.folderId = '1';
             folderUploadNodeInstance.fileAPIOptions = { a: 1, b: 2 };
-
             const data = folderUploadNodeInstance.getFormattedFiles();
-
             expect(data).toEqual([
                 {
                     file: file1,
-                    options: {
-                        ...folderUploadNodeInstance.fileAPIOptions,
-                        folderId: folderUploadNodeInstance.folderId,
-                        uploadInitTimestamp: now,
-                    },
+                    options: Object.assign({}, folderUploadNodeInstance.fileAPIOptions, { folderId: folderUploadNodeInstance.folderId, uploadInitTimestamp: now }),
                 },
                 {
                     file: file2,
-                    options: {
-                        ...folderUploadNodeInstance.fileAPIOptions,
-                        folderId: folderUploadNodeInstance.folderId,
-                        uploadInitTimestamp: now,
-                    },
+                    options: Object.assign({}, folderUploadNodeInstance.fileAPIOptions, { folderId: folderUploadNodeInstance.folderId, uploadInitTimestamp: now }),
                 },
             ]);
         });
     });
-
     describe('createFolder()', () => {
-        test('create folder with folderAPI', async () => {
+        test('create folder with folderAPI', () => __awaiter(this, void 0, void 0, function* () {
             const parentFolderId = '0';
             folderUploadNodeInstance.folderId = '123';
             folderUploadNodeInstance.folderId = '123';
             folderUploadNodeInstance.parentFolderId = parentFolderId;
-
-            await folderUploadNodeInstance.createFolder();
-
+            yield folderUploadNodeInstance.createFolder();
             expect(FolderAPI).toHaveBeenCalled();
             expect(folderCreateMock).toHaveBeenCalled();
-        });
+        }));
     });
-
     describe('buildCurrentFolderFromEntry()', () => {
-        test('should resolve when entry is empty', async () => {
+        test('should resolve when entry is empty', () => __awaiter(this, void 0, void 0, function* () {
             folderUploadNodeInstance.entry = undefined;
-
             try {
-                await folderUploadNodeInstance.buildCurrentFolderFromEntry();
-            } catch (error) {
+                yield folderUploadNodeInstance.buildCurrentFolderFromEntry();
+            }
+            catch (error) {
                 throw Error('buildCurrentFolderFromEntry throws an error');
             }
-        });
-
-        test('should readEntry() when entry is not empty', async () => {
+        }));
+        test('should readEntry() when entry is not empty', () => __awaiter(this, void 0, void 0, function* () {
             const reader = { reader: true };
             folderUploadNodeInstance.readEntry = (readerParam, resolve) => {
                 expect(readerParam).toEqual(reader);
                 resolve();
             };
-
             folderUploadNodeInstance.entry = {
                 createReader: () => reader,
             };
-
-            await folderUploadNodeInstance.buildCurrentFolderFromEntry();
-        });
+            yield folderUploadNodeInstance.buildCurrentFolderFromEntry();
+        }));
     });
-
     describe('readEntry()', () => {
-        test('should call readEntries() on the reader instance', async () => {
+        test('should call readEntries() on the reader instance', () => __awaiter(this, void 0, void 0, function* () {
             const readEntriesMock = jest.fn();
             const reader = { readEntries: readEntriesMock };
-
-            await folderUploadNodeInstance.readEntry(reader, noop);
-
+            yield folderUploadNodeInstance.readEntry(reader, noop);
             expect(readEntriesMock).toHaveBeenCalledTimes(1);
-        });
+        }));
     });
-
     describe('createFolderUploadNodesFromEntries()', () => {
-        test('should create folders and files from entries', async () => {
+        test('should create folders and files from entries', () => __awaiter(this, void 0, void 0, function* () {
             const entries = [{ name: '1', isFile: true }, { name: '2', isFile: false }, { name: '3', isFile: true }];
-
-            await folderUploadNodeInstance.createFolderUploadNodesFromEntries(entries);
-
+            yield folderUploadNodeInstance.createFolderUploadNodesFromEntries(entries);
             expect(folderUploadNodeInstance.files).toEqual([{ name: '1', isFile: true }, { name: '3', isFile: true }]);
             expect(Object.keys(folderUploadNodeInstance.folders)).toHaveLength(1);
             expect(folderUploadNodeInstance.folders['2'].name).toEqual('2');
             expect(folderUploadNodeInstance.folders['2'].entry).toEqual(entries[1]);
-        });
+        }));
     });
 });
+//# sourceMappingURL=FolderUploadNode-test.js.map

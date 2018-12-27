@@ -1,79 +1,23 @@
 /**
- * @flow
+ * @was-flow
  * @file Base class with utility methods for API calls
  * @author Box
  */
-
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import noop from 'lodash/noop';
 import Xhr from '../util/Xhr';
 import Cache from '../util/Cache';
 import { getTypedFileId } from '../util/file';
 import { getBadItemError, getBadPermissionsError } from '../util/error';
-import {
-    DEFAULT_HOSTNAME_API,
-    DEFAULT_HOSTNAME_UPLOAD,
-    HTTP_GET,
-    HTTP_POST,
-    HTTP_PUT,
-    HTTP_DELETE,
-} from '../constants';
-
+import { DEFAULT_HOSTNAME_API, DEFAULT_HOSTNAME_UPLOAD, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, } from '../constants';
 class Base {
-    /**
-     * @property {Cache}
-     */
-    cache: APICache;
-
-    /**
-     * @property {boolean}
-     */
-    destroyed: boolean;
-
-    /**
-     * @property {Xhr}
-     */
-    xhr: Xhr;
-
-    /**
-     * @property {string}
-     */
-    apiHost: string;
-
-    /**
-     * @property {string}
-     */
-    uploadHost: string;
-
-    /**
-     * @property {*}
-     */
-    options: Options;
-
-    /**
-     * @property {Function}
-     */
-    consoleLog: Function;
-
-    /**
-     * @property {Function}
-     */
-    consoleError: Function;
-
-    /**
-     * @property {string}
-     */
-    errorCode: string;
-
-    /**
-     * @property {Function}
-     */
-    successCallback: (data?: Object) => void;
-
-    /**
-     * @property {Function}
-     */
-    errorCallback: ElementsErrorCallback;
-
     /**
      * [constructor]
      *
@@ -85,7 +29,34 @@ class Base {
      * @param {string} [options.uploadHost] - Upload host name
      * @return {Base} Base instance
      */
-    constructor(options: Options) {
+    constructor(options) {
+        /**
+         * Generic success handler
+         *
+         * @param {Object} data - The response data
+         */
+        this.successHandler = (data) => {
+            if (!this.isDestroyed() && typeof this.successCallback === 'function') {
+                this.successCallback(data);
+            }
+        };
+        /**
+         * Generic error handler
+         *
+         * @param {Object} data - The response data
+         * @param {Function} errorCallback the error callback
+         */
+        this.errorHandler = (error) => {
+            if (!this.isDestroyed() && typeof this.errorCallback === 'function') {
+                const { response } = error;
+                if (response) {
+                    this.errorCallback(response.data, this.errorCode);
+                }
+                else {
+                    this.errorCallback(error, this.errorCode);
+                }
+            }
+        };
         this.cache = options.cache || new Cache();
         this.apiHost = options.apiHost || DEFAULT_HOSTNAME_API;
         this.uploadHost = options.uploadHost || DEFAULT_HOSTNAME_UPLOAD;
@@ -100,26 +71,23 @@ class Base {
         this.consoleLog = !!options.consoleLog && !!window.console ? window.console.log || noop : noop;
         this.consoleError = !!options.consoleError && !!window.console ? window.console.error || noop : noop;
     }
-
     /**
      * [destructor]
      *
      * @return {void}
      */
-    destroy(): void {
+    destroy() {
         this.xhr.abort();
         this.destroyed = true;
     }
-
     /**
      * Asks the API if its destructor has been called
      *
      * @return {void}
      */
-    isDestroyed(): boolean {
+    isDestroyed() {
         return this.destroyed;
     }
-
     /**
      * Checks that our desired API call has sufficient permissions and an item ID
      *
@@ -128,95 +96,59 @@ class Base {
      * @param {string} id - Item id
      * @return {void}
      */
-    checkApiCallValidity(permissionToCheck: string, permissions?: Object, id?: string): void {
+    checkApiCallValidity(permissionToCheck, permissions, id) {
         if (!id || !permissions) {
             throw getBadItemError();
         }
-
         const permission = permissions[permissionToCheck];
         if (!permission) {
             throw getBadPermissionsError();
         }
     }
-
     /**
      * Base URL for api
      *
      * @return {string} base url
      */
-    getBaseApiUrl(): string {
-        const suffix: string = this.apiHost.endsWith('/') ? '2.0' : '/2.0';
+    getBaseApiUrl() {
+        const suffix = this.apiHost.endsWith('/') ? '2.0' : '/2.0';
         return `${this.apiHost}${suffix}`;
     }
-
     /**
      * Base URL for api uploads
      *
      * @return {string} base url
      */
-    getBaseUploadUrl(): string {
-        const suffix: string = this.uploadHost.endsWith('/') ? 'api/2.0' : '/api/2.0';
+    getBaseUploadUrl() {
+        const suffix = this.uploadHost.endsWith('/') ? 'api/2.0' : '/api/2.0';
         return `${this.uploadHost}${suffix}`;
     }
-
     /**
      * Gets the cache instance
      *
      * @return {Cache} cache instance
      */
-    getCache(): APICache {
+    getCache() {
         return this.cache;
     }
-
-    /**
-     * Generic success handler
-     *
-     * @param {Object} data - The response data
-     */
-    successHandler = (data: any): void => {
-        if (!this.isDestroyed() && typeof this.successCallback === 'function') {
-            this.successCallback(data);
-        }
-    };
-
-    /**
-     * Generic error handler
-     *
-     * @param {Object} data - The response data
-     * @param {Function} errorCallback the error callback
-     */
-    errorHandler = (error: $AxiosError<any>): void => {
-        if (!this.isDestroyed() && typeof this.errorCallback === 'function') {
-            const { response } = error;
-
-            if (response) {
-                this.errorCallback(response.data, this.errorCode);
-            } else {
-                this.errorCallback(error, this.errorCode);
-            }
-        }
-    };
-
     /**
      * Gets the URL for the API, meant to be overridden
      * @param {string} id - The item id
      */
     /* eslint-disable no-unused-vars */
-    getUrl(id: string) {
+    getUrl(id) {
         /* eslint-enable no-unused-vars */
         throw new Error('Implement me!');
     }
-
     /**
      * Formats an API entry for use in components
      * @param {string} entry - an API response entry
      */
     /* eslint-disable no-unused-vars */
-    format(entry: Object) {
+    format(entry) {
         /* eslint-enable no-unused-vars */
         throw new Error('Implement me!');
     }
-
     /**
      * Generic API GET
      *
@@ -227,23 +159,10 @@ class Base {
      * @param {string} url - API url
      * @returns {Promise}
      */
-    get({
-        id,
-        successCallback,
-        errorCallback,
-        requestData,
-        url,
-    }: {
-        id: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-        requestData?: Object,
-        url?: string,
-    }): Promise<any> {
+    get({ id, successCallback, errorCallback, requestData, url, }) {
         const apiUrl = url || this.getUrl(id);
         return this.makeRequest(HTTP_GET, id, apiUrl, successCallback, errorCallback, requestData);
     }
-
     /**
      * Generic API POST
      *
@@ -253,22 +172,9 @@ class Base {
      * @param {Function} successCallback - The success callback
      * @param {Function} errorCallback - The error callback
      */
-    post({
-        id,
-        url,
-        data,
-        successCallback,
-        errorCallback,
-    }: {
-        id: string,
-        url: string,
-        data: Object,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): Promise<any> {
+    post({ id, url, data, successCallback, errorCallback, }) {
         return this.makeRequest(HTTP_POST, id, url, successCallback, errorCallback, data);
     }
-
     /**
      * Generic API PUT
      *
@@ -278,22 +184,9 @@ class Base {
      * @param {Function} successCallback - The success callback
      * @param {Function} errorCallback - The error callback
      */
-    put({
-        id,
-        url,
-        data,
-        successCallback,
-        errorCallback,
-    }: {
-        id: string,
-        url: string,
-        data: Object,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): Promise<any> {
+    put({ id, url, data, successCallback, errorCallback, }) {
         return this.makeRequest(HTTP_PUT, id, url, successCallback, errorCallback, data);
     }
-
     /**
      * Generic API DELETE
      *
@@ -303,22 +196,9 @@ class Base {
      * @param {Function} errorCallback - The error callback
      * @param {Object} data optional data to delete
      */
-    delete({
-        id,
-        url,
-        data,
-        successCallback,
-        errorCallback,
-    }: {
-        id: string,
-        url: string,
-        data?: Object,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): Promise<any> {
+    delete({ id, url, data, successCallback, errorCallback, }) {
         return this.makeRequest(HTTP_DELETE, id, url, successCallback, errorCallback, data);
     }
-
     /**
      * Generic API CRUD operations
      *
@@ -329,35 +209,24 @@ class Base {
      * @param {Function} errorCallback - The error callback
      * @param {Object} requestData - Optional info to be added to the API call such as params or request body data
      */
-    async makeRequest(
-        method: string,
-        id: string,
-        url: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-        requestData: Object = {},
-    ): Promise<void> {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        this.successCallback = successCallback;
-        this.errorCallback = errorCallback;
-
-        // $FlowFixMe
-        const xhrMethod: Function = this.xhr[method.toLowerCase()].bind(this.xhr);
-
-        try {
-            const { data } = await xhrMethod({
-                id: getTypedFileId(id),
-                url,
-                ...requestData,
-            });
-            this.successHandler(data);
-        } catch (error) {
-            this.errorHandler(error);
-        }
+    makeRequest(method, id, url, successCallback, errorCallback, requestData = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.isDestroyed()) {
+                return;
+            }
+            this.successCallback = successCallback;
+            this.errorCallback = errorCallback;
+            // $FlowFixMe
+            const xhrMethod = this.xhr[method.toLowerCase()].bind(this.xhr);
+            try {
+                const { data } = yield xhrMethod(Object.assign({ id: getTypedFileId(id), url }, requestData));
+                this.successHandler(data);
+            }
+            catch (error) {
+                this.errorHandler(error);
+            }
+        });
     }
 }
-
 export default Base;
+//# sourceMappingURL=Base.js.map

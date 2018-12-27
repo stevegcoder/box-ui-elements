@@ -1,11 +1,7 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import Tooltip from 'box-react-ui/lib/components/tooltip/Tooltip';
-import SidebarNavButton from '../SidebarNavButton';
-
 describe('components/ContentSidebar/SidebarNavButton', () => {
-    const getWrapper = props => shallow(<SidebarNavButton {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     test('should render nav button properly', () => {
         const props = {
             tooltip: 'foo',
@@ -14,7 +10,6 @@ describe('components/ContentSidebar/SidebarNavButton', () => {
         expect(wrapper.find(Tooltip).prop('text')).toBe('foo');
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should render nav button properly when selected', () => {
         const props = {
             tooltip: 'foo',
@@ -25,3 +20,4 @@ describe('components/ContentSidebar/SidebarNavButton', () => {
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=SidebarNavButton-test.js.map

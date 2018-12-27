@@ -1,21 +1,12 @@
 /**
- * @flow
+ * @was-flow
  * @file Local storage wrapper that falls back to an in memory store
  * @author Box
  */
-
 import Cache from './Cache';
-
 const KEY_PREFIX = 'localStore';
 const SERVICE_VERSION = '0';
-
 class LocalStore {
-    memoryStore: APICache;
-
-    localStorage: typeof localStorage;
-
-    isLocalStorageAvailable: boolean;
-
     /**
      * [constructor]
      *
@@ -26,7 +17,6 @@ class LocalStore {
         this.localStorage = window.localStorage;
         this.isLocalStorageAvailable = this.canUseLocalStorage();
     }
-
     /**
      * Builds a key for the session store
      * @private
@@ -34,10 +24,9 @@ class LocalStore {
      *
      * @return {string}
      */
-    buildKey(key: string): string {
+    buildKey(key) {
         return `${KEY_PREFIX}/${SERVICE_VERSION}/${key}`;
     }
-
     /**
      * Test to see browser can use local storage.
      * See http://stackoverflow.com/questions/14555347
@@ -47,20 +36,19 @@ class LocalStore {
      * @private
      * @return {boolean} True if browser can use localStore
      */
-    canUseLocalStorage(): boolean {
+    canUseLocalStorage() {
         if (!this.localStorage) {
             return false;
         }
-
         try {
             this.localStorage.setItem(this.buildKey('TestKey'), 'testValue');
             this.localStorage.removeItem(this.buildKey('TestKey'));
             return true;
-        } catch (e) {
+        }
+        catch (e) {
             return false;
         }
     }
-
     /**
      * Set an item
      *
@@ -69,18 +57,19 @@ class LocalStore {
      *
      * @return {void}
      */
-    setItem(key: string, value: any) {
+    setItem(key, value) {
         if (this.isLocalStorageAvailable) {
             try {
                 this.localStorage.setItem(this.buildKey(key), JSON.stringify(value));
-            } catch (e) {
+            }
+            catch (e) {
                 // no-op
             }
-        } else {
+        }
+        else {
             this.memoryStore.set(key, value);
         }
     }
-
     /**
      * Get an item
      *
@@ -88,23 +77,23 @@ class LocalStore {
      *
      * @return {*}
      */
-    getItem(key: string): ?Object {
+    getItem(key) {
         if (this.isLocalStorageAvailable) {
             try {
                 const item = this.localStorage.getItem(this.buildKey(key));
                 if (!item) {
                     return null;
                 }
-
                 return JSON.parse(item);
-            } catch (e) {
+            }
+            catch (e) {
                 return null;
             }
-        } else {
+        }
+        else {
             return this.memoryStore.get(key);
         }
     }
-
     /**
      * Remove an item
      *
@@ -112,19 +101,18 @@ class LocalStore {
      *
      * @return {void}
      */
-    removeItem(key: string): void {
+    removeItem(key) {
         if (this.isLocalStorageAvailable) {
             try {
                 this.localStorage.removeItem(this.buildKey(key));
-            } catch (e) {
+            }
+            catch (e) {
                 // no-op
             }
-
             return;
         }
-
         this.memoryStore.unset(key);
     }
 }
-
 export default LocalStore;
+//# sourceMappingURL=LocalStore.js.map

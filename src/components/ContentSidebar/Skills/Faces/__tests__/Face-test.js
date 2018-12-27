@@ -1,7 +1,4 @@
-import * as React from 'react';
 import { shallow } from 'enzyme';
-import Face from '../Face';
-
 describe('components/ContentSidebar/Skills/Face/Face', () => {
     test('should correctly render a face', () => {
         const props = {
@@ -10,11 +7,9 @@ describe('components/ContentSidebar/Skills/Face/Face', () => {
             onDelete: jest.fn(),
             onSelect: jest.fn(),
         };
-
-        const wrapper = shallow(<Face {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render a face when editing', () => {
         const props = {
             face: { text: 'foo', image_url: 'bar' },
@@ -22,11 +17,9 @@ describe('components/ContentSidebar/Skills/Face/Face', () => {
             onDelete: jest.fn(),
             onSelect: jest.fn(),
         };
-
-        const wrapper = shallow(<Face {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render a face when selected face is being rendered', () => {
         const face = { text: 'foo', image_url: 'bar' };
         const props = {
@@ -36,11 +29,9 @@ describe('components/ContentSidebar/Skills/Face/Face', () => {
             onDelete: jest.fn(),
             onSelect: jest.fn(),
         };
-
-        const wrapper = shallow(<Face {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render a face when un-selected face is being rendered', () => {
         const face = { text: 'foo', image_url: 'bar' };
         const props = {
@@ -50,8 +41,8 @@ describe('components/ContentSidebar/Skills/Face/Face', () => {
             onDelete: jest.fn(),
             onSelect: jest.fn(),
         };
-
-        const wrapper = shallow(<Face {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=Face-test.js.map

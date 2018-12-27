@@ -24,12 +24,12 @@ const version = isRelease ? packageJSON.version : 'dev';
 const outputPath = outputDir ? path.resolve(outputDir) : path.resolve('dist', version, language);
 const Translations = new TranslationsPlugin();
 const entries = {
-    picker: path.resolve('src/wrappers/ContentPickers.js'),
-    uploader: path.resolve('src/wrappers/ContentUploader.js'),
-    explorer: path.resolve('src/wrappers/ContentExplorer.js'),
-    preview: path.resolve('src/wrappers/ContentPreview.js'),
-    sidebar: path.resolve('src/wrappers/ContentSidebar.js'),
-    openwith: path.resolve('src/wrappers/ContentOpenWith.js'),
+    picker: path.resolve('src/wrappers/ContentPickers.ts'),
+    uploader: path.resolve('src/wrappers/ContentUploader.ts'),
+    explorer: path.resolve('src/wrappers/ContentExplorer.ts'),
+    preview: path.resolve('src/wrappers/ContentPreview.ts'),
+    sidebar: path.resolve('src/wrappers/ContentSidebar.ts'),
+    openwith: path.resolve('src/wrappers/ContentOpenWith.ts'),
 };
 const entriesToBuild =
     typeof process.env.ENTRY === 'string'

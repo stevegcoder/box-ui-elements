@@ -1,154 +1,130 @@
 /**
- * @flow
+ * @was-flow
  * @file HOC to make popup-able Box UI Elements
  * @author Box
  */
-
-import React, { PureComponent } from 'react';
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
+            t[p[i]] = s[p[i]];
+    return t;
+};
+import { PureComponent } from 'react';
 import Modal from 'react-modal';
 import noop from 'lodash/noop';
 import omit from 'lodash/omit';
-
 import { CLIENT_NAME_CONTENT_PICKER, CLIENT_NAME_CONTENT_UPLOADER } from '../constants';
-
-type PropsShape = {
-    onCancel?: Function,
-    onChoose?: Function,
-    onClose?: Function,
-    onClick?: Function,
-    modal: ModalOptions,
-};
-
-type State = {
-    isOpen: boolean,
-};
-
-const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
-    class Wrapper extends PureComponent<Props, State> {
-        props: Props;
-
-        state: State;
-
-        /**
-         * [constructor]
-         *
-         * @param {*} props
-         * @return {Wrapper}
-         */
-        constructor(props: Props) {
-            super(props);
-            this.state = {
-                isOpen: false,
-            };
-        }
-
-        /**
-         * Hides the modal and call the callback
-         *
-         * @param {Function} callback - function to call
-         * @return {void}
-         */
-        close(callback: Function, data: any) {
-            this.setState({ isOpen: false }, () => callback(data));
-        }
-
+const makePopup = (kit) => (Wrapped) => class Wrapper extends PureComponent {
+    /**
+     * [constructor]
+     *
+     * @param {*} props
+     * @return {Wrapper}
+     */
+    constructor(props) {
+        super(props);
         /**
          * Callback for clicking
          *
          * @param {*} data - any callback data
          * @return {void}
          */
-        onClick = (data: any) => {
-            const { onClick = noop }: Props = this.props;
+        this.onClick = (data) => {
+            const { onClick = noop } = this.props;
             this.close(onClick, data);
         };
-
         /**
          * Callback for pressing close
          *
          * @param {*} data - any callback data
          * @return {void}
          */
-        onClose = (data: any) => {
-            const { onClose = noop }: Props = this.props;
+        this.onClose = (data) => {
+            const { onClose = noop } = this.props;
             this.close(onClose, data);
         };
-
         /**
          * Callback for pressing cancel
          *
          * @param {*} data - any callback data
          * @return {void}
          */
-        onCancel = (data: any) => {
-            const { onCancel = noop }: Props = this.props;
+        this.onCancel = (data) => {
+            const { onCancel = noop } = this.props;
             this.close(onCancel, data);
         };
-
         /**
          * Callback for pressing choose
          *
          * @param {*} data - any callback data
          * @return {void}
          */
-        onChoose = (data: any) => {
-            const { onChoose = noop }: Props = this.props;
+        this.onChoose = (data) => {
+            const { onChoose = noop } = this.props;
             this.close(onChoose, data);
         };
-
         /**
          * Button click handler
          *
          * @return {void}
          */
-        onButtonClick = () => {
+        this.onButtonClick = () => {
             this.setState({ isOpen: true });
         };
-
-        /**
-         * Renders the component
-         *
-         * @return {void}
-         */
-        render() {
-            const { isOpen }: State = this.state;
-            const { modal, ...rest }: Props = this.props;
-            const wrappedProps = omit(rest, ['onCancel', 'onChoose', 'onClose', 'modal']);
-            const {
-                buttonLabel = 'Missing modal.buttonLabel in options',
-                buttonClassName = 'btn btn-primary',
-                modalClassName = 'be-modal-wrapper-content',
-                overlayClassName = 'be-modal-wrapper-overlay',
-            }: ModalOptions = modal;
-
-            switch (kit) {
-                case CLIENT_NAME_CONTENT_PICKER:
-                    wrappedProps.onCancel = this.onCancel;
-                    wrappedProps.onChoose = this.onChoose;
-                    break;
-                case CLIENT_NAME_CONTENT_UPLOADER:
-                    wrappedProps.onClose = this.onClose;
-                    break;
-                default:
-                    throw new Error('Unknown kit type');
-            }
-
-            return (
-                <div>
-                    <button type="button" onClick={this.onButtonClick} className={buttonClassName}>
-                        {buttonLabel}
-                    </button>
-                    <Modal
-                        isOpen={isOpen}
-                        contentLabel={kit}
-                        className={modalClassName}
-                        overlayClassName={overlayClassName}
-                    >
-                        <Wrapped {...wrappedProps} />
-                    </Modal>
-                </div>
-            );
+        this.state = {
+            isOpen: false,
+        };
+    }
+    /**
+     * Hides the modal and call the callback
+     *
+     * @param {Function} callback - function to call
+     * @return {void}
+     */
+    close(callback, data) {
+        this.setState({ isOpen: false }, () => callback(data));
+    }
+    /**
+     * Renders the component
+     *
+     * @return {void}
+     */
+    render() {
+        const { isOpen } = this.state;
+        const _a = this.props, { modal } = _a, rest = __rest(_a, ["modal"]);
+        const wrappedProps = omit(rest, ['onCancel', 'onChoose', 'onClose', 'modal']);
+        const { buttonLabel = 'Missing modal.buttonLabel in options', buttonClassName = 'btn btn-primary', modalClassName = 'be-modal-wrapper-content', overlayClassName = 'be-modal-wrapper-overlay', } = modal;
+        switch (kit) {
+            case CLIENT_NAME_CONTENT_PICKER:
+                wrappedProps.onCancel = this.onCancel;
+                wrappedProps.onChoose = this.onChoose;
+                break;
+            case CLIENT_NAME_CONTENT_UPLOADER:
+                wrappedProps.onClose = this.onClose;
+                break;
+            default:
+                throw new Error('Unknown kit type');
         }
-    };
-
+        return type = "button";
+        onClick = { this: .onButtonClick };
+        className = { buttonClassName } >
+            { buttonLabel }
+            < /button>
+            < Modal;
+        isOpen = { isOpen };
+        contentLabel = { kit };
+        className = { modalClassName };
+        overlayClassName = { overlayClassName }
+            >
+                Object.assign({}, wrappedProps) /  >
+            /Modal>
+            < /div>;
+    }
+};
+;
+;
 export default makePopup;
+//# sourceMappingURL=makePopup.js.map

@@ -1,9 +1,5 @@
-import * as React from 'react';
 import { shallow } from 'enzyme';
-
-import ActiveState from '../ActiveState';
 import Task from '../../task/Task';
-
 const items = [
     {
         type: 'comment',
@@ -54,23 +50,20 @@ const items = [
         },
     },
 ];
-
 const activityFeedError = { title: 't', content: 'm' };
-
 describe('components/ContentSidebar/ActiveState/activity-feed/ActiveState', () => {
     test('should correctly render empty state', () => {
-        const wrapper = shallow(<ActiveState items={[]} />);
+        const wrapper = shallow(items, { []:  } /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render with comments, tasks, versions', () => {
-        const wrapper = shallow(<ActiveState items={items} />).dive();
+        const wrapper = shallow(items, { items } /  > ).dive();
         expect(wrapper).toMatchSnapshot();
         expect(wrapper.find(Task)).toHaveLength(1);
     });
-
     test('should correctly render with an inline error if some feed items fail to fetch', () => {
-        const wrapper = shallow(<ActiveState inlineError={activityFeedError} items={[]} />);
+        const wrapper = shallow(inlineError, { activityFeedError }, items = { []:  } /  > );
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=ActiveState-test.js.map

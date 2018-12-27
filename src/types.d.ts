@@ -72,7 +72,7 @@ import {
 } from '../src/constants';
 
 
-export export type Method =
+export type Method =
     | typeof HTTP_DELETE
     | typeof HTTP_GET
     | typeof HTTP_POST

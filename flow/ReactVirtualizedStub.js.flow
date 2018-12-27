@@ -1,4 +1,4 @@
-// @flow
+// @was-flow
 import { Component } from 'react'
 declare export var Column: typeof Component
 declare export var Table: typeof Component

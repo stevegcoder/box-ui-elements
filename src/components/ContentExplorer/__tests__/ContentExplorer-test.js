@@ -1,7 +1,4 @@
-import React from 'react';
 import { mount } from 'enzyme';
-import { ContentExplorerComponent as ContentExplorer } from '../ContentExplorer';
-
 jest.mock('../../Header/Header', () => 'mock-header');
 jest.mock('../../SubHeader/SubHeader', () => 'mock-subheader');
 jest.mock('../Content', () => 'mock-content');
@@ -11,20 +8,16 @@ jest.mock('../DeleteConfirmationDialog', () => 'mock-deletedialog');
 jest.mock('../RenameDialog', () => 'mock-renamedialog');
 jest.mock('../ShareDialog', () => 'mock-sharedialog');
 jest.mock('../PreviewDialog', () => 'mock-previewdialog');
-
 describe('components/ContentExplorer/ContentExplorer', () => {
     let rootElement;
-    const getWrapper = props => mount(<ContentExplorer {...props} />, { attachTo: rootElement });
-
+    const getWrapper = props => mount(Object.assign({}, props) /  > , { attachTo: rootElement });
     beforeEach(() => {
         rootElement = document.createElement('div');
         document.body.appendChild(rootElement);
     });
-
     afterEach(() => {
         document.body.removeChild(rootElement);
     });
-
     describe('uploadSuccessHandler()', () => {
         test('should force reload the files list', () => {
             const wrapper = getWrapper({});
@@ -40,3 +33,4 @@ describe('components/ContentExplorer/ContentExplorer', () => {
         });
     });
 });
+//# sourceMappingURL=ContentExplorer-test.js.map

@@ -1,37 +1,31 @@
 import noop from 'lodash/noop';
 import Item from '../Item';
 import Cache from '../../util/Cache';
-
 let item;
 let file;
 let folder;
 let cache;
 const errorCode = 'foo';
-
 describe('api/Item', () => {
     beforeEach(() => {
         item = new Item({});
         cache = new Cache();
     });
-
     describe('getParentCacheKey()', () => {
         test('should return correct key', () => {
             expect(item.getParentCacheKey('foo')).toBe('folder_foo');
         });
     });
-
     describe('getCacheKey()', () => {
         test('should return correct key', () => {
             expect(item.getCacheKey('foo')).toBe('getCacheKey(foo) should be overriden');
         });
     });
-
     describe('getUrl()', () => {
         test('should return correct folder api url', () => {
             expect(item.getUrl('foo')).toBe('getUrl(foo) should be overriden');
         });
     });
-
     describe('errorHandler()', () => {
         beforeEach(() => {
             item.errorCode = errorCode;
@@ -42,20 +36,17 @@ describe('api/Item', () => {
             item.errorHandler('foo');
             expect(item.errorCallback).not.toHaveBeenCalled();
         });
-
         test('should call error callback even when no response', () => {
             item.errorCallback = jest.fn();
             item.errorHandler('foo');
             expect(item.errorCallback).toHaveBeenCalled();
         });
-
         test('should call error callback with response data', () => {
             item.errorCallback = jest.fn();
             item.errorHandler({ response: { data: 'foo' } });
             expect(item.errorCallback).toHaveBeenCalledWith('foo', errorCode);
         });
     });
-
     describe('merge()', () => {
         test('should merge new value', () => {
             cache.set('key', {
@@ -66,7 +57,6 @@ describe('api/Item', () => {
             expect(result.foo).toEqual('bar');
         });
     });
-
     describe('postDeleteCleanup()', () => {
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -88,7 +78,6 @@ describe('api/Item', () => {
             expect(unsetAllMock).toHaveBeenCalledWith('search_');
         });
     });
-
     describe('renameSuccessHandler()', () => {
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -128,7 +117,6 @@ describe('api/Item', () => {
             expect(item.merge).toHaveBeenCalledWith('key', 'name', 'name');
         });
     });
-
     describe('shareSuccessHandler()', () => {
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -158,7 +146,6 @@ describe('api/Item', () => {
             expect(item.merge).toHaveBeenCalledWith('key', 'shared_link', 'link');
         });
     });
-
     describe('rename()', () => {
         beforeEach(() => {
             file = {
@@ -168,31 +155,26 @@ describe('api/Item', () => {
                 },
             };
         });
-
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
             item.xhr = null;
             return expect(item.rename()).rejects.toBeUndefined();
         });
-
         test('should not do anything if id is missing', () => {
             delete file.id;
             item.xhr = null;
             return expect(item.rename(file, 'name', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if permissions is missing', () => {
             delete file.permissions;
             item.xhr = null;
             return expect(item.rename(file, 'name', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if can rename is false', () => {
             delete file.permissions.can_rename;
             item.xhr = null;
             return expect(item.rename(file, 'name', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should make xhr to rename item and call success callback', () => {
             item.renameSuccessHandler = jest.fn();
             item.errorHandler = jest.fn();
@@ -213,7 +195,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should make xhr to rename item and call error callback', () => {
             const error = new Error('error');
             item.renameSuccessHandler = jest.fn();
@@ -235,7 +216,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should default to noop error callback', () => {
             item.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.resolve('success')),
@@ -245,7 +225,6 @@ describe('api/Item', () => {
             });
         });
     });
-
     describe('share()', () => {
         beforeEach(() => {
             file = {
@@ -256,37 +235,31 @@ describe('api/Item', () => {
                 },
             };
         });
-
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
             item.xhr = null;
             return expect(item.share()).rejects.toBeUndefined();
         });
-
         test('should not do anything if id is missing', () => {
             delete file.id;
             item.xhr = null;
             return expect(item.share(file, 'access', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if permissions is missing', () => {
             delete file.permissions;
             item.xhr = null;
             return expect(item.share(file, 'access', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if can share is false', () => {
             delete file.permissions.can_share;
             item.xhr = null;
             return expect(item.share(file, 'access', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if can set share access is false', () => {
             delete file.permissions.can_set_share_access;
             item.xhr = null;
             return expect(item.share(file, 'access', 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should make xhr to share item and call success callback with access', () => {
             item.shareSuccessHandler = jest.fn();
             item.errorHandler = jest.fn();
@@ -307,7 +280,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should make xhr to share item and call success callback with access null', () => {
             item.shareSuccessHandler = jest.fn();
             item.errorHandler = jest.fn();
@@ -328,7 +300,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should make xhr to share item and call error callback', () => {
             const error = new Error('error');
             item.shareSuccessHandler = jest.fn();
@@ -350,7 +321,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should default to noop error callback', () => {
             item.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.resolve('success')),
@@ -360,7 +330,6 @@ describe('api/Item', () => {
             });
         });
     });
-
     describe('deleteItem()', () => {
         beforeEach(() => {
             file = {
@@ -374,49 +343,41 @@ describe('api/Item', () => {
                 },
             };
         });
-
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
             item.xhr = null;
             return expect(item.deleteItem()).rejects.toBeUndefined();
         });
-
         test('should not do anything if id is missing', () => {
             delete file.id;
             item.xhr = null;
             return expect(item.deleteItem(file, 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if parent is missing', () => {
             delete file.parent;
             item.xhr = null;
             return expect(item.deleteItem(file, 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if parent id is missing', () => {
             delete file.parent.id;
             item.xhr = null;
             return expect(item.deleteItem(file, 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if type is missing', () => {
             delete file.type;
             item.xhr = null;
             return expect(item.deleteItem(file, 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if permissions is missing', () => {
             delete file.permissions;
             item.xhr = null;
             return expect(item.deleteItem(file, 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should not do anything if can delete is false', () => {
             delete file.permissions.can_delete;
             item.xhr = null;
             return expect(item.deleteItem(file, 'success', jest.fn())).rejects.toBeUndefined();
         });
-
         test('should make xhr to delete file and call success callback', () => {
             item.deleteSuccessHandler = jest.fn();
             item.errorHandler = jest.fn();
@@ -435,7 +396,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should make xhr to delete folder and call success callback', () => {
             file.type = 'folder';
             item.deleteSuccessHandler = jest.fn();
@@ -457,7 +417,6 @@ describe('api/Item', () => {
                 expect(item.getUrl).toHaveBeenCalledWith('id');
             });
         });
-
         test('should make xhr to share item and call error callback', () => {
             const error = new Error('error');
             item.deleteSuccessHandler = jest.fn();
@@ -486,7 +445,6 @@ describe('api/Item', () => {
             });
         });
     });
-
     describe('deleteSuccessHandler()', () => {
         beforeEach(() => {
             folder = {
@@ -497,14 +455,12 @@ describe('api/Item', () => {
                 },
             };
         });
-
         test('should not do anything if destroyed', () => {
             item.isDestroyed = jest.fn().mockReturnValueOnce(true);
             item.postDeleteCleanup = jest.fn();
             item.deleteSuccessHandler();
             expect(item.postDeleteCleanup).not.toHaveBeenCalled();
         });
-
         test('should parse the response, flatten the collection and call finish', () => {
             cache.set('parent', folder);
             item.id = 'id';
@@ -516,7 +472,6 @@ describe('api/Item', () => {
             item.merge = jest.fn();
             item.successCallback = jest.fn();
             item.deleteSuccessHandler();
-
             expect(cache.get('parent')).toEqual({
                 id: 'parentId',
                 item_collection: {
@@ -533,11 +488,9 @@ describe('api/Item', () => {
                 entries: ['file_item1', 'file_item2', 'file_item3'],
             });
         });
-
         test('should throw bad item error when entries is missing', () => {
             delete folder.item_collection.entries;
             cache.set('parent', folder);
-
             item.id = 'id';
             item.parentId = 'parentId';
             item.postDeleteCleanup = jest.fn();
@@ -549,7 +502,6 @@ describe('api/Item', () => {
             expect(item.postDeleteCleanup).not.toHaveBeenCalled();
             expect(item.getParentCacheKey).toHaveBeenCalledWith('parentId');
         });
-
         test('should just cleanup when parent folder is not there', () => {
             item.parentId = 'parentId';
             item.postDeleteCleanup = jest.fn();
@@ -561,11 +513,9 @@ describe('api/Item', () => {
             expect(item.postDeleteCleanup).toHaveBeenCalled();
             expect(item.getParentCacheKey).toHaveBeenCalledWith('parentId');
         });
-
         test('should just cleanup when parent folders item collection is not there', () => {
             delete folder.item_collection;
             cache.set('parent', folder);
-
             item.parentId = 'parentId';
             item.postDeleteCleanup = jest.fn();
             item.getCache = jest.fn().mockReturnValueOnce(cache);
@@ -578,3 +528,4 @@ describe('api/Item', () => {
         });
     });
 });
+//# sourceMappingURL=Item-test.js.map

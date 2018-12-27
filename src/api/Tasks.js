@@ -1,20 +1,11 @@
 /**
- * @flow
+ * @was-flow
  * @file Helper for the box Tasks API
  * @author Box
  */
-
 import Base from './Base';
-import {
-    PERMISSION_CAN_COMMENT,
-    ERROR_CODE_CREATE_TASK,
-    ERROR_CODE_UPDATE_TASK,
-    ERROR_CODE_DELETE_TASK,
-    ERROR_CODE_FETCH_TASK_ASSIGNMENT,
-    ERROR_CODE_FETCH_TASKS,
-} from '../constants';
+import { PERMISSION_CAN_COMMENT, ERROR_CODE_CREATE_TASK, ERROR_CODE_UPDATE_TASK, ERROR_CODE_DELETE_TASK, ERROR_CODE_FETCH_TASK_ASSIGNMENT, ERROR_CODE_FETCH_TASKS, } from '../constants';
 import { TASKS_FIELDS_TO_FETCH, TASK_ASSIGNMENTS_FIELDS_TO_FETCH } from '../util/fields';
-
 class Tasks extends Base {
     /**
      * API URL for tasks
@@ -22,25 +13,22 @@ class Tasks extends Base {
      * @param {string} [id] - a box file id
      * @return {string} base url for files
      */
-    getUrl(id: string): string {
+    getUrl(id) {
         if (!id) {
             throw new Error('Missing file id!');
         }
-
         return `${this.getBaseApiUrl()}/files/${id}/tasks`;
     }
-
     /**
      * API URL for tasks endpoint
      *
      * @param {string} [id] - A box task id
      * @return {string} base url for tasks
      */
-    tasksUrl(id?: string): string {
+    tasksUrl(id) {
         const baseUrl = `${this.getBaseApiUrl()}/tasks`;
         return id ? `${baseUrl}/${id}` : baseUrl;
     }
-
     /**
      * API for getting assignments for a given task
      *
@@ -51,22 +39,15 @@ class Tasks extends Base {
      * @param {Object} params request params
      * @return {Promise}
      */
-    getAssignments(
-        id: string,
-        taskId: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-        requestData: Object = {
-            params: {
-                fields: TASK_ASSIGNMENTS_FIELDS_TO_FETCH.toString(),
-            },
+    getAssignments(id, taskId, successCallback, errorCallback, requestData = {
+        params: {
+            fields: TASK_ASSIGNMENTS_FIELDS_TO_FETCH.toString(),
         },
-    ): void {
+    }) {
         this.errorCode = ERROR_CODE_FETCH_TASK_ASSIGNMENT;
         const url = `${this.tasksUrl(taskId)}/assignments`;
         this.get({ id, successCallback, errorCallback, requestData, url });
     }
-
     /**
      * API for creating a task on a file
      *
@@ -77,29 +58,16 @@ class Tasks extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    createTask({
-        file,
-        message,
-        dueAt,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        message: string,
-        dueAt?: string,
-        successCallback: Function,
-        errorCallback: (e: ElementsXhrError, code: string) => void,
-    }): void {
+    createTask({ file, message, dueAt, successCallback, errorCallback, }) {
         const { id = '', permissions } = file;
         this.errorCode = ERROR_CODE_CREATE_TASK;
-
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         const requestData = {
             data: {
                 item: {
@@ -110,7 +78,6 @@ class Tasks extends Base {
                 due_at: dueAt,
             },
         };
-
         this.post({
             id,
             url: this.tasksUrl(),
@@ -119,7 +86,6 @@ class Tasks extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for updating a task on a file
      *
@@ -131,38 +97,22 @@ class Tasks extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    updateTask({
-        file,
-        taskId,
-        message,
-        dueAt,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        taskId: string,
-        message: string,
-        dueAt?: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    updateTask({ file, taskId, message, dueAt, successCallback, errorCallback, }) {
         const { id = '', permissions } = file;
         this.errorCode = ERROR_CODE_UPDATE_TASK;
         try {
             // We don't know task_edit specific permissions, so let the client try and fail gracefully
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
-        const data: { message: string, due_at?: string } = { message };
+        const data = { message };
         const requestData = { data };
-
         if (dueAt) {
             requestData.data.due_at = dueAt;
         }
-
         this.put({
             id,
             url: this.tasksUrl(taskId),
@@ -171,7 +121,6 @@ class Tasks extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for deleting a task on a file
      *
@@ -181,28 +130,17 @@ class Tasks extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    deleteTask({
-        file,
-        taskId,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        taskId: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    deleteTask({ file, taskId, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_DELETE_TASK;
         const { id = '', permissions } = file;
-
         try {
             // We don't know task_delete specific permissions, so let the client try and fail gracefully
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         this.delete({
             id,
             url: this.tasksUrl(taskId),
@@ -210,7 +148,6 @@ class Tasks extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for fetching tasks on a file
      *
@@ -220,16 +157,11 @@ class Tasks extends Base {
      * @param {Object} requestData - additional request data
      * @returns {Promise<void>}
      */
-    getTasks(
-        id: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-        requestData: Object = {
-            params: {
-                fields: TASKS_FIELDS_TO_FETCH.toString(),
-            },
+    getTasks(id, successCallback, errorCallback, requestData = {
+        params: {
+            fields: TASKS_FIELDS_TO_FETCH.toString(),
         },
-    ): void {
+    }) {
         this.errorCode = ERROR_CODE_FETCH_TASKS;
         this.get({
             id,
@@ -239,5 +171,5 @@ class Tasks extends Base {
         });
     }
 }
-
 export default Tasks;
+//# sourceMappingURL=Tasks.js.map

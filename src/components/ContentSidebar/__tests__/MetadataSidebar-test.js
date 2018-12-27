@@ -1,15 +1,11 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import LoadingIndicator from 'box-react-ui/lib/components/loading-indicator/LoadingIndicator';
 import LoadingIndicatorWrapper from 'box-react-ui/lib/components/loading-indicator/LoadingIndicatorWrapper';
 import Instances from 'box-react-ui/lib/features/metadata-instance-editor/Instances';
 import EmptyContent from 'box-react-ui/lib/features/metadata-instance-editor/EmptyContent';
 import InlineError from 'box-react-ui/lib/components/inline-error/InlineError';
-import { MetadataSidebarComponent as MetadataSidebar } from '../MetadataSidebar';
-
 describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
-    const getWrapper = props => shallow(<MetadataSidebar {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     test('should render Metadata sidebar component when instances and templates are available', () => {
         const getEditors = jest.fn();
         const api = {
@@ -31,7 +27,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
         expect(getEditors).toHaveBeenCalled();
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
-
     test('should render Metadata sidebar component with empty content when instances are empty', () => {
         const getEditors = jest.fn();
         const api = {
@@ -53,7 +48,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
         expect(getEditors).toHaveBeenCalled();
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
-
     test('should render loading indicator component when templates are not available', () => {
         const getEditors = jest.fn();
         const api = {
@@ -74,7 +68,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
         expect(getEditors).toHaveBeenCalled();
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
-
     test('should render loading indicator component when instances are not available', () => {
         const getEditors = jest.fn();
         const api = {
@@ -95,7 +88,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
         expect(getEditors).toHaveBeenCalled();
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
-
     test('should render error when there was an error', () => {
         const getEditors = jest.fn();
         const api = {
@@ -117,7 +109,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
         expect(getEditors).toHaveBeenCalled();
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
-
     describe('getEditor()', () => {
         test('should return the correct editor', () => {
             const getEditors = jest.fn();
@@ -137,7 +128,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             expect(instance.getEditor(2)).toBe(editors[1]);
         });
     });
-
     describe('onRemoveSuccessHandler()', () => {
         test('should remove the correct editor', () => {
             const getEditors = jest.fn();
@@ -161,7 +151,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             });
         });
     });
-
     describe('onRemove()', () => {
         test('should not do anything if editor not found', () => {
             const getEditors = jest.fn();
@@ -201,15 +190,9 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             wrapper.setState({ editors });
             instance.setState = jest.fn();
             instance.onRemove(1);
-            expect(deleteMetadata).toBeCalledWith(
-                {},
-                editors[1].template,
-                expect.any(Function),
-                instance.errorCallback,
-            );
+            expect(deleteMetadata).toBeCalledWith({}, editors[1].template, expect.any(Function), instance.errorCallback);
         });
     });
-
     describe('onAddSuccessHandler()', () => {
         test('should add the new editor', () => {
             const getEditors = jest.fn();
@@ -234,7 +217,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             });
         });
     });
-
     describe('onAdd()', () => {
         test('should call metadata add api', () => {
             const getEditors = jest.fn();
@@ -258,7 +240,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             });
         });
     });
-
     describe('onSaveSuccessHandler()', () => {
         test('should update the correct editor', () => {
             const getEditors = jest.fn();
@@ -281,7 +262,6 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             });
         });
     });
-
     describe('onSave()', () => {
         test('should not do anything if editor not found', () => {
             const getEditors = jest.fn();
@@ -322,16 +302,9 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
             wrapper.setState({ editors });
             instance.setState = jest.fn();
             instance.onSave(1, 'ops');
-            expect(updateMetadata).toBeCalledWith(
-                {},
-                editors[1].template,
-                'ops',
-                expect.any(Function),
-                instance.errorCallback,
-            );
+            expect(updateMetadata).toBeCalledWith({}, editors[1].template, 'ops', expect.any(Function), instance.errorCallback);
         });
     });
-
     describe('onModification()', () => {
         test('should not do anything if editor not found', () => {
             const getEditors = jest.fn();
@@ -378,3 +351,4 @@ describe('components/ContentSidebar/Metadata/MetadataSidebar', () => {
         });
     });
 });
+//# sourceMappingURL=MetadataSidebar-test.js.map

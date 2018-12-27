@@ -1,7 +1,4 @@
-import * as React from 'react';
 import { shallow } from 'enzyme';
-import Faces from '../Faces';
-
 describe('components/ContentSidebar/Skills/Faces/Faces', () => {
     test('should correctly render error when no faces', () => {
         const props = {
@@ -12,11 +9,9 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: false,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render faces when not editable', () => {
         const props = {
             card: {
@@ -26,11 +21,9 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: false,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render faces without removed faces', () => {
         const props = {
             card: {
@@ -40,13 +33,10 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: false,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         wrapper.setState({ removes: [props.card.entries[1]] });
-
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render edit button when editable', () => {
         const props = {
             card: {
@@ -56,11 +46,9 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: true,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render time line when face is selected', () => {
         const props = {
             card: {
@@ -70,13 +58,10 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: false,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         wrapper.setState({ selected: props.card.entries[1] });
-
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render save and cancel button when editable and editing', () => {
         const props = {
             card: {
@@ -86,13 +71,10 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: true,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         wrapper.setState({ isEditing: true });
-
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render when isLoading is true', () => {
         const props = {
             card: {
@@ -103,10 +85,9 @@ describe('components/ContentSidebar/Skills/Faces/Faces', () => {
             isEditable: true,
             onSkillChange: jest.fn(),
         };
-
-        const wrapper = shallow(<Faces {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         wrapper.setState({ isLoading: true });
-
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=Faces-test.js.map

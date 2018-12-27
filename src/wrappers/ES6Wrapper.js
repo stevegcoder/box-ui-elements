@@ -1,63 +1,14 @@
 /**
- * @flow
+ * @was-flow
  * @file Base class for the Box UI Elements ES6 wrapper
  * @author Box
  */
-
 import EventEmitter from 'events';
 import ReactDOM from 'react-dom';
 import { addLocaleData } from 'react-intl';
 import { DEFAULT_CONTAINER } from '../constants';
 import i18n from '../i18n';
-
-declare var __VERSION__: string;
-
 class ES6Wrapper extends EventEmitter {
-    /**
-     * @property {Function}
-     */
-    emit: Function;
-
-    /**
-     * @property {HTMLElement}
-     */
-    container: HTMLElement;
-
-    /**
-     * @property {string}
-     */
-    id: string;
-
-    /**
-     * @property {string}
-     */
-    token: Token;
-
-    /**
-     * @property {string}
-     */
-    options: { [key: string]: any };
-
-    /**
-     * @property {string}
-     */
-    language: string = i18n.language;
-
-    /**
-     * @property {Object}
-     */
-    localeData: any = i18n.localeData;
-
-    /**
-     * @property {Object}
-     */
-    messages: StringMap = i18n.messages;
-
-    /**
-     * @property {Element}
-     */
-    component: any;
-
     /**
      * [constructor]
      *
@@ -66,9 +17,37 @@ class ES6Wrapper extends EventEmitter {
      */
     constructor() {
         super();
+        /**
+         * @property {string}
+         */
+        this.language = i18n.language;
+        /**
+         * @property {Object}
+         */
+        this.localeData = i18n.localeData;
+        /**
+         * @property {Object}
+         */
+        this.messages = i18n.messages;
+        /**
+         * Sets reference to the inner component
+         *
+         * @protected
+         * @return {void}
+         */
+        this.setComponent = (component) => {
+            this.component = component;
+        };
+        /**
+         * Callback for interaction events
+         *
+         * @return {void}
+         */
+        this.onInteraction = (data) => {
+            this.emit('interaction', data);
+        };
         addLocaleData(this.localeData);
     }
-
     /**
      * Shows the content picker.
      *
@@ -78,7 +57,7 @@ class ES6Wrapper extends EventEmitter {
      * @param {Object|void} [options] Optional options.
      * @return {void}
      */
-    show(id: string, token: Token, options: { [key: string]: any } = {}): void {
+    show(id, token, options = {}) {
         this.id = id;
         this.token = token;
         this.options = options;
@@ -86,10 +65,12 @@ class ES6Wrapper extends EventEmitter {
         this.emit = this.emit.bind(this);
         const container = options.container || DEFAULT_CONTAINER;
         this.container =
-            container instanceof HTMLElement ? container : ((document.querySelector(container): any): HTMLElement);
+            container instanceof HTMLElement ? container : ((document.querySelector(container)));
+        any;
+        HTMLElement;
+        ;
         this.render();
     }
-
     /**
      * Hides the content picker.
      * Removes all event listeners.
@@ -98,14 +79,13 @@ class ES6Wrapper extends EventEmitter {
      * @public
      * @return {void}
      */
-    hide(): void {
+    hide() {
         this.removeAllListeners();
         ReactDOM.unmountComponentAtNode(this.container);
         if (this.container) {
             this.container.innerHTML = '';
         }
     }
-
     /**
      * Renders the component.
      * Should be overriden.
@@ -116,49 +96,27 @@ class ES6Wrapper extends EventEmitter {
     render() {
         throw new Error('Unimplemented!');
     }
-
-    /**
-     * Sets reference to the inner component
-     *
-     * @protected
-     * @return {void}
-     */
-    setComponent = (component: any) => {
-        this.component = component;
-    };
-
     /**
      * Gets reference to the inner component
      *
      * @public
      * @return {Element}
      */
-    getComponent(): any {
+    getComponent() {
         return this.component;
     }
-
     /**
      * Clears out the cache used by the component
      *
      * @public
      * @return {Element}
      */
-    clearCache(): void {
+    clearCache() {
         const component = this.getComponent();
         if (component && typeof component.clearCache === 'function') {
             component.clearCache();
         }
     }
-
-    /**
-     * Callback for interaction events
-     *
-     * @return {void}
-     */
-    onInteraction = (data: any): void => {
-        this.emit('interaction', data);
-    };
-
     /**
      * Wrapper for emit to prevent JS exceptions
      * in the listeners own code.
@@ -168,15 +126,15 @@ class ES6Wrapper extends EventEmitter {
      * @param {Object} data - event data
      * @return {boolean} true if the event had listeners, false otherwise.
      */
-    emit(eventName: string, data: any): boolean {
+    emit(eventName, data) {
         try {
             return super.emit(eventName, data);
-        } catch (e) {
+        }
+        catch (e) {
             // do nothing
         }
-
         return false;
     }
 }
-
 export default ES6Wrapper;
+//# sourceMappingURL=ES6Wrapper.js.map

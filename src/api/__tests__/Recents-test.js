@@ -1,7 +1,6 @@
 import Recents from '../Recents';
 import Cache from '../../util/Cache';
 import { FOLDER_FIELDS_TO_FETCH } from '../../util/fields';
-
 describe('api/Recents', () => {
     let recents;
     let cache;
@@ -11,19 +10,16 @@ describe('api/Recents', () => {
         recents.errorCode = errorCode;
         cache = new Cache();
     });
-
     describe('getCacheKey()', () => {
         test('should return correct key', () => {
             expect(recents.getCacheKey('foo')).toBe('recents_foo');
         });
     });
-
     describe('getUrl()', () => {
         test('should return correct recents api url', () => {
             expect(recents.getUrl()).toBe('https://api.box.com/2.0/recent_items');
         });
     });
-
     describe('recents()', () => {
         test('should not do anything if destroyed', () => {
             recents.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -71,12 +67,10 @@ describe('api/Recents', () => {
             expect(recents.key).toBe('key');
         });
     });
-
     describe('recentsRequest()', () => {
         beforeEach(() => {
             recents.id = 'id';
         });
-
         test('should not do anything if destroyed', () => {
             recents.isDestroyed = jest.fn().mockReturnValueOnce(true);
             recents.xhr = null;
@@ -107,7 +101,6 @@ describe('api/Recents', () => {
             recents.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.resolve(error)),
             };
-
             return recents.recentsRequest().then(() => {
                 expect(recents.recentsSuccessHandler).toHaveBeenCalledWith(error);
                 expect(recents.recentsErrorHandler).not.toHaveBeenCalled();
@@ -118,7 +111,6 @@ describe('api/Recents', () => {
             });
         });
     });
-
     describe('recentsErrorHandler()', () => {
         test('should not do anything if destroyed', () => {
             recents.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -132,7 +124,6 @@ describe('api/Recents', () => {
             expect(recents.errorCallback).toHaveBeenCalledWith('foo', errorCode);
         });
     });
-
     describe('recentsSuccessHandler()', () => {
         test('should not do anything if destroyed', () => {
             recents.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -184,14 +175,12 @@ describe('api/Recents', () => {
                     ],
                 },
             };
-
             recents.options = { cache };
             recents.id = 'id2'; // root folder
             recents.key = 'key';
             recents.finish = jest.fn();
             recents.getCache = jest.fn().mockReturnValueOnce(cache);
             recents.recentsSuccessHandler(response);
-
             expect(cache.get('key')).toEqual({
                 item_collection: {
                     entries: ['file_item1', 'file_item3'],
@@ -208,7 +197,6 @@ describe('api/Recents', () => {
             expect(cache.get('file_item2')).toBeUndefined();
         });
     });
-
     describe('finish()', () => {
         const item1 = {
             id: 'item1',
@@ -245,21 +233,18 @@ describe('api/Recents', () => {
                 ],
             },
         };
-
         beforeEach(() => {
             cache.set('file_item1', item1);
             cache.set('file_item2', item2);
             cache.set('file_item3', item3);
             cache.set('key', recent);
         });
-
         test('should not do anything if destroyed', () => {
             recents.successCallback = jest.fn();
             recents.isDestroyed = jest.fn().mockReturnValueOnce(true);
             recents.finish();
             expect(recents.successCallback).not.toHaveBeenCalled();
         });
-
         test('should call success callback with proper collection', () => {
             recents.id = 'id';
             recents.key = 'key';
@@ -274,7 +259,6 @@ describe('api/Recents', () => {
                 items: [item1, item2, item3],
             });
         });
-
         test('should throw bad item error when item collection is missing', () => {
             cache.set('key', {});
             recents.id = 'id';
@@ -284,7 +268,6 @@ describe('api/Recents', () => {
             expect(recents.finish.bind(recents)).toThrow(Error, /Bad box item/);
             expect(recents.successCallback).not.toHaveBeenCalled();
         });
-
         test('should throw bad item error when item collection is missing entries', () => {
             cache.set('key', { item_collection: {} });
             recents.id = 'id';
@@ -296,3 +279,4 @@ describe('api/Recents', () => {
         });
     });
 });
+//# sourceMappingURL=Recents-test.js.map

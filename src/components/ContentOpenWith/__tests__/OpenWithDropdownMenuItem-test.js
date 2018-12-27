@@ -1,11 +1,7 @@
-import React from 'react';
 import noop from 'lodash/noop';
 import { shallow } from 'enzyme';
-import OpenWithDropdownMenuItem from '../OpenWithDropdownMenuItem';
-
 describe('components/ContentOpenWith/OpenWithMenu', () => {
-    const getWrapper = props => shallow(<OpenWithDropdownMenuItem {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     test('should render the description and correct icon', () => {
         const props = {
             integration: {
@@ -18,7 +14,6 @@ describe('components/ContentOpenWith/OpenWithMenu', () => {
         const wrapper = getWrapper(props);
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should use the default icon when no mapping can be found to an existing icon', () => {
         const props = {
             integration: {
@@ -32,3 +27,4 @@ describe('components/ContentOpenWith/OpenWithMenu', () => {
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=OpenWithDropdownMenuItem-test.js.map

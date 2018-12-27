@@ -1,16 +1,13 @@
 /**
- * @flow
+ * @was-flow
  * @file Function to sort the item list
  * @author Box
  */
-
 import comparator from './comparator';
 import { getBadItemError } from './error';
-
-function isSortingNeeded(order?: Order[], sortBy: SortBy, sortDirection: SortDirection): boolean {
+function isSortingNeeded(order, sortBy, sortDirection) {
     return !Array.isArray(order) || !order.some(entry => entry.by === sortBy && entry.direction === sortDirection);
 }
-
 /**
  * Sorts items in place
  *
@@ -20,22 +17,15 @@ function isSortingNeeded(order?: Order[], sortBy: SortBy, sortDirection: SortDir
  * @param {Cache} cache item cache
  * @return {void}
  */
-export default function(
-    item: FlattenedBoxItem,
-    sortBy: SortBy,
-    sortDirection: SortDirection,
-    cache: APICache,
-): FlattenedBoxItem {
-    const { item_collection }: FlattenedBoxItem = item;
+export default function (item, sortBy, sortDirection, cache) {
+    const { item_collection } = item;
     if (!item_collection) {
         throw getBadItemError();
     }
-
-    const { entries, order }: FlattenedBoxItemCollection = item_collection;
+    const { entries, order } = item_collection;
     if (!Array.isArray(entries)) {
         throw getBadItemError();
     }
-
     if (isSortingNeeded(order, sortBy, sortDirection)) {
         entries.sort(comparator(sortBy, sortDirection, cache));
         item_collection.order = [
@@ -45,10 +35,8 @@ export default function(
             },
         ];
     }
-
     return item;
 }
-
 /**
  * Sort valid feed items, descending by created_at time.
  *
@@ -56,16 +44,15 @@ export default function(
  * type that is allowed in the feed.
  * @return {Array<?Comments | ?Tasks | ?FileVersions>} the sorted feed items
  */
-export function sortFeedItems(...args: Array<?Comments | ?Tasks | ?FileVersions>): FeedItems {
-    const feedItems: FeedItems = args
+export function sortFeedItems(...args) {
+    const feedItems = args
         .reduce((items, itemContainer) => {
-            if (itemContainer) {
-                return items.concat(itemContainer.entries);
-            }
-
-            return items;
-        }, [])
+        if (itemContainer) {
+            return items.concat(itemContainer.entries);
+        }
+        return items;
+    }, [])
         .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
-
     return feedItems;
 }
+//# sourceMappingURL=sorter.js.map

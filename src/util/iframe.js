@@ -1,9 +1,8 @@
 /**
- * @flow
+ * @was-flow
  * @file Function to create iframe and downloading
  * @author Box
  */
-
 /**
  * Creates an empty iframe or uses an existing one
  * for the purposes of downloading or printing
@@ -11,8 +10,8 @@
  * @private
  * @return {HTMLIFrameElement} Iframe
  */
-function createDownloadIframe(): HTMLIFrameElement {
-    let iframe: HTMLIFrameElement = ((document.querySelector('#boxdownloadiframe'): any): HTMLIFrameElement);
+function createDownloadIframe() {
+    let iframe = ((document.querySelector('#boxdownloadiframe'))), any, HTMLIFrameElement;
     if (!iframe) {
         // if no existing iframe create a new one
         iframe = document.createElement('iframe');
@@ -22,12 +21,10 @@ function createDownloadIframe(): HTMLIFrameElement {
             document.body.appendChild(iframe);
         }
     }
-
     // Clean the iframe up
     iframe.contentDocument.write('<head></head><body></body>');
     return iframe;
 }
-
 /**
  * Opens url in an iframe
  * Used for downloads
@@ -35,8 +32,9 @@ function createDownloadIframe(): HTMLIFrameElement {
  * @param {string} url - URL to open
  * @return {HTMLIFrameElement}
  */
-export default function openUrlInsideIframe(url: string): HTMLIFrameElement {
-    const iframe: HTMLIFrameElement = createDownloadIframe();
+export default function openUrlInsideIframe(url) {
+    const iframe = createDownloadIframe();
     iframe.src = url;
     return iframe;
 }
+//# sourceMappingURL=iframe.js.map

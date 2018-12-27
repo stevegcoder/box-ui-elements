@@ -1,15 +1,12 @@
 import PlainUpload from '../PlainUpload';
 import * as crypto from '../../../util/webcrypto';
-
 let upload;
-
 describe('api/uploads/PlainUpload', () => {
     beforeEach(() => {
         upload = new PlainUpload({
             token: '123',
         });
     });
-
     describe('uploadSuccessHandler()', () => {
         test('should not do anything if API is destroyed', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -19,20 +16,16 @@ describe('api/uploads/PlainUpload', () => {
             });
             expect(upload.successCallback).not.toHaveBeenCalled();
         });
-
         test('should call success callback with returned entries', () => {
             const entries = [{}, {}];
-
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.successCallback = jest.fn();
-
             upload.uploadSuccessHandler({
                 data: { entries },
             });
             expect(upload.successCallback).toHaveBeenCalledWith(entries);
         });
     });
-
     describe('uploadProgressHandler', () => {
         test('should not do anything if API is destroyed', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -40,18 +33,14 @@ describe('api/uploads/PlainUpload', () => {
             upload.uploadProgressHandler(new ProgressEvent('null'));
             expect(upload.progressCallback).not.toHaveBeenCalled();
         });
-
         test('should call progress callback with progress event', () => {
             const event = new ProgressEvent('null');
-
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.progressCallback = jest.fn();
-
             upload.uploadProgressHandler(event);
             expect(upload.progressCallback).toHaveBeenCalledWith(event);
         });
     });
-
     describe('makePreflightRequest()', () => {
         test('should not do anything if API is destroyed', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -66,10 +55,8 @@ describe('api/uploads/PlainUpload', () => {
             expect(upload.getBaseUploadUrl).not.toHaveBeenCalled();
             expect(upload.xhr.options).not.toHaveBeenCalled();
         });
-
         test('should make preflight request with current file attributes', () => {
             const baseUrl = 'base';
-
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.getBaseApiUrl = jest.fn().mockReturnValueOnce(baseUrl);
             upload.file = {
@@ -77,11 +64,9 @@ describe('api/uploads/PlainUpload', () => {
                 name: 'zavala',
             };
             upload.folderId = '123';
-
             upload.xhr = {
                 options: jest.fn(),
             };
-
             upload.makePreflightRequest({});
             expect(upload.xhr.options).toHaveBeenCalledWith({
                 url: `${baseUrl}/files/content`,
@@ -96,10 +81,8 @@ describe('api/uploads/PlainUpload', () => {
                 errorHandler: expect.any(Function),
             });
         });
-
         test('should make preflight request to upload file version url if fileId is given', () => {
             const baseUrl = 'base';
-
             upload.fileId = '234';
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.getBaseApiUrl = jest.fn().mockReturnValueOnce(baseUrl);
@@ -108,11 +91,9 @@ describe('api/uploads/PlainUpload', () => {
                 name: 'zavala',
             };
             upload.folderId = '123';
-
             upload.xhr = {
                 options: jest.fn(),
             };
-
             upload.makePreflightRequest();
             expect(upload.xhr.options).toHaveBeenCalledWith({
                 url: `${baseUrl}/files/${upload.fileId}/content`,
@@ -122,7 +103,6 @@ describe('api/uploads/PlainUpload', () => {
             });
         });
     });
-
     describe('preflightSuccessHandler', () => {
         test('should not do anything if API is destroyed', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -132,7 +112,6 @@ describe('api/uploads/PlainUpload', () => {
             upload.preflightSuccessHandler({ data: {} });
             expect(upload.xhr.uploadFile).not.toHaveBeenCalled();
         });
-
         test('should generate upload URL and make request if no URL is provided', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.computeSHA1 = jest.fn().mockReturnValueOnce(Promise.resolve('somehash'));
@@ -144,7 +123,6 @@ describe('api/uploads/PlainUpload', () => {
             upload.xhr = {
                 uploadFile: jest.fn(),
             };
-
             return upload.preflightSuccessHandler({ data: {} }).then(() => {
                 expect(upload.xhr.uploadFile).toHaveBeenCalledWith({
                     url: `${upload.uploadHost}/api/2.0/files/content`,
@@ -161,7 +139,6 @@ describe('api/uploads/PlainUpload', () => {
                 });
             });
         });
-
         test('should upload with no Content-MD5 hash if hashing fails', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.computeSHA1 = jest.fn().mockReturnValueOnce(Promise.resolve(''));
@@ -172,7 +149,6 @@ describe('api/uploads/PlainUpload', () => {
             upload.xhr = {
                 uploadFile: jest.fn(),
             };
-
             return upload.preflightSuccessHandler({ data: {} }).then(() => {
                 expect(upload.xhr.uploadFile).toHaveBeenCalledWith({
                     url: `${upload.uploadHost}/api/2.0/files/content`,
@@ -187,10 +163,8 @@ describe('api/uploads/PlainUpload', () => {
                 });
             });
         });
-
         test('should upload to new file version if file ID is provided', () => {
             const fileId = '123';
-
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.computeSHA1 = jest.fn().mockReturnValueOnce(Promise.resolve('somehash'));
             upload.file = {
@@ -201,7 +175,6 @@ describe('api/uploads/PlainUpload', () => {
             upload.xhr = {
                 uploadFile: jest.fn(),
             };
-
             return upload.preflightSuccessHandler({ data: {} }).then(() => {
                 expect(upload.xhr.uploadFile).toHaveBeenCalledWith({
                     url: `${upload.uploadHost}/api/2.0/files/${fileId}/content`,
@@ -216,7 +189,6 @@ describe('api/uploads/PlainUpload', () => {
             });
         });
     });
-
     describe('upload()', () => {
         test('should not do anything if API is destroyed', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -224,15 +196,13 @@ describe('api/uploads/PlainUpload', () => {
             upload.upload({});
             expect(upload.makePreflightRequest).not.toHaveBeenCalled();
         });
-
         test('should set properties and make preflight request', () => {
             const folderId = '123';
             const file = {};
-            const successCallback = () => {};
-            const errorCallback = () => {};
-            const progressCallback = () => {};
+            const successCallback = () => { };
+            const errorCallback = () => { };
+            const progressCallback = () => { };
             const overwrite = true;
-
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.makePreflightRequest = jest.fn();
             upload.upload({
@@ -243,7 +213,6 @@ describe('api/uploads/PlainUpload', () => {
                 progressCallback,
                 overwrite,
             });
-
             expect(upload.folderId).toBe(folderId);
             expect(upload.file).toBe(file);
             expect(upload.successCallback).toBe(successCallback);
@@ -252,7 +221,6 @@ describe('api/uploads/PlainUpload', () => {
             expect(upload.overwrite).toBe(overwrite);
         });
     });
-
     describe('cancel()', () => {
         test('should not do anything if API is destroyed', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(true);
@@ -260,7 +228,6 @@ describe('api/uploads/PlainUpload', () => {
             upload.cancel();
             expect(upload.destroy).not.toHaveBeenCalled();
         });
-
         test('should abort xhr', () => {
             upload.isDestroyed = jest.fn().mockReturnValueOnce(false);
             upload.destroy = jest.fn();
@@ -268,13 +235,11 @@ describe('api/uploads/PlainUpload', () => {
             expect(upload.destroy).toHaveBeenCalled();
         });
     });
-
     describe('computeSHA1()', () => {
         test('should read file and compute digest', () => {
             const file = new File(['123'], 'sample.jpg');
             upload.readFile = jest.fn().mockReturnValueOnce(Promise.resolve({ buffer: new ArrayBuffer(3) }));
             crypto.digest = jest.fn().mockReturnValueOnce(Promise.resolve(new ArrayBuffer(3)));
-
             return upload.computeSHA1(file).then(computedSHA1 => {
                 expect(upload.readFile).toBeCalled();
                 expect(crypto.digest).toBeCalled();
@@ -283,3 +248,4 @@ describe('api/uploads/PlainUpload', () => {
         });
     });
 });
+//# sourceMappingURL=PlainUpload-test.js.map

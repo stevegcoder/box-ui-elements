@@ -1,15 +1,11 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import IconMagicWand from 'box-react-ui/lib/icons/general/IconMagicWand';
 import IconMetadataThick from 'box-react-ui/lib/icons/general/IconMetadataThick';
 import IconDocInfo from 'box-react-ui/lib/icons/general/IconDocInfo';
 import IconChatRound from 'box-react-ui/lib/icons/general/IconChatRound';
 import SidebarNavButton from '../SidebarNavButton';
-import SidebarNav from '../SidebarNav';
-
 describe('components/ContentSidebar/SidebarNav', () => {
-    const getWrapper = props => shallow(<SidebarNav {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     test('should render skills tab', () => {
         const props = {
             hasSkills: true,
@@ -21,7 +17,6 @@ describe('components/ContentSidebar/SidebarNav', () => {
         expect(wrapper.find(IconChatRound)).toHaveLength(0);
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should render details tab', () => {
         const props = {
             hasDetails: true,
@@ -33,7 +28,6 @@ describe('components/ContentSidebar/SidebarNav', () => {
         expect(wrapper.find(IconChatRound)).toHaveLength(0);
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should render activity tab', () => {
         const props = {
             hasActivityFeed: true,
@@ -45,7 +39,6 @@ describe('components/ContentSidebar/SidebarNav', () => {
         expect(wrapper.find(IconChatRound)).toHaveLength(1);
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should render metadata tab', () => {
         const props = {
             hasMetadata: true,
@@ -57,7 +50,6 @@ describe('components/ContentSidebar/SidebarNav', () => {
         expect(wrapper.find(IconChatRound)).toHaveLength(0);
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should select activity tab', () => {
         const props = {
             hasSkills: true,
@@ -71,12 +63,11 @@ describe('components/ContentSidebar/SidebarNav', () => {
         expect(wrapper.find(IconDocInfo)).toHaveLength(0);
         expect(wrapper.find(IconChatRound)).toHaveLength(1);
         expect(wrapper.find(SidebarNavButton)).toHaveLength(3);
-        expect(
-            wrapper
-                .find(SidebarNavButton)
-                .at(0)
-                .prop('isSelected'),
-        ).toBeTruthy();
+        expect(wrapper
+            .find(SidebarNavButton)
+            .at(0)
+            .prop('isSelected')).toBeTruthy();
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=SidebarNav-test.js.map

@@ -1,12 +1,9 @@
 import Versions from '../Versions';
-
 let versions;
-
 describe('api/Versions', () => {
     beforeEach(() => {
         versions = new Versions({});
     });
-
     describe('getUrl()', () => {
         test('should throw when version api url without id', () => {
             expect(() => {
@@ -17,7 +14,6 @@ describe('api/Versions', () => {
             expect(versions.getUrl('foo')).toBe('https://api.box.com/2.0/files/foo/versions');
         });
     });
-
     describe('successHandler()', () => {
         test('should return API response with properly formatted data', () => {
             const uploadVersion = {
@@ -38,25 +34,17 @@ describe('api/Versions', () => {
                 total_count: 2,
                 entries: [uploadVersion, deleteVersion],
             };
-
             versions.successCallback = jest.fn();
-
             const formattedResponse = {
                 total_count: 2,
                 entries: [
-                    {
-                        ...uploadVersion,
-                        action: 'upload',
-                    },
-                    {
-                        ...deleteVersion,
-                        action: 'delete',
-                    },
+                    Object.assign({}, uploadVersion, { action: 'upload' }),
+                    Object.assign({}, deleteVersion, { action: 'delete' }),
                 ],
             };
-
             versions.successHandler(response);
             expect(versions.successCallback).toBeCalledWith(formattedResponse);
         });
     });
 });
+//# sourceMappingURL=Versions-test.js.map

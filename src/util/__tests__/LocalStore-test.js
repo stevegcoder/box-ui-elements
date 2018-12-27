@@ -1,6 +1,5 @@
 import { withData } from 'leche';
 import LocalStore from '../LocalStore';
-
 const localStorageMock = (() => {
     const store = {};
     return {
@@ -15,18 +14,14 @@ const localStorageMock = (() => {
         },
     };
 })();
-
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-
 describe('util/LocalStore', () => {
     let localStore;
     const key = 'randomKey';
     const value = '{"hi": 1}';
-
     beforeEach(() => {
         localStore = new LocalStore();
     });
-
     describe('setItem()', () => {
         test('should call setItem on localStorage properly when localStorage is available', () => {
             localStore.isLocalStorageAvailable = true;
@@ -35,7 +30,6 @@ describe('util/LocalStore', () => {
             localStore.setItem(key, value);
             expect(localStore.localStorage.setItem).toHaveBeenCalledWith(key, JSON.stringify(value));
         });
-
         test('should set value in memory when localStorage is not available', () => {
             localStore.isLocalStorageAvailable = false;
             localStore.memoryStore.set = jest.fn();
@@ -43,7 +37,6 @@ describe('util/LocalStore', () => {
             expect(localStore.memoryStore.set).toHaveBeenCalledWith(key, value);
         });
     });
-
     describe('getItem()', () => {
         withData([[value, JSON.parse(value)], [null, null]], (rawValue, expected) => {
             test('should call getItem on localStorage properly when localStorage is available', () => {
@@ -54,7 +47,6 @@ describe('util/LocalStore', () => {
                 expect(localStore.localStorage.getItem).toHaveBeenCalledWith(key);
             });
         });
-
         test('should set value from memory when localStorage is not available', () => {
             localStore.isLocalStorageAvailable = false;
             localStore.memoryStore.get = jest.fn().mockReturnValueOnce(value);
@@ -62,7 +54,6 @@ describe('util/LocalStore', () => {
             expect(localStore.memoryStore.get).toHaveBeenCalledWith(key);
         });
     });
-
     describe('removeItem()', () => {
         test('should call removeItem on localStorage properly when localStorage is available', () => {
             localStore.isLocalStorageAvailable = true;
@@ -71,7 +62,6 @@ describe('util/LocalStore', () => {
             localStore.removeItem(key);
             expect(localStore.localStorage.removeItem).toHaveBeenCalledWith(key);
         });
-
         test('should delete value from memory when localStorage is not available and key exists in memory', () => {
             localStore.isLocalStorageAvailable = false;
             localStore.memoryStore.set(key, value);
@@ -80,7 +70,6 @@ describe('util/LocalStore', () => {
             expect(localStore.memoryStore.has(key)).toBeFalsy();
             expect(localStore.localStorage.removeItem).not.toHaveBeenCalled();
         });
-
         test('should noop when localStorage is not available and key does not exists in memory', () => {
             localStore.isLocalStorageAvailable = false;
             localStore.memoryStore.set(key, value);
@@ -90,3 +79,4 @@ describe('util/LocalStore', () => {
         });
     });
 });
+//# sourceMappingURL=LocalStore-test.js.map

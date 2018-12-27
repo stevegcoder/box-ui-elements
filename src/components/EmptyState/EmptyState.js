@@ -1,55 +1,36 @@
 /**
- * @flow
+ * @was-flow
  * @file Empty state component
  * @author Box
  */
-
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import ErrorEmptyState from 'box-react-ui/lib/icons/states/ErrorEmptyState';
-import FolderEmptyState from 'box-react-ui/lib/icons/states/FolderEmptyState';
-import SelectedItemsEmptyState from 'box-react-ui/lib/icons/states/SelectedItemsEmptyState';
-import SearchEmptyState from 'box-react-ui/lib/icons/states/SearchEmptyState';
 import messages from '../messages';
 import { VIEW_ERROR, VIEW_FOLDER, VIEW_SEARCH, VIEW_SELECTED } from '../../constants';
-
 import './EmptyState.scss';
-
-type Props = {
-    view: View,
-    isLoading: boolean,
-};
-
-const EmptyState = ({ view, isLoading }: Props) => {
+const EmptyState = ({ view, isLoading }) => {
     let type;
-    const message =
-        isLoading && view === VIEW_FOLDER ? (
-            <FormattedMessage {...messages.loadingState} />
-        ) : (
-            <FormattedMessage {...messages[`${view}State`]} />
-        );
-
+    const message = isLoading && view === VIEW_FOLDER ? (Object.assign({}, messages.loadingState) /  >
+    ) : (Object.assign({}, messages[`${view}State`]) /  >
+    );
     switch (view) {
         case VIEW_ERROR:
-            type = <ErrorEmptyState />;
+            type = />;;
             break;
         case VIEW_SELECTED:
-            type = <SelectedItemsEmptyState />;
+            type = />;;
             break;
         case VIEW_SEARCH:
-            type = <SearchEmptyState />;
+            type = />;;
             break;
         default:
-            type = <FolderEmptyState />;
+            type = />;;
             break;
     }
-
-    return (
-        <div className="be-empty">
-            {type}
-            <div>{message}</div>
-        </div>
-    );
+    return className = "be-empty" >
+        { type }
+        < div > { message } < /div>
+        < /div>;
 };
-
+;
+;
 export default EmptyState;
+//# sourceMappingURL=EmptyState.js.map

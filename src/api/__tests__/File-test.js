@@ -1,27 +1,30 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import File from '../File';
 import Cache from '../../util/Cache';
 import * as fields from '../../util/fields';
 import { X_REP_HINTS, ERROR_CODE_FETCH_FILE, ERROR_CODE_GET_DOWNLOAD_URL } from '../../constants';
-
 jest.mock('../../util/file', () => ({
     getTypedFileId: jest.fn().mockReturnValue('file_id'),
 }));
-
 let file;
 let cache;
-
 describe('api/File', () => {
     beforeEach(() => {
         file = new File({});
         cache = new Cache();
     });
-
     describe('getCacheKey()', () => {
         test('should return correct key', () => {
             expect(file.getCacheKey('foo')).toBe('file_foo');
         });
     });
-
     describe('getUrl()', () => {
         test('should return correct file api url without id', () => {
             expect(file.getUrl()).toBe('https://api.box.com/2.0/files');
@@ -30,7 +33,6 @@ describe('api/File', () => {
             expect(file.getUrl('foo')).toBe('https://api.box.com/2.0/files/foo');
         });
     });
-
     describe('getDownloadUrl()', () => {
         test('should make xhr to get download url and call success callback', () => {
             const success = jest.fn();
@@ -44,7 +46,6 @@ describe('api/File', () => {
                 });
             });
         });
-
         test('should make xhr to get download url and not call success callback if destroyed', () => {
             file.isDestroyed = jest.fn().mockReturnValueOnce(true);
             const success = jest.fn();
@@ -58,7 +59,6 @@ describe('api/File', () => {
                 });
             });
         });
-
         test('should make xhr to get download url and call error callback', () => {
             const error = new Error('error');
             const successCb = jest.fn();
@@ -74,7 +74,6 @@ describe('api/File', () => {
                 });
             });
         });
-
         test('should make xhr to get download url and not call error callback when destroyed', () => {
             file.isDestroyed = jest.fn().mockReturnValueOnce(true);
             const error = new Error('error');
@@ -92,11 +91,9 @@ describe('api/File', () => {
             });
         });
     });
-
     describe('setFileDescription()', () => {
         const success = jest.fn();
         const error = jest.fn();
-
         test('should fail if the file object is bad', () => {
             file.xhr = jest.fn();
             return file.setFileDescription({}, 'foo', success, error).catch(() => {
@@ -105,7 +102,6 @@ describe('api/File', () => {
                 expect(error).toHaveBeenCalled();
             });
         });
-
         test('should fail if we have insufficient permissions', () => {
             file.xhr = jest.fn();
             const mockFile = {
@@ -114,18 +110,15 @@ describe('api/File', () => {
                     can_rename: false,
                 },
             };
-
             return file.setFileDescription(mockFile, 'foo', success, error).catch(() => {
                 expect(file.xhr).not.toHaveBeenCalled();
                 expect(success).not.toHaveBeenCalled();
                 expect(error).toHaveBeenCalled();
             });
         });
-
         test('should make an xhr', () => {
             file.getUrl = jest.fn().mockReturnValue('url');
             file.merge = jest.fn();
-
             const mockFile = {
                 id: '1',
                 permissions: {
@@ -136,7 +129,6 @@ describe('api/File', () => {
             file.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.resolve(mockFile)),
             };
-
             return file.setFileDescription(mockFile, 'foo', success, error).then(() => {
                 expect(file.xhr.put).toHaveBeenCalledWith({
                     id: 'file_id',
@@ -147,11 +139,9 @@ describe('api/File', () => {
                 });
             });
         });
-
         test('should merge the new file description in and execute the success callback', () => {
             file.getCacheKey = jest.fn().mockReturnValue('key');
             file.merge = jest.fn();
-
             const mockFile = {
                 id: '1',
                 permissions: {
@@ -159,25 +149,20 @@ describe('api/File', () => {
                 },
                 description: 'foo',
             };
-
             const mockFileResponse = mockFile;
             mockFileResponse.description = 'fo';
-
             file.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.resolve({ data: mockFileResponse })),
             };
-
             return file.setFileDescription(mockFile, 'foo', success, error).then(() => {
                 expect(file.xhr.put).toHaveBeenCalled();
                 expect(file.merge).toHaveBeenCalledWith('key', 'description', 'fo');
                 expect(error).not.toHaveBeenCalled();
             });
         });
-
         test('should not merge the new file description in and not execute the success callback when destroyed', () => {
             file.getCacheKey = jest.fn().mockReturnValue('key');
             file.merge = jest.fn();
-
             const mockFile = {
                 id: '1',
                 permissions: {
@@ -185,22 +170,18 @@ describe('api/File', () => {
                 },
                 description: 'foo',
             };
-
             const mockFileResponse = mockFile;
             mockFileResponse.description = 'fo';
             file.isDestroyed = jest.fn().mockReturnValueOnce(true);
-
             file.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.resolve({ data: mockFileResponse })),
             };
-
             return file.setFileDescription(mockFile, 'foo', success, error).then(() => {
                 expect(file.xhr.put).toHaveBeenCalled();
                 expect(file.merge).not.toHaveBeenCalled();
                 expect(error).not.toHaveBeenCalled();
             });
         });
-
         test('should not call the error callback on failure when destroyed', () => {
             file.isDestroyed = jest.fn().mockReturnValueOnce(true);
             file.merge = jest.fn();
@@ -212,18 +193,15 @@ describe('api/File', () => {
                 description: 'foo',
             };
             const mockError = new Error();
-
             file.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.reject(mockError)),
             };
-
             return file.setFileDescription(mockFile, 'bar', success, error).then(() => {
                 expect(file.xhr.put).toHaveBeenCalled();
                 expect(file.merge).not.toHaveBeenCalled();
                 expect(error).not.toHaveBeenCalled();
             });
         });
-
         test('should call the error callback on failure', () => {
             file.merge = jest.fn().mockReturnValueOnce('orig');
             const mockFile = {
@@ -234,11 +212,9 @@ describe('api/File', () => {
                 description: 'foo',
             };
             const mockError = new Error();
-
             file.xhr = {
                 put: jest.fn().mockReturnValueOnce(Promise.reject(mockError)),
             };
-
             return file.setFileDescription(mockFile, 'bar', success, error).then(() => {
                 expect(file.xhr.put).toHaveBeenCalled();
                 expect(file.merge).toHaveBeenCalledWith('file_1', 'description', 'foo');
@@ -246,23 +222,21 @@ describe('api/File', () => {
             });
         });
     });
-
     describe('getFile()', () => {
-        test('should not do anything if destroyed', async () => {
+        test('should not do anything if destroyed', () => __awaiter(this, void 0, void 0, function* () {
             file.isDestroyed = jest.fn().mockReturnValueOnce(true);
             file.getCache = jest.fn();
             file.getCacheKey = jest.fn();
             file.xhr = null;
             const success = jest.fn();
             const error = jest.fn();
-            await file.getFile('id', success, error);
+            yield file.getFile('id', success, error);
             expect(file.getCache).not.toHaveBeenCalled();
             expect(file.getCacheKey).not.toHaveBeenCalled();
             expect(success).not.toHaveBeenCalled();
             expect(error).not.toHaveBeenCalled();
-        });
-
-        test('should return cached file', async () => {
+        }));
+        test('should return cached file', () => __awaiter(this, void 0, void 0, function* () {
             cache.set('key', 'file');
             file.xhr = null;
             file.options = { cache };
@@ -270,13 +244,12 @@ describe('api/File', () => {
             file.getCacheKey = jest.fn().mockReturnValueOnce('key');
             fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
             const success = jest.fn();
-            await file.getFile('id', success);
+            yield file.getFile('id', success);
             expect(file.getCacheKey).toHaveBeenCalledWith('id');
             expect(success).toHaveBeenCalledWith('file');
             expect(fields.findMissingProperties).toHaveBeenCalledWith('file', undefined);
-        });
-
-        test('should make xhr to get file when cached if missing fields', async () => {
+        }));
+        test('should make xhr to get file when cached if missing fields', () => __awaiter(this, void 0, void 0, function* () {
             cache.set('key', { id: '123' });
             file.options = { cache };
             file.getCache = jest.fn().mockReturnValueOnce(cache);
@@ -286,9 +259,8 @@ describe('api/File', () => {
             file.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { foo: 'bar' } })),
             };
-
             const success = jest.fn();
-            await file.getFile('id', success);
+            yield file.getFile('id', success);
             expect(success).toHaveBeenCalledWith({
                 id: '123',
                 foo: 'bar',
@@ -306,9 +278,8 @@ describe('api/File', () => {
                     'X-Rep-Hints': X_REP_HINTS,
                 },
             });
-        });
-
-        test('should make xhr to get file and call success callback when missing fields', async () => {
+        }));
+        test('should make xhr to get file and call success callback when missing fields', () => __awaiter(this, void 0, void 0, function* () {
             file.options = { cache };
             file.getCache = jest.fn().mockReturnValueOnce(cache);
             file.getCacheKey = jest.fn().mockReturnValueOnce('key');
@@ -317,9 +288,8 @@ describe('api/File', () => {
             file.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: 'new file' })),
             };
-
             const success = jest.fn();
-            await file.getFile('id', success);
+            yield file.getFile('id', success);
             expect(success).toHaveBeenCalledWith('new file');
             expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: 'id' }, undefined);
             expect(fields.fillMissingProperties).toHaveBeenCalledWith('new file', ['missing1', 'missing2']);
@@ -333,9 +303,8 @@ describe('api/File', () => {
                     'X-Rep-Hints': X_REP_HINTS,
                 },
             });
-        });
-
-        test('should make xhr to get file and not call success callback when destroyed', async () => {
+        }));
+        test('should make xhr to get file and not call success callback when destroyed', () => __awaiter(this, void 0, void 0, function* () {
             fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
             file.isDestroyed = jest
                 .fn()
@@ -344,10 +313,8 @@ describe('api/File', () => {
             file.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { file: 'new file' } })),
             };
-
             const success = jest.fn();
-
-            await file.getFile('id', success);
+            yield file.getFile('id', success);
             expect(success).not.toHaveBeenCalled();
             expect(file.xhr.get).toHaveBeenCalledWith({
                 id: 'file_id',
@@ -356,23 +323,19 @@ describe('api/File', () => {
                     'X-Rep-Hints': X_REP_HINTS,
                 },
             });
-        });
-
-        test('should call error callback when xhr fails', async () => {
+        }));
+        test('should call error callback when xhr fails', () => __awaiter(this, void 0, void 0, function* () {
             const error = new Error('error');
             fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
             file.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.reject(error)),
             };
-
             const successCb = jest.fn();
             const errorCb = jest.fn();
-
-            await file.getFile('id', successCb, errorCb, {
+            yield file.getFile('id', successCb, errorCb, {
                 forceFetch: false,
                 includePreviewSidebarFields: true,
             });
-
             expect(successCb).not.toHaveBeenCalled();
             expect(errorCb).toHaveBeenCalledWith(error, ERROR_CODE_FETCH_FILE);
             expect(file.xhr.get).toHaveBeenCalledWith({
@@ -382,9 +345,8 @@ describe('api/File', () => {
                     'X-Rep-Hints': X_REP_HINTS,
                 },
             });
-        });
-
-        test('should make xhr to get file when forced to clear cache', async () => {
+        }));
+        test('should make xhr to get file when forced to clear cache', () => __awaiter(this, void 0, void 0, function* () {
             cache.set('key', { id: '123' });
             fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
             fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: '123', foo: 'bar' });
@@ -394,10 +356,8 @@ describe('api/File', () => {
             file.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { foo: 'bar' } })),
             };
-
             const success = jest.fn();
-
-            await file.getFile('id', success, 'error', { forceFetch: true });
+            yield file.getFile('id', success, 'error', { forceFetch: true });
             expect(file.getCacheKey).toHaveBeenCalledWith('id');
             expect(success).toHaveBeenCalledWith({ id: '123', foo: 'bar' });
             expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: 'id' }, undefined);
@@ -409,9 +369,8 @@ describe('api/File', () => {
                     'X-Rep-Hints': X_REP_HINTS,
                 },
             });
-        });
-
-        test('should make xhr to get file even with cached file when asked to update cache', async () => {
+        }));
+        test('should make xhr to get file even with cached file when asked to update cache', () => __awaiter(this, void 0, void 0, function* () {
             cache.set('key', { id: '123' });
             fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
             fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: 'new', foo: 'bar', missing: null });
@@ -421,10 +380,8 @@ describe('api/File', () => {
             file.xhr = {
                 get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { id: 'new', foo: 'bar' } })),
             };
-
             const success = jest.fn();
-
-            await file.getFile('id', success, 'error', {
+            yield file.getFile('id', success, 'error', {
                 forceFetch: false,
                 refreshCache: true,
             });
@@ -445,6 +402,7 @@ describe('api/File', () => {
                     'X-Rep-Hints': X_REP_HINTS,
                 },
             });
-        });
+        }));
     });
 });
+//# sourceMappingURL=File-test.js.map

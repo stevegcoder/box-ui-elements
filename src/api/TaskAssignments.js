@@ -1,17 +1,10 @@
 /**
- * @flow
+ * @was-flow
  * @file Helper for the box Task Assignments API
  * @author Box
  */
-
 import Base from './Base';
-import {
-    PERMISSION_CAN_COMMENT,
-    ERROR_CODE_CREATE_TASK_ASSIGNMENT,
-    ERROR_CODE_UPDATE_TASK_ASSIGNMENT,
-    ERROR_CODE_DELETE_TASK_ASSIGNMENT,
-} from '../constants';
-
+import { PERMISSION_CAN_COMMENT, ERROR_CODE_CREATE_TASK_ASSIGNMENT, ERROR_CODE_UPDATE_TASK_ASSIGNMENT, ERROR_CODE_DELETE_TASK_ASSIGNMENT, } from '../constants';
 class TaskAssignments extends Base {
     /**
      * API URL for task assignments. Getting a list of assignments "/tasks/id/assignments" does not give us the fields
@@ -21,11 +14,10 @@ class TaskAssignments extends Base {
      * @param {string} id - a box task assignment ID
      * @return {string} base url for task assignments
      */
-    getUrl(id?: string): string {
+    getUrl(id) {
         const baseUrl = `${this.getBaseApiUrl()}/task_assignments`;
         return id ? `${baseUrl}/${id}` : baseUrl;
     }
-
     /**
      * API for creating a task assignment on a file
      *
@@ -36,29 +28,16 @@ class TaskAssignments extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    createTaskAssignment({
-        file,
-        taskId,
-        assignTo,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        taskId: string,
-        assignTo: { id: string },
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    createTaskAssignment({ file, taskId, assignTo, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_CREATE_TASK_ASSIGNMENT;
         const { id = '', permissions } = file;
-
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         const requestData = {
             data: {
                 task: {
@@ -68,7 +47,6 @@ class TaskAssignments extends Base {
                 assign_to: assignTo,
             },
         };
-
         this.post({
             id,
             url: this.getUrl(),
@@ -77,7 +55,6 @@ class TaskAssignments extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for updating a task assignment on a file
      *
@@ -89,36 +66,20 @@ class TaskAssignments extends Base {
      * @param {string} [message] - The task assignments text
      * @return {void}
      */
-    updateTaskAssignment({
-        file,
-        taskAssignmentId,
-        resolutionState,
-        message,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        taskAssignmentId: string,
-        resolutionState: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-        message?: string,
-    }): void {
+    updateTaskAssignment({ file, taskAssignmentId, resolutionState, message, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_UPDATE_TASK_ASSIGNMENT;
         const { id = '', permissions } = file;
-
         try {
             // We don't know task_assignment_edit specific permissions, so let the client try and fail gracefully
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         const requestData = {
             data: { resolution_state: resolutionState, message },
         };
-
         this.put({
             id,
             url: this.getUrl(taskAssignmentId),
@@ -127,7 +88,6 @@ class TaskAssignments extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for deleting a task assignment on a file
      *
@@ -137,28 +97,17 @@ class TaskAssignments extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    deleteTaskAssignment({
-        file,
-        taskAssignmentId,
-        successCallback,
-        errorCallback,
-    }: {
-        file: BoxItem,
-        taskAssignmentId: string,
-        successCallback: Function,
-        errorCallback: ElementsErrorCallback,
-    }): void {
+    deleteTaskAssignment({ file, taskAssignmentId, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_DELETE_TASK_ASSIGNMENT;
         const { id = '', permissions } = file;
-
         try {
             // We don't know task_assignment_delete specific permissions, so let the client try and fail gracefully
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
-
         this.delete({
             id,
             url: this.getUrl(taskAssignmentId),
@@ -167,5 +116,5 @@ class TaskAssignments extends Base {
         });
     }
 }
-
 export default TaskAssignments;
+//# sourceMappingURL=TaskAssignments.js.map

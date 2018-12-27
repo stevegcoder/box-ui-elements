@@ -1,55 +1,43 @@
 /**
- * @flow
+ * @was-flow
  * @file File Keywords SkillCard component
  * @author Box
  */
-
-import React, { PureComponent } from 'react';
-import { FormattedMessage } from 'react-intl';
-import classNames from 'classnames';
-import PlainButton from 'box-react-ui/lib/components/plain-button/PlainButton';
-import IconEdit from 'box-react-ui/lib/icons/general/IconEdit';
-import LoadingIndicatorWrapper from 'box-react-ui/lib/components/loading-indicator/LoadingIndicatorWrapper';
-import InlineError from 'box-react-ui/lib/components/inline-error/InlineError';
-import Tooltip from 'box-react-ui/lib/components/tooltip/Tooltip';
-import EditableKeywords from './EditableKeywords';
-import ReadOnlyKeywords from './ReadOnlyKeywords';
-import messages from '../../../messages';
-import { SKILLS_TARGETS } from '../../../../interactionTargets';
-
+import { PureComponent } from 'react';
 import './Keywords.scss';
-
-type Props = {
-    card: SkillCard,
-    hasError: boolean,
-    transcript?: SkillCard,
-    isEditable: boolean,
-    getViewer?: Function,
-    onSkillChange: Function,
-};
-
-type State = {
-    isEditing: boolean,
-    isLoading: boolean,
-    hasError: boolean,
-    keywords: Array<SkillCardEntry>,
-    adds: Array<SkillCardEntry>,
-    removes: Array<SkillCardEntry>,
-};
-
-class Keywords extends PureComponent<Props, State> {
-    props: Props;
-
-    state: State;
-
+class Keywords extends PureComponent {
     /**
      * [constructor]
      *
      * @public
      * @return {Keywords}
      */
-    constructor(props: Props) {
+    constructor(props) {
         super(props);
+        /**
+         * Toggles the edit mode
+         *
+         * @private
+         * @return {void}
+         */
+        this.toggleIsEditing = () => {
+            this.setState(prevState => ({
+                isEditing: !prevState.isEditing,
+            }));
+        };
+        /**
+         * Adds a new keyword.
+         * Iterates over the transcript to find locations
+         *
+         * @private
+         * @return {void}
+         */
+        this.onAdd = (keyword) => {
+            const { transcript } = this.props;
+            const { adds } = this.state;
+            const locations = [];
+            const regex = new RegExp(`\\b${((keyword.text)), any), string;
+        };
         this.state = {
             keywords: props.card.entries,
             adds: [],
@@ -59,7 +47,6 @@ class Keywords extends PureComponent<Props, State> {
             isLoading: false,
         };
     }
-
     /**
      * Helper to reset the state
      *
@@ -67,7 +54,7 @@ class Keywords extends PureComponent<Props, State> {
      * @param {Object} props - component props
      * @return {void}
      */
-    resetState(props: Props): void {
+    resetState(props) {
         this.setState({
             keywords: props.card.entries,
             adds: [],
@@ -77,31 +64,8 @@ class Keywords extends PureComponent<Props, State> {
             isLoading: false,
         });
     }
-
-    /**
-     * Toggles the edit mode
-     *
-     * @private
-     * @return {void}
-     */
-    toggleIsEditing = (): void => {
-        this.setState(prevState => ({
-            isEditing: !prevState.isEditing,
-        }));
-    };
-
-    /**
-     * Adds a new keyword.
-     * Iterates over the transcript to find locations
-     *
-     * @private
-     * @return {void}
-     */
-    onAdd = (keyword: SkillCardEntry): void => {
-        const { transcript }: Props = this.props;
-        const { adds } = this.state;
-        const locations = [];
-        const regex = new RegExp(`\\b${((keyword.text: any): string)}\\b`, 'i');
+}
+`, 'i');
 
         if (transcript && Array.isArray(transcript.entries)) {
             transcript.entries.forEach(
@@ -216,3 +180,5 @@ class Keywords extends PureComponent<Props, State> {
 }
 
 export default Keywords;
+;
+//# sourceMappingURL=Keywords.js.map

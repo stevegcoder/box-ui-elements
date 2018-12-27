@@ -1,10 +1,5 @@
-import * as React from 'react';
 import { mount, shallow } from 'enzyme';
-
-import Task from '..';
-
 jest.mock('../../comment/Comment', () => 'mock-comment');
-
 const allHandlers = {
     tasks: {
         edit: jest.fn(),
@@ -14,10 +9,8 @@ const allHandlers = {
         getMentionWithQuery: jest.fn(),
     },
 };
-
 const approverSelectorContacts = [];
 const mentionSelectorContacts = [];
-
 describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
     const task = {
         created_at: 12345678,
@@ -46,23 +39,17 @@ describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
         },
     };
     const currentUser = { name: 'Jake Thomas', id: 1 };
-
     test('should correctly render task', () => {
-        const wrapper = shallow(<Task currentUser={currentUser} {...task} />);
-
+        const wrapper = shallow(currentUser, { currentUser }, Object.assign({}, task) /  > );
         expect(wrapper.hasClass('bcs-task')).toBe(true);
         expect(wrapper.find('mock-comment').length).toEqual(1);
-        expect(
-            wrapper
-                .find('.bcs-task-assignees')
-                .children()
-                .getElements().length,
-        ).toEqual(2);
+        expect(wrapper
+            .find('.bcs-task-assignees')
+            .children()
+            .getElements().length).toEqual(2);
         expect(wrapper.find('.bcs-task-due-date').length).toEqual(1);
-
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should correctly render a pending task', () => {
         const myTask = {
             created_at: Date.now(),
@@ -88,90 +75,53 @@ describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
             },
             isPending: true,
         };
-
-        const wrapper = shallow(<Task currentUser={currentUser} {...myTask} />);
+        const wrapper = shallow(currentUser, { currentUser }, Object.assign({}, myTask) /  > );
         expect(wrapper.hasClass('bcs-is-pending')).toBe(true);
     });
-
     test('should show actions for current user and if onAssignmentUpdate is defined', () => {
         task.isPending = false;
-        const wrapper = shallow(<Task currentUser={currentUser} {...task} onAssignmentUpdate={jest.fn()} />);
-
-        expect(
-            wrapper
-                .find('.bcs-task-assignees')
-                .children()
-                .getElements()[0].props.shouldShowActions,
-        ).toBe(true);
-        expect(
-            !!wrapper
-                .find('.bcs-task-assignees')
-                .children()
-                .getElements()[1].props.shouldShowActions,
-        ).toBe(false);
-
+        const wrapper = shallow(currentUser, { currentUser }, Object.assign({}, task), onAssignmentUpdate = { jest, : .fn() } /  > );
+        expect(wrapper
+            .find('.bcs-task-assignees')
+            .children()
+            .getElements()[0].props.shouldShowActions).toBe(true);
+        expect(!!wrapper
+            .find('.bcs-task-assignees')
+            .children()
+            .getElements()[1].props.shouldShowActions).toBe(false);
         expect(wrapper).toMatchSnapshot();
     });
-
     test('should show tooltips when actions are shown', () => {
-        const wrapper = shallow(<Task currentUser={currentUser} {...task} onAssignmentUpdate={jest.fn()} />);
-        const assignment = shallow(
-            wrapper
-                .find('.bcs-task-assignees')
-                .children()
-                .getElements()[0],
-        );
-
+        const wrapper = shallow(currentUser, { currentUser }, Object.assign({}, task), onAssignmentUpdate = { jest, : .fn() } /  > );
+        const assignment = shallow(wrapper
+            .find('.bcs-task-assignees')
+            .children()
+            .getElements()[0]);
         expect(assignment).toMatchSnapshot();
     });
-
     test('should not show actions for current user if onAssignmentUpdate is not defined', () => {
-        const wrapper = shallow(<Task currentUser={currentUser} {...task} />);
-
-        expect(
-            !!wrapper
-                .find('.bcs-task-assignees')
-                .children()
-                .getElements()[0].props.shouldShowActions,
-        ).toBe(false);
+        const wrapper = shallow(currentUser, { currentUser }, Object.assign({}, task) /  > );
+        expect(!!wrapper
+            .find('.bcs-task-assignees')
+            .children()
+            .getElements()[0].props.shouldShowActions).toBe(false);
     });
-
     test('should call onAssignmentUpdate with approved status when check is clicked', () => {
         const onAssignmentUpdateSpy = jest.fn();
-        const wrapper = mount(
-            <Task
-                currentUser={currentUser}
-                {...task}
-                onAssignmentUpdate={onAssignmentUpdateSpy}
-                approverSelectorContacts={approverSelectorContacts}
-                mentionSelectorContacts={mentionSelectorContacts}
-            />,
-        );
-
+        const wrapper = mount(currentUser, { currentUser }, Object.assign({}, task), onAssignmentUpdate = { onAssignmentUpdateSpy }, approverSelectorContacts = { approverSelectorContacts }, mentionSelectorContacts = { mentionSelectorContacts }
+            /  > );
         const checkButton = wrapper.find('.bcs-task-check-btn').hostNodes();
         checkButton.simulate('click');
-
         expect(onAssignmentUpdateSpy).toHaveBeenCalledWith('123125', 0, 'approved');
     });
-
     test('should call onAssignmentUpdate with rejected status when check is clicked', () => {
         const onAssignmentUpdateSpy = jest.fn();
-        const wrapper = mount(
-            <Task
-                currentUser={currentUser}
-                {...task}
-                onAssignmentUpdate={onAssignmentUpdateSpy}
-                approverSelectorContacts={approverSelectorContacts}
-                mentionSelectorContacts={mentionSelectorContacts}
-            />,
-        );
-
+        const wrapper = mount(currentUser, { currentUser }, Object.assign({}, task), onAssignmentUpdate = { onAssignmentUpdateSpy }, approverSelectorContacts = { approverSelectorContacts }, mentionSelectorContacts = { mentionSelectorContacts }
+            /  > );
         const checkButton = wrapper.find('.bcs-task-x-btn').hostNodes();
         checkButton.simulate('click');
-
         expect(onAssignmentUpdateSpy).toHaveBeenCalledWith('123125', 0, 'rejected');
     });
-
     test('should not allow user to delete if they lack delete permissions on the comment', () => {
         const myTask = {
             created_at: Date.now(),
@@ -196,21 +146,10 @@ describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
                 ],
             },
         };
-
-        const wrapper = shallow(
-            <Task
-                {...myTask}
-                currentUser={currentUser}
-                approverSelectorContacts={approverSelectorContacts}
-                mentionSelectorContacts={mentionSelectorContacts}
-                handlers={allHandlers}
-                onDelete={jest.fn()}
-            />,
-        );
-
+        const wrapper = shallow(Object.assign({}, myTask), currentUser = { currentUser }, approverSelectorContacts = { approverSelectorContacts }, mentionSelectorContacts = { mentionSelectorContacts }, handlers = { allHandlers }, onDelete = { jest, : .fn() }
+            /  > );
         expect(wrapper.find('InlineDelete').length).toEqual(0);
     });
-
     test('should not allow user to edit if they lack edit permissions on the comment', () => {
         const myTask = {
             created_at: Date.now(),
@@ -235,21 +174,10 @@ describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
                 ],
             },
         };
-
-        const wrapper = mount(
-            <Task
-                {...myTask}
-                currentUser={currentUser}
-                approverSelectorContacts={approverSelectorContacts}
-                mentionSelectorContacts={mentionSelectorContacts}
-                handlers={allHandlers}
-                onEdit={jest.fn()}
-            />,
-        );
-
+        const wrapper = mount(Object.assign({}, myTask), currentUser = { currentUser }, approverSelectorContacts = { approverSelectorContacts }, mentionSelectorContacts = { mentionSelectorContacts }, handlers = { allHandlers }, onEdit = { jest, : .fn() }
+            /  > );
         expect(wrapper.find('InlineEdit').length).toEqual(0);
     });
-
     test('should not allow task creator to delete if onDelete handler is undefined', () => {
         const myTask = {
             created_at: Date.now(),
@@ -274,19 +202,10 @@ describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
                 ],
             },
         };
-
-        const wrapper = shallow(
-            <Task
-                {...myTask}
-                currentUser={currentUser}
-                approverSelectorContacts={approverSelectorContacts}
-                mentionSelectorContacts={mentionSelectorContacts}
-            />,
-        );
-
+        const wrapper = shallow(Object.assign({}, myTask), currentUser = { currentUser }, approverSelectorContacts = { approverSelectorContacts }, mentionSelectorContacts = { mentionSelectorContacts }
+            /  > );
         expect(wrapper.find('InlineDelete').length).toEqual(0);
     });
-
     test('should not allow task creator to edit if onEdit handler is undefined', () => {
         const myTask = {
             created_at: Date.now(),
@@ -311,28 +230,14 @@ describe('components/ContentSidebar/ActivityFeed/task/Task', () => {
                 ],
             },
         };
-
-        const wrapper = shallow(
-            <Task
-                {...myTask}
-                currentUser={currentUser}
-                approverSelectorContacts={approverSelectorContacts}
-                mentionSelectorContacts={mentionSelectorContacts}
-                handlers={allHandlers}
-            />,
-        );
-
+        const wrapper = shallow(Object.assign({}, myTask), currentUser = { currentUser }, approverSelectorContacts = { approverSelectorContacts }, mentionSelectorContacts = { mentionSelectorContacts }, handlers = { allHandlers }
+            /  > );
         expect(wrapper.find('InlineEdit').length).toEqual(0);
     });
-
     test('should not render due date when not passed in', () => {
-        const taskWithNoDueDate = {
-            ...task,
-            due_at: null,
-        };
-
-        const wrapper = shallow(<Task currentUser={currentUser} {...taskWithNoDueDate} />);
-
+        const taskWithNoDueDate = Object.assign({}, task, { due_at: null });
+        const wrapper = shallow(currentUser, { currentUser }, Object.assign({}, taskWithNoDueDate) /  > );
         expect(wrapper).toMatchSnapshot();
     });
 });
+//# sourceMappingURL=Task-test.js.map

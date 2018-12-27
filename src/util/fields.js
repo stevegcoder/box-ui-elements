@@ -1,52 +1,11 @@
 /**
- * @flow
+ * @was-flow
  * @file Utility to combine API fields needed
  * @author Box
  */
-
 import has from 'lodash/has';
 import setProp from 'lodash/set';
-import {
-    FIELD_ID,
-    FIELD_NAME,
-    FIELD_TYPE,
-    FIELD_SIZE,
-    FIELD_PARENT,
-    FIELD_EXTENSION,
-    FIELD_PERMISSIONS,
-    FIELD_ITEM_COLLECTION,
-    FIELD_ITEM_EXPIRATION,
-    FIELD_PATH_COLLECTION,
-    FIELD_MODIFIED_AT,
-    FIELD_CREATED_AT,
-    FIELD_SHARED_LINK,
-    FIELD_ALLOWED_SHARED_LINK_ACCESS_LEVELS,
-    FIELD_HAS_COLLABORATIONS,
-    FIELD_IS_EXTERNALLY_OWNED,
-    FIELD_CREATED_BY,
-    FIELD_MODIFIED_BY,
-    FIELD_OWNED_BY,
-    FIELD_DESCRIPTION,
-    FIELD_REPRESENTATIONS,
-    FIELD_SHA1,
-    FIELD_WATERMARK_INFO,
-    FIELD_AUTHENTICATED_DOWNLOAD_URL,
-    FIELD_FILE_VERSION,
-    FIELD_IS_DOWNLOAD_AVAILABLE,
-    FIELD_VERSION_NUMBER,
-    FIELD_METADATA_SKILLS,
-    FIELD_TASK_ASSIGNMENT_COLLECTION,
-    FIELD_IS_COMPLETED,
-    FIELD_MESSAGE,
-    FIELD_TAGGED_MESSAGE,
-    FIELD_DUE_AT,
-    FIELD_TRASHED_AT,
-    FIELD_ASSIGNED_TO,
-    FIELD_RESOLUTION_STATE,
-    FIELD_RESTORED_FROM,
-    PLACEHOLDER_USER,
-} from '../constants';
-
+import { FIELD_ID, FIELD_NAME, FIELD_TYPE, FIELD_SIZE, FIELD_PARENT, FIELD_EXTENSION, FIELD_PERMISSIONS, FIELD_ITEM_COLLECTION, FIELD_ITEM_EXPIRATION, FIELD_PATH_COLLECTION, FIELD_MODIFIED_AT, FIELD_CREATED_AT, FIELD_SHARED_LINK, FIELD_ALLOWED_SHARED_LINK_ACCESS_LEVELS, FIELD_HAS_COLLABORATIONS, FIELD_IS_EXTERNALLY_OWNED, FIELD_CREATED_BY, FIELD_MODIFIED_BY, FIELD_OWNED_BY, FIELD_DESCRIPTION, FIELD_REPRESENTATIONS, FIELD_SHA1, FIELD_WATERMARK_INFO, FIELD_AUTHENTICATED_DOWNLOAD_URL, FIELD_FILE_VERSION, FIELD_IS_DOWNLOAD_AVAILABLE, FIELD_VERSION_NUMBER, FIELD_METADATA_SKILLS, FIELD_TASK_ASSIGNMENT_COLLECTION, FIELD_IS_COMPLETED, FIELD_MESSAGE, FIELD_TAGGED_MESSAGE, FIELD_DUE_AT, FIELD_TRASHED_AT, FIELD_ASSIGNED_TO, FIELD_RESOLUTION_STATE, FIELD_RESTORED_FROM, PLACEHOLDER_USER, } from '../constants';
 // Minimum set of fields needed for Content Explorer / Picker
 const FOLDER_FIELDS_TO_FETCH = [
     FIELD_ID,
@@ -66,7 +25,6 @@ const FOLDER_FIELDS_TO_FETCH = [
     FIELD_IS_EXTERNALLY_OWNED,
     FIELD_ITEM_COLLECTION,
 ];
-
 // Fields needed for the sidebar
 const SIDEBAR_FIELDS_TO_FETCH = [
     FIELD_ID,
@@ -88,7 +46,6 @@ const SIDEBAR_FIELDS_TO_FETCH = [
     FIELD_IS_EXTERNALLY_OWNED,
     FIELD_RESTORED_FROM,
 ];
-
 // Fields needed for preview
 const PREVIEW_FIELDS_TO_FETCH = [
     FIELD_ID,
@@ -104,7 +61,6 @@ const PREVIEW_FIELDS_TO_FETCH = [
     FIELD_AUTHENTICATED_DOWNLOAD_URL,
     FIELD_IS_DOWNLOAD_AVAILABLE,
 ];
-
 // Fields needed to get tasks data
 const TASKS_FIELDS_TO_FETCH = [
     FIELD_TASK_ASSIGNMENT_COLLECTION,
@@ -114,7 +70,6 @@ const TASKS_FIELDS_TO_FETCH = [
     FIELD_DUE_AT,
     FIELD_MESSAGE,
 ];
-
 // Fields needed to get tasks data
 const VERSIONS_FIELDS_TO_FETCH = [
     FIELD_TRASHED_AT,
@@ -123,10 +78,8 @@ const VERSIONS_FIELDS_TO_FETCH = [
     FIELD_MODIFIED_BY,
     FIELD_VERSION_NUMBER,
 ];
-
 // Fields needed to get task assignments data
 const TASK_ASSIGNMENTS_FIELDS_TO_FETCH = [FIELD_ASSIGNED_TO, FIELD_RESOLUTION_STATE, FIELD_MESSAGE];
-
 // Fields needed to get tasks data
 const COMMENTS_FIELDS_TO_FETCH = [
     FIELD_TAGGED_MESSAGE,
@@ -136,10 +89,8 @@ const COMMENTS_FIELDS_TO_FETCH = [
     FIELD_MODIFIED_AT,
     FIELD_PERMISSIONS,
 ];
-
 // Fields that represent users
 const USER_FIELDS = [FIELD_CREATED_BY, FIELD_MODIFIED_BY, FIELD_OWNED_BY, FIELD_ASSIGNED_TO];
-
 /**
  * Finds properties missing in an object
  *
@@ -147,15 +98,13 @@ const USER_FIELDS = [FIELD_CREATED_BY, FIELD_MODIFIED_BY, FIELD_OWNED_BY, FIELD_
  * @param {Array<string>|void} [properties] - object properties to check
  * @return {Array<string>} comma seperated list of properties missing
  */
-function findMissingProperties(obj?: Object, properties?: Array<string> = []): Array<string> {
+function findMissingProperties(obj, properties = []) {
     // If file doesn't exist or is an empty object, we should fetch all fields
     if (!obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
         return properties;
     }
-
-    return properties.filter((field: string) => !has(obj, field));
+    return properties.filter((field) => !has(obj, field));
 }
-
 /**
  * Fill properties missing in an object
  *
@@ -163,50 +112,34 @@ function findMissingProperties(obj?: Object, properties?: Array<string> = []): A
  * @param {Array<string>|void} [properties] - some properties to check
  * @return {Object} new object with missing fields
  */
-function fillMissingProperties(obj?: Object = {}, properties?: Array<string>): Object {
+function fillMissingProperties(obj = {}, properties) {
     // If file doesn't exist or is an empty object, we should fetch all fields
     if (!Array.isArray(properties) || properties.length === 0) {
         return obj;
     }
-
-    const newObj = { ...obj };
+    const newObj = Object.assign({}, obj);
     const missingProperties = findMissingProperties(obj, properties);
-    missingProperties.forEach((field: string) => {
+    missingProperties.forEach((field) => {
         // @Note: This will overwrite non object fields
         // @Note: We don't know the type of the field
         setProp(newObj, field, null);
     });
     return newObj;
 }
-
 /**
  * Fill user properties that are null in an object
  *
  * @param {Object} obj - some object
  * @return {Object} new object with user placeholder
  */
-function fillUserPlaceholder(obj: Object): Object {
-    const newObj = { ...obj };
-
-    USER_FIELDS.forEach((field: string) => {
+function fillUserPlaceholder(obj) {
+    const newObj = Object.assign({}, obj);
+    USER_FIELDS.forEach((field) => {
         if (has(newObj, field) && newObj[field] === null) {
             setProp(newObj, field, PLACEHOLDER_USER);
         }
     });
-
     return newObj;
 }
-
-export {
-    FOLDER_FIELDS_TO_FETCH,
-    PREVIEW_FIELDS_TO_FETCH,
-    SIDEBAR_FIELDS_TO_FETCH,
-    TASKS_FIELDS_TO_FETCH,
-    VERSIONS_FIELDS_TO_FETCH,
-    TASK_ASSIGNMENTS_FIELDS_TO_FETCH,
-    COMMENTS_FIELDS_TO_FETCH,
-    USER_FIELDS,
-    findMissingProperties,
-    fillMissingProperties,
-    fillUserPlaceholder,
-};
+export { FOLDER_FIELDS_TO_FETCH, PREVIEW_FIELDS_TO_FETCH, SIDEBAR_FIELDS_TO_FETCH, TASKS_FIELDS_TO_FETCH, VERSIONS_FIELDS_TO_FETCH, TASK_ASSIGNMENTS_FIELDS_TO_FETCH, COMMENTS_FIELDS_TO_FETCH, USER_FIELDS, findMissingProperties, fillMissingProperties, fillUserPlaceholder, };
+//# sourceMappingURL=fields.js.map

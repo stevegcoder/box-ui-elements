@@ -1,20 +1,22 @@
-import React from 'react';
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import noop from 'lodash/noop';
 import { shallow } from 'enzyme';
-import { ContentPreviewComponent as ContentPreview } from '../ContentPreview';
 import PreviewLoading from '../PreviewLoading';
 import * as TokenService from '../../../util/TokenService';
 import SidebarUtils from '../../ContentSidebar/SidebarUtils';
 import { PREVIEW_FIELDS_TO_FETCH } from '../../../util/fields';
-
 jest.mock('../../Internationalize', () => 'mock-internationalize');
-
 let props;
 let file;
-
 describe('components/ContentPreview/ContentPreview', () => {
-    const getWrapper = props => shallow(<ContentPreview {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     const PERFORMANCE_TIME = 100;
     beforeEach(() => {
         global.Box = {};
@@ -28,15 +30,12 @@ describe('components/ContentPreview/ContentPreview', () => {
             now: jest.fn().mockReturnValue(PERFORMANCE_TIME),
         };
     });
-
     afterEach(() => {
         delete global.Box;
     });
-
     describe('componentDidUpdate()', () => {
-        test('should not reload preview if component updates but we should not load preview', async () => {
+        test('should not reload preview if component updates but we should not load preview', () => __awaiter(this, void 0, void 0, function* () {
             file = { id: '123' };
-
             props = {
                 hasSidebar: true,
                 token: 'token',
@@ -47,20 +46,16 @@ describe('components/ContentPreview/ContentPreview', () => {
             const instance = wrapper.instance();
             instance.shouldLoadPreview = jest.fn().mockReturnValue(false);
             instance.loadPreview = jest.fn();
-
             wrapper.setProps({
                 hasSidebar: false,
             });
-
             expect(instance.loadPreview).toHaveBeenCalledTimes(0);
-        });
+        }));
     });
-
     describe('shouldLoadPreview()', () => {
         let wrapper;
         let instance;
         let file;
-
         beforeEach(() => {
             wrapper = getWrapper(props);
             instance = wrapper.instance();
@@ -70,27 +65,22 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             instance.preview = new global.Box.Preview();
         });
-
         test('should return true if file version ID has changed', () => {
             const oldFile = { id: '123', file_version: { id: '1234' } };
             expect(instance.shouldLoadPreview({ file: oldFile })).toBe(true);
         });
-
         test('should return true if file object has newly been populated', () => {
             wrapper.setState({ file: { id: '123' } });
             expect(instance.shouldLoadPreview({ file: undefined })).toBeTruthy();
         });
-
         test('should return false if file has not changed', () => {
             expect(instance.shouldLoadPreview({ file })).toBe(false);
         });
     });
-
     describe('canDownload()', () => {
         let wrapper;
         let instance;
         let file;
-
         beforeEach(() => {
             file = {
                 id: '123',
@@ -100,14 +90,12 @@ describe('components/ContentPreview/ContentPreview', () => {
                 is_download_available: true,
             };
         });
-
         test('should return true when all conditions are met', () => {
             wrapper = getWrapper(props);
             instance = wrapper.instance();
             wrapper.setState({ file });
             expect(instance.canDownload()).toBeTruthy();
         });
-
         test('should return false if canDownload is false', () => {
             props.canDownload = false;
             wrapper = getWrapper(props);
@@ -115,7 +103,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canDownload()).toBeFalsy();
         });
-
         test('should return false if can_download is false', () => {
             props.canDownload = true;
             file.permissions.can_download = false;
@@ -124,7 +111,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canDownload()).toBeFalsy();
         });
-
         test('should return false if is_download_available is false', () => {
             props.canDownload = true;
             file.is_download_available = false;
@@ -134,7 +120,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.canDownload()).toBeFalsy();
         });
     });
-
     describe('loadPreview()', () => {
         beforeEach(() => {
             // Fresh global preview object
@@ -146,11 +131,9 @@ describe('components/ContentPreview/ContentPreview', () => {
                 this.removeAllListeners = jest.fn();
                 this.destroy = jest.fn();
             };
-
             file = { id: '123' };
         });
-
-        test('should get read token for preview', async () => {
+        test('should get read token for preview', () => __awaiter(this, void 0, void 0, function* () {
             props = {
                 token: 'token',
                 fileId: file.id,
@@ -160,12 +143,11 @@ describe('components/ContentPreview/ContentPreview', () => {
             const wrapper = getWrapper(props);
             wrapper.setState({ file });
             const instance = wrapper.instance();
-            await instance.loadPreview();
+            yield instance.loadPreview();
             expect(TokenService.default.getReadToken).toHaveBeenCalledWith('file_123', props.token);
             TokenService.default.getReadToken = origGetReadToken;
-        });
-
-        test('should bind onPreviewError prop to preview "preview_error" event', async () => {
+        }));
+        test('should bind onPreviewError prop to preview "preview_error" event', () => __awaiter(this, void 0, void 0, function* () {
             props = {
                 onError: jest.fn(),
                 token: 'token',
@@ -175,11 +157,10 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             const instance = wrapper.instance();
             instance.onPreviewError = jest.fn();
-            await instance.loadPreview();
+            yield instance.loadPreview();
             expect(instance.preview.addListener).toHaveBeenCalledWith('preview_error', instance.onPreviewError);
-        });
-
-        test('should bind onPreviewMetric prop to preview "preview_metric" event', async () => {
+        }));
+        test('should bind onPreviewMetric prop to preview "preview_metric" event', () => __awaiter(this, void 0, void 0, function* () {
             props = {
                 onMetric: jest.fn(),
                 token: 'token',
@@ -189,11 +170,10 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             const instance = wrapper.instance();
             instance.onPreviewMetric = jest.fn();
-            await instance.loadPreview();
+            yield instance.loadPreview();
             expect(instance.preview.addListener).toHaveBeenCalledWith('preview_metric', instance.onPreviewMetric);
-        });
-
-        test('should bind onPreviewLoad method to preview "load" event', async () => {
+        }));
+        test('should bind onPreviewLoad method to preview "load" event', () => __awaiter(this, void 0, void 0, function* () {
             props = {
                 onMetric: jest.fn(),
                 token: 'token',
@@ -202,11 +182,10 @@ describe('components/ContentPreview/ContentPreview', () => {
             const wrapper = getWrapper(props);
             wrapper.setState({ file });
             const instance = wrapper.instance();
-            await instance.loadPreview();
+            yield instance.loadPreview();
             expect(instance.preview.addListener).toHaveBeenCalledWith('load', instance.onPreviewLoad);
-        });
-
-        test('should call preview show with correct params', async () => {
+        }));
+        test('should call preview show with correct params', () => __awaiter(this, void 0, void 0, function* () {
             props = {
                 onMetric: jest.fn(),
                 token: 'token',
@@ -216,25 +195,19 @@ describe('components/ContentPreview/ContentPreview', () => {
             const wrapper = getWrapper(props);
             wrapper.setState({ file });
             const instance = wrapper.instance();
-            await instance.loadPreview();
-            expect(instance.preview.show).toHaveBeenCalledWith(
-                file.id,
-                props.token,
-                expect.objectContaining({
-                    showDownload: false,
-                    skipServerUpdate: true,
-                    header: 'none',
-                    useHotkeys: false,
-                    container: expect.stringContaining('.bcpr-content'),
-                }),
-            );
-        });
+            yield instance.loadPreview();
+            expect(instance.preview.show).toHaveBeenCalledWith(file.id, props.token, expect.objectContaining({
+                showDownload: false,
+                skipServerUpdate: true,
+                header: 'none',
+                useHotkeys: false,
+                container: expect.stringContaining('.bcpr-content'),
+            }));
+        }));
     });
-
     describe('fetchFile()', () => {
         let getFileStub;
         let instance;
-
         beforeEach(() => {
             file = { id: '123' };
             props = {
@@ -253,7 +226,6 @@ describe('components/ContentPreview/ContentPreview', () => {
                 }),
             };
         });
-
         test('should fetch the file with provided success and error callbacks', () => {
             const success = jest.fn();
             const error = jest.fn();
@@ -268,52 +240,36 @@ describe('components/ContentPreview/ContentPreview', () => {
                 fields: PREVIEW_FIELDS_TO_FETCH,
             });
         });
-
         test('should fetch the file with default success and error callback', () => {
             instance.fetchFileSuccessCallback = jest.fn();
             instance.fetchFileErrorCallback = jest.fn();
             SidebarUtils.canHaveSidebar = jest.fn().mockReturnValueOnce(true);
             instance.fetchFile(file.id);
-            expect(getFileStub).toBeCalledWith(
-                file.id,
-                instance.fetchFileSuccessCallback,
-                instance.fetchFileErrorCallback,
-                {
-                    fields: PREVIEW_FIELDS_TO_FETCH,
-                },
-            );
+            expect(getFileStub).toBeCalledWith(file.id, instance.fetchFileSuccessCallback, instance.fetchFileErrorCallback, {
+                fields: PREVIEW_FIELDS_TO_FETCH,
+            });
         });
-
         test('should fetch the file without sidebar fields', () => {
             instance.fetchFileSuccessCallback = jest.fn();
             instance.fetchFileErrorCallback = jest.fn();
             SidebarUtils.canHaveSidebar = jest.fn().mockReturnValueOnce(false);
             instance.fetchFile(file.id);
-            expect(getFileStub).toBeCalledWith(
-                file.id,
-                instance.fetchFileSuccessCallback,
-                instance.fetchFileErrorCallback,
-                {
-                    fields: PREVIEW_FIELDS_TO_FETCH,
-                },
-            );
+            expect(getFileStub).toBeCalledWith(file.id, instance.fetchFileSuccessCallback, instance.fetchFileErrorCallback, {
+                fields: PREVIEW_FIELDS_TO_FETCH,
+            });
         });
-
         test('should short circuit if there is no fileId', () => {
             instance.fetchFile(null);
             expect(getFileStub).not.toBeCalled();
         });
     });
-
     describe('fetchFileSuccessCallback()', () => {
         let instance;
-
         beforeEach(() => {
             const wrapper = getWrapper(props);
             instance = wrapper.instance();
             instance.retryCount = 5;
         });
-
         test('should reset the retry count and set state', () => {
             instance.fetchFileSuccessCallback(file);
             expect(instance.retryCount).toEqual(0);
@@ -321,34 +277,29 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.state.isFileError).toEqual(false);
             expect(instance.state.isReloadNotificationVisible).toEqual(false);
         });
-
         test('should set the state to new file if watermarked', () => {
-            const newFile = { ...file };
+            const newFile = Object.assign({}, file);
             newFile.watermark_info = { is_watermarked: true };
             instance.setState({ file });
             instance.fetchFileSuccessCallback(newFile);
-
             expect(instance.retryCount).toEqual(0);
             expect(instance.state.file).toEqual(newFile);
             expect(instance.state.isFileError).toEqual(false);
             expect(instance.state.isReloadNotificationVisible).toEqual(false);
         });
-
         test('should not set new file in state if sha1 matches', () => {
-            const newFile = { ...file };
+            const newFile = Object.assign({}, file);
             newFile.file_version = { sha1: 'sha' };
             file.file_version = { sha1: 'sha' };
             instance.setState({
                 file,
             });
             instance.fetchFileSuccessCallback(newFile);
-
             expect(instance.retryCount).toEqual(0);
             expect(instance.state.file).toEqual(file);
         });
-
         test('should not set new file in state but show notification if sha1 changes', () => {
-            const newFile = { ...file };
+            const newFile = Object.assign({}, file);
             newFile.file_version = { sha1: 'sha1' };
             file.file_version = { sha1: 'sha2' };
             instance.setState({
@@ -357,7 +308,6 @@ describe('components/ContentPreview/ContentPreview', () => {
                 isReloadNotificationVisible: true,
             });
             instance.fetchFileSuccessCallback(newFile);
-
             expect(instance.retryCount).toEqual(0);
             expect(instance.stagedFile).toEqual(newFile);
             expect(instance.state.file).toEqual(file);
@@ -365,48 +315,37 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.state.isReloadNotificationVisible).toBeTruthy();
         });
     });
-
     describe('fetchFileErrorCallback()', () => {
         let instance;
         let error;
         let onError;
-
         beforeEach(() => {
             onError = jest.fn();
-            const wrapper = getWrapper({
-                ...props,
-                onError,
-            });
+            const wrapper = getWrapper(Object.assign({}, props, { onError }));
             instance = wrapper.instance();
             instance.fetchFile = jest.fn();
             instance.retryCount = 5;
             error = new Error('foo');
         });
-
         test('should set the file error state if we have surpassed our retry count', () => {
             instance.fetchFileErrorCallback(error);
             expect(instance.state.isFileError).toEqual(true);
             expect(instance.fetchFile).not.toBeCalled();
             expect(onError).toHaveBeenCalled();
         });
-
         jest.useFakeTimers();
-
         test('should try to fetch the file again after the timeout', () => {
             instance.retryCount = 0;
             instance.fetchFileErrorCallback(error);
             jest.runAllTimers();
-
             expect(instance.fetchFile).toBeCalled();
             expect(onError).not.toHaveBeenCalled();
         });
     });
-
     describe('getTotalFileFetchTime()', () => {
         let instance;
         const startTime = 1.23;
         const endTime = 5.46;
-
         beforeEach(() => {
             props = {
                 token: 'token',
@@ -417,25 +356,21 @@ describe('components/ContentPreview/ContentPreview', () => {
             instance.fetchFileStartTime = startTime;
             instance.fetchFileEndTime = endTime;
         });
-
         test('should return the default if no start time', () => {
             instance.fetchFileStartTime = null;
             const totalMetrics = instance.getTotalFileFetchTime();
             expect(totalMetrics).toEqual(0);
         });
-
         test('should return the default if no end time', () => {
             instance.fetchFileEndTime = null;
             const totalMetrics = instance.getTotalFileFetchTime();
             expect(totalMetrics).toEqual(0);
         });
-
         test('should return the total fetching time', () => {
             const total = instance.getTotalFileFetchTime();
             expect(total).toEqual(4);
         });
     });
-
     describe('addFetchFileTimeToPreviewMetrics()', () => {
         let instance;
         const metrics = {
@@ -444,7 +379,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             total: 100,
         };
         const FETCHING_TIME = 200;
-
         beforeEach(() => {
             props = {
                 token: 'token',
@@ -454,12 +388,10 @@ describe('components/ContentPreview/ContentPreview', () => {
             instance = wrapper.instance();
             instance.getTotalFileFetchTime = jest.fn().mockReturnValue(FETCHING_TIME);
         });
-
         test('should add the total file fetching time to rendering if the file was converted', () => {
             const totalMetrics = instance.addFetchFileTimeToPreviewMetrics(metrics);
             const { conversion, rendering } = metrics;
             const totalRendering = rendering + FETCHING_TIME;
-
             expect(instance.getTotalFileFetchTime).toBeCalled();
             expect(totalMetrics).toEqual({
                 conversion,
@@ -468,17 +400,11 @@ describe('components/ContentPreview/ContentPreview', () => {
                 preload: undefined,
             });
         });
-
         test('should add the total file fetching time to conversion if the file was not converted', () => {
             const CONVERSION_TIME = 50;
-            const totalMetrics = instance.addFetchFileTimeToPreviewMetrics({
-                ...metrics,
-                conversion: CONVERSION_TIME,
-            });
-
+            const totalMetrics = instance.addFetchFileTimeToPreviewMetrics(Object.assign({}, metrics, { conversion: CONVERSION_TIME }));
             const { rendering } = metrics;
             const totalConversion = CONVERSION_TIME + FETCHING_TIME;
-
             expect(instance.getTotalFileFetchTime).toBeCalled();
             expect(totalMetrics).toEqual({
                 conversion: totalConversion,
@@ -487,16 +413,11 @@ describe('components/ContentPreview/ContentPreview', () => {
                 preload: undefined,
             });
         });
-
         test('should add the total file fetching time to preload if it exists', () => {
             const PRELOAD_TIME = 20;
-            const totalMetrics = instance.addFetchFileTimeToPreviewMetrics({
-                ...metrics,
-                preload: PRELOAD_TIME,
-            });
+            const totalMetrics = instance.addFetchFileTimeToPreviewMetrics(Object.assign({}, metrics, { preload: PRELOAD_TIME }));
             const { conversion, rendering } = metrics;
             const totalRendering = rendering + FETCHING_TIME;
-
             expect(instance.getTotalFileFetchTime).toBeCalled();
             expect(totalMetrics).toEqual({
                 conversion,
@@ -506,7 +427,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
         });
     });
-
     describe('onPreviewLoad()', () => {
         let instance;
         const data = {
@@ -524,7 +444,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             rendering: 50,
             total: 150,
         };
-
         beforeEach(() => {
             props = {
                 token: 'token',
@@ -538,19 +457,14 @@ describe('components/ContentPreview/ContentPreview', () => {
             instance.getFileIndex = jest.fn().mockReturnValue(0);
             instance.addFetchFileTimeToPreviewMetrics = jest.fn().mockReturnValue(totalTimeMetrics);
         });
-
         test('should modify the timing metrics to add in the total file fetching time', () => {
             instance.onPreviewLoad(data);
             expect(instance.addFetchFileTimeToPreviewMetrics).toBeCalledWith(data.metrics.time);
-            expect(props.onLoad).toBeCalledWith({
-                ...data,
-                metrics: {
+            expect(props.onLoad).toBeCalledWith(Object.assign({}, data, { metrics: {
                     time: totalTimeMetrics,
-                },
-            });
+                } }));
         });
     });
-
     describe('onPreviewMetric()', () => {
         let instance;
         let onMetric;
@@ -563,7 +477,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             value: 40,
         };
         const FETCHING_TIME = 20;
-
         beforeEach(() => {
             onMetric = jest.fn();
             props = {
@@ -575,17 +488,11 @@ describe('components/ContentPreview/ContentPreview', () => {
             instance = wrapper.instance();
             instance.getTotalFileFetchTime = jest.fn().mockReturnValue(FETCHING_TIME);
         });
-
         test('should add in the total file fetching time to load events', () => {
             data.event_name = 'load';
             instance.onPreviewMetric(data);
-            expect(onMetric).toBeCalledWith({
-                ...data,
-                file_info_time: FETCHING_TIME,
-                value: data.value + FETCHING_TIME,
-            });
+            expect(onMetric).toBeCalledWith(Object.assign({}, data, { file_info_time: FETCHING_TIME, value: data.value + FETCHING_TIME }));
         });
-
         test('should not emit a load time related metric if invalid load time is present', () => {
             data.event_name = 'load';
             data.value = 0;
@@ -594,13 +501,11 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(onMetric).not.toBeCalled();
         });
     });
-
     describe('render()', () => {
         test('should render PreviewLoading if there is no file', () => {
             const wrapper = getWrapper(props);
             expect(wrapper.find(PreviewLoading).exists()).toBe(true);
         });
-
         test('should render nothing if there is no fileId', () => {
             const wrapper = getWrapper({
                 fileId: null,
@@ -608,7 +513,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(wrapper.getElement()).toBe(null);
         });
     });
-
     describe('loadFileFromStage()', () => {
         test('should set new file in state if it exists', () => {
             const wrapper = getWrapper(props);
@@ -626,7 +530,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.state.isFileError).toBeFalsy();
         });
     });
-
     describe('closeReloadNotification()', () => {
         test('should set new file in state if it exists', () => {
             const wrapper = getWrapper(props);
@@ -638,28 +541,24 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.state.isReloadNotificationVisible).toBeFalsy();
         });
     });
-
     describe('prefetch()', () => {
-        test('should prefetch files', async () => {
+        test('should prefetch files', () => __awaiter(this, void 0, void 0, function* () {
             props.token = jest.fn();
             const wrapper = getWrapper(props);
             const instance = wrapper.instance();
             const options = {
                 refreshCache: false,
             };
-
             instance.fetchFile = jest.fn();
             TokenService.default.cacheTokens = jest.fn().mockReturnValueOnce(Promise.resolve());
-            await instance.prefetch(['1', '2', '3']);
-
+            yield instance.prefetch(['1', '2', '3']);
             expect(TokenService.default.cacheTokens).toHaveBeenCalledWith(['file_1', 'file_2', 'file_3'], props.token);
             expect(instance.fetchFile).toHaveBeenCalledTimes(3);
             expect(instance.fetchFile).toHaveBeenNthCalledWith(1, '1', noop, noop, options);
             expect(instance.fetchFile).toHaveBeenNthCalledWith(2, '2', noop, noop, options);
             expect(instance.fetchFile).toHaveBeenNthCalledWith(3, '3', noop, noop, options);
-        });
+        }));
     });
-
     describe('updatePreviewToken()', () => {
         let instance;
         const token = 'token';
@@ -670,15 +569,12 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             instance = wrapper.instance();
         });
-
         test('should update the preview token and not reload', () => {
             instance.preview = new global.Box.Preview();
             instance.updatePreviewToken();
-
             expect(instance.preview.updateToken).toBeCalledWith(token, false);
         });
     });
-
     describe('componentDidUpdate()', () => {
         let wrapper;
         let instance;
@@ -695,7 +591,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             instance.updatePreviewToken = jest.fn();
             instance.loadPreview = jest.fn();
         });
-
         test('should destroy preview and load the file if file id changed', () => {
             wrapper.setProps({
                 fileId: 'bar',
@@ -703,7 +598,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.destroyPreview).toBeCalledTimes(1);
             expect(instance.fetchFile).toBeCalledTimes(1);
         });
-
         test('should load preview if fileId hasnt changed and shouldLoadPreview returns ture', () => {
             instance.shouldLoadPreview = jest.fn().mockReturnValue(true);
             wrapper.setProps({
@@ -711,7 +605,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             expect(instance.loadPreview).toBeCalledTimes(1);
         });
-
         test('should update the preview with the new token if it changes', () => {
             wrapper.setProps({
                 token: 'bar',
@@ -719,7 +612,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.updatePreviewToken).toBeCalledTimes(1);
         });
     });
-
     describe('getDerivedStateFromProps()', () => {
         let wrapper;
         const token = 'token';
@@ -727,7 +619,6 @@ describe('components/ContentPreview/ContentPreview', () => {
         const newFileId = 'bar';
         const currentFileId = 'currentFileId';
         const prevFileIdProp = 'prevFileIdProp';
-
         beforeEach(() => {
             wrapper = getWrapper({
                 token,
@@ -741,7 +632,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             expect(wrapper.state(currentFileId)).toBe(newFileId);
         });
-
         test('should not update the currentFileId in state if the fileId prop stays the same', () => {
             wrapper.setState({
                 currentFileId: newFileId,
@@ -753,7 +643,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             expect(wrapper.state(currentFileId)).toBe(newFileId);
         });
-
         test('should update preview if navigation occurs then browser back clicked', () => {
             // navigation
             wrapper.setState({
@@ -761,7 +650,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             expect(wrapper.state(prevFileIdProp)).toBe(initialFileId);
             expect(wrapper.state(currentFileId)).toBe(newFileId);
-
             // URL update
             wrapper.setProps({
                 fileId: newFileId,
@@ -769,7 +657,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             expect(wrapper.state(currentFileId)).toBe(newFileId);
             expect(wrapper.state(prevFileIdProp)).toBe(newFileId);
-
             // browser back
             wrapper.setProps({
                 fileId: initialFileId,
@@ -778,7 +665,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(wrapper.state(prevFileIdProp)).toBe(initialFileId);
             expect(wrapper.state(currentFileId)).toBe(initialFileId);
         });
-
         test('should have the correct state when navigation and props update', () => {
             // navigation
             wrapper.setState({
@@ -786,42 +672,36 @@ describe('components/ContentPreview/ContentPreview', () => {
             });
             expect(wrapper.state(prevFileIdProp)).toBe(initialFileId);
             expect(wrapper.state(currentFileId)).toBe(newFileId);
-
             // URL update
             wrapper.setProps({
                 fileId: newFileId,
             });
             expect(wrapper.state(currentFileId)).toBe(newFileId);
             expect(wrapper.state(prevFileIdProp)).toBe(newFileId);
-
             // browser back
             wrapper.setProps({
                 fileId: initialFileId,
             });
             expect(wrapper.state(prevFileIdProp)).toBe(initialFileId);
             expect(wrapper.state(currentFileId)).toBe(initialFileId);
-
             // browser forward
             wrapper.setProps({
                 fileId: newFileId,
             });
             expect(wrapper.state(prevFileIdProp)).toBe(newFileId);
             expect(wrapper.state(currentFileId)).toBe(newFileId);
-
             // browser back
             wrapper.setProps({
                 fileId: initialFileId,
             });
             expect(wrapper.state(prevFileIdProp)).toBe(initialFileId);
             expect(wrapper.state(currentFileId)).toBe(initialFileId);
-
             // navigation
             wrapper.setState({
                 currentFileId: newFileId,
             });
             expect(wrapper.state(prevFileIdProp)).toBe(initialFileId);
             expect(wrapper.state(currentFileId)).toBe(newFileId);
-
             // URL update
             wrapper.setProps({
                 fileId: newFileId,
@@ -830,12 +710,10 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(wrapper.state(prevFileIdProp)).toBe(newFileId);
         });
     });
-
     describe('canAnnotate()', () => {
         let wrapper;
         let instance;
         let file;
-
         beforeEach(() => {
             file = {
                 id: '123',
@@ -844,14 +722,12 @@ describe('components/ContentPreview/ContentPreview', () => {
                 },
             };
         });
-
         test('should return true if showAnnotations prop is true and there are annotations edit permissions', () => {
             wrapper = getWrapper(props);
             instance = wrapper.instance();
             wrapper.setState({ file });
             expect(instance.canAnnotate()).toBeTruthy();
         });
-
         test('should return false if showAnnotations prop is false', () => {
             props.showAnnotations = false;
             wrapper = getWrapper(props);
@@ -859,7 +735,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canAnnotate()).toBeFalsy();
         });
-
         test('should return false if can_annotate permission is false', () => {
             wrapper = getWrapper(props);
             instance = wrapper.instance();
@@ -868,12 +743,10 @@ describe('components/ContentPreview/ContentPreview', () => {
             expect(instance.canAnnotate()).toBeFalsy();
         });
     });
-
     describe('canViewAnnotations()', () => {
         let wrapper;
         let instance;
         let file;
-
         beforeEach(() => {
             props.showAnnotations = true;
             file = {
@@ -885,7 +758,6 @@ describe('components/ContentPreview/ContentPreview', () => {
                 },
             };
         });
-
         test('should return true if showAnnotations prop is true and has can_annotate permission', () => {
             wrapper = getWrapper(props);
             instance = wrapper.instance();
@@ -893,7 +765,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canViewAnnotations()).toBeTruthy();
         });
-
         test('should return true if showAnnotations prop is true and has can view all annotations', () => {
             file.permissions = {
                 can_annotate: false,
@@ -905,7 +776,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canViewAnnotations()).toBeTruthy();
         });
-
         test('should return true if showAnnotations prop is true and has can view self annotations', () => {
             file.permissions = {
                 can_annotate: false,
@@ -917,7 +787,6 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canViewAnnotations()).toBeTruthy();
         });
-
         test('should return false if showAnnotations prop is false', () => {
             props.showAnnotations = false;
             wrapper = getWrapper(props);
@@ -925,20 +794,18 @@ describe('components/ContentPreview/ContentPreview', () => {
             wrapper.setState({ file });
             expect(instance.canViewAnnotations()).toBeFalsy();
         });
-
         test('should return false if there are no view or edit permissions', () => {
             wrapper = getWrapper(props);
             props.showAnnotations = true;
-
             file.permissions = {
                 can_annotate: false,
                 can_view_annotations_all: false,
                 can_view_annotations_self: false,
             };
-
             instance = wrapper.instance();
             wrapper.setState({ file });
             expect(instance.canViewAnnotations()).toBeFalsy();
         });
     });
 });
+//# sourceMappingURL=ContentPreview-test.js.map

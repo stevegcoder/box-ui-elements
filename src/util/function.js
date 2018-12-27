@@ -1,9 +1,8 @@
 /**
- * @flow
+ * @was-flow
  * @file Function utilities
  * @author Box
  */
-
 /**
  * Wrapper around the promises.create() method to allow a promise to retry
  * multiple times. A third parameter (besides resolve and reject) is passed
@@ -16,45 +15,34 @@
  * @param {number} [backoffFactor] - Optional exponential backoff factor to retry the promise with after it fails
  * @return {Promise} Promise - proxies the promise of the passed function.
  */
-
-function retryNumOfTimes(
-    func: Function,
-    times: number,
-    initialTimeout?: number = 0,
-    backoffFactor?: number = 1,
-): Promise<any> {
+function retryNumOfTimes(func, times, initialTimeout = 0, backoffFactor = 1) {
     let tries = 0;
     let timeout = initialTimeout;
-
     return new Promise((resolve, hardReject) => {
         function doTry() {
             tries += 1;
-
             new Promise((tryResolve, tryReject) => {
                 func(tryResolve, tryReject, hardReject);
             })
                 .then(resolve)
                 .catch(reason => {
-                    if (tries < times) {
-                        timeout *= backoffFactor;
-                        // eslint-disable-next-line no-use-before-define
-                        executeAfterTimeout(timeout);
-                        return;
-                    }
-
-                    hardReject(reason);
-                });
+                if (tries < times) {
+                    timeout *= backoffFactor;
+                    // eslint-disable-next-line no-use-before-define
+                    executeAfterTimeout(timeout);
+                    return;
+                }
+                hardReject(reason);
+            });
         }
-
         function executeAfterTimeout(time) {
             setTimeout(() => {
                 doTry();
             }, time);
         }
-
         executeAfterTimeout(timeout);
     });
 }
-
 // eslint-disable-next-line import/prefer-default-export
 export { retryNumOfTimes };
+//# sourceMappingURL=function.js.map

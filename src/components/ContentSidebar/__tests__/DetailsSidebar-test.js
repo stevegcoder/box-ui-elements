@@ -1,90 +1,62 @@
 import { shallow } from 'enzyme';
-import * as React from 'react';
 import messages from '../../messages';
-import { DetailsSidebarComponent as DetailsSidebar } from '../DetailsSidebar';
 import { ERROR_CODE_FETCH_CLASSIFICATION, IS_ERROR_DISPLAYED } from '../../../constants';
-
 jest.mock('../SidebarFileProperties', () => 'SidebarFileProperties');
 jest.mock('../SidebarAccessStats', () => 'SidebarAccessStats');
-
 const file = {
     id: 'foo',
 };
-
 describe('components/ContentSidebar/DetailsSidebar', () => {
     const onError = jest.fn();
-    const getWrapper = (props, options) => shallow(<DetailsSidebar onError={onError} {...props} />, options);
-
+    const getWrapper = (props, options) => shallow(onError, { onError }, Object.assign({}, props) /  > , options);
     describe('render()', () => {
         test('should render DetailsSidebar with all components', () => {
-            const wrapper = getWrapper(
-                {
-                    file,
-                    hasProperties: true,
-                    hasNotices: true,
-                    hasAccessStats: true,
-                    hasClassification: true,
-                    hasRetentionPolicy: true,
-                    hasVersions: true,
-                },
-                { disableLifecycleMethods: true },
-            );
+            const wrapper = getWrapper({
+                file,
+                hasProperties: true,
+                hasNotices: true,
+                hasAccessStats: true,
+                hasClassification: true,
+                hasRetentionPolicy: true,
+                hasVersions: true,
+            }, { disableLifecycleMethods: true });
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should render DetailsSidebar with properties', () => {
-            const wrapper = getWrapper(
-                {
-                    file,
-                    hasProperties: true,
-                },
-                { disableLifecycleMethods: true },
-            );
+            const wrapper = getWrapper({
+                file,
+                hasProperties: true,
+            }, { disableLifecycleMethods: true });
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should render DetailsSidebar with notices', () => {
-            const wrapper = getWrapper(
-                {
-                    file,
-                    hasNotices: true,
-                },
-                { disableLifecycleMethods: true },
-            );
+            const wrapper = getWrapper({
+                file,
+                hasNotices: true,
+            }, { disableLifecycleMethods: true });
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should render DetailsSidebar with access stats', () => {
-            const wrapper = getWrapper(
-                {
-                    file,
-                    hasAccessStats: true,
-                },
-                { disableLifecycleMethods: true },
-            );
+            const wrapper = getWrapper({
+                file,
+                hasAccessStats: true,
+            }, { disableLifecycleMethods: true });
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should render DetailsSidebar with versions', () => {
-            const wrapper = getWrapper(
-                {
-                    file,
-                    hasVersions: true,
-                },
-                { disableLifecycleMethods: true },
-            );
+            const wrapper = getWrapper({
+                file,
+                hasVersions: true,
+            }, { disableLifecycleMethods: true });
             expect(wrapper).toMatchSnapshot();
         });
-
         test('should render empty SidebarContent', () => {
             const wrapper = getWrapper({
                 file,
             });
-
             expect(wrapper.find('SidebarContent').children()).toHaveLength(0);
         });
     });
-
     describe('componentDidMount()', () => {
         test('should call fetchAccessStats when hasAccessStats is true', () => {
             const wrapper = getWrapper({ hasAccessStats: true }, { disableLifecycleMethods: true });
@@ -101,7 +73,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             expect(instance.fetchClassification).toHaveBeenCalled();
         });
     });
-
     describe('fetchAccessStatsSuccessCallback()', () => {
         test('should update the file state', () => {
             const wrapper = getWrapper();
@@ -115,7 +86,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             });
         });
     });
-
     describe('fetchAccessStatsErrorCallback()', () => {
         test('should set a maskError if there is an error in fetching the access stats', () => {
             const wrapper = getWrapper();
@@ -133,7 +103,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
                 },
             });
         });
-
         test('should set an error if user is forbidden from fetching the access stats', () => {
             const wrapper = getWrapper();
             const instance = wrapper.instance();
@@ -151,7 +120,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             });
         });
     });
-
     describe('fetchAccessStats()', () => {
         test('should fetch the file access stats', () => {
             const getStats = jest.fn();
@@ -165,14 +133,9 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             instance.setState = jest.fn();
             instance.fetchAccessStats();
             expect(instance.setState).toBeCalledWith({ isLoadingAccessStats: true });
-            expect(getStats).toBeCalledWith(
-                file.id,
-                instance.fetchAccessStatsSuccessCallback,
-                instance.fetchAccessStatsErrorCallback,
-            );
+            expect(getStats).toBeCalledWith(file.id, instance.fetchAccessStatsSuccessCallback, instance.fetchAccessStatsErrorCallback);
         });
     });
-
     describe('fetchClassificationSuccessCallback', () => {
         test('should update the classification state', () => {
             const wrapper = getWrapper();
@@ -186,7 +149,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             });
         });
     });
-
     describe('fetchClassificationErrorCallback', () => {
         test('should set an inlineError if there is an error in fetching the classification', () => {
             const wrapper = getWrapper();
@@ -204,7 +166,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
                 },
             });
         });
-
         test('should invoke onError prop with error details', () => {
             const onError = jest.fn();
             const code = ERROR_CODE_FETCH_CLASSIFICATION;
@@ -218,7 +179,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
                 [IS_ERROR_DISPLAYED]: true,
             });
         });
-
         test('should not display inline error when a forbidden error', () => {
             const onError = jest.fn();
             const code = ERROR_CODE_FETCH_CLASSIFICATION;
@@ -233,7 +193,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
                 error,
                 [IS_ERROR_DISPLAYED]: false,
             });
-
             expect(instance.setState).toBeCalledWith({
                 isLoadingClassification: false,
                 classification: undefined,
@@ -241,7 +200,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             });
         });
     });
-
     describe('fetchClassification', () => {
         test('should fetch the classification info', () => {
             const getClassification = jest.fn();
@@ -255,17 +213,11 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             instance.setState = jest.fn();
             instance.fetchClassification();
             expect(instance.setState).toBeCalledWith({ isLoadingClassification: true });
-            expect(getClassification).toBeCalledWith(
-                file,
-                instance.fetchClassificationSuccessCallback,
-                instance.fetchClassificationErrorCallback,
-                {
-                    refreshCache: true,
-                },
-            );
+            expect(getClassification).toBeCalledWith(file, instance.fetchClassificationSuccessCallback, instance.fetchClassificationErrorCallback, {
+                refreshCache: true,
+            });
         });
     });
-
     describe('descriptionChangeErrorCallback()', () => {
         test('should set an inlineError if there is an error in updating the file description', () => {
             const wrapper = getWrapper();
@@ -283,7 +235,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             });
         });
     });
-
     describe('descriptionChangeSuccessCallback()', () => {
         test('should update the file state', () => {
             const wrapper = getWrapper();
@@ -296,7 +247,6 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
             });
         });
     });
-
     describe('onClassificationClick()', () => {
         test('should call onClassificationClick with the classification fetch function', () => {
             const onClassificationClick = jest.fn();
@@ -308,3 +258,4 @@ describe('components/ContentSidebar/DetailsSidebar', () => {
         });
     });
 });
+//# sourceMappingURL=DetailsSidebar-test.js.map

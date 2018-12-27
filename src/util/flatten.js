@@ -1,12 +1,10 @@
 /**
- * @flow
+ * @was-flow
  * @file Function to flatten an item list
  * @author Box
  */
-
 import { getBadItemError } from './error';
 import { TYPE_FOLDER, TYPE_FILE, TYPE_WEBLINK } from '../constants';
-
 /**
  * Takes an item list and flattens it by moving
  * all item entries into the cache and replacing the list
@@ -19,14 +17,13 @@ import { TYPE_FOLDER, TYPE_FILE, TYPE_WEBLINK } from '../constants';
  * @param {WebLink} weblinkAPI api for web links
  * @return {Array} list with items replaced with reference keys
  */
-export default function(list: BoxItem[], folderAPI: FolderAPI, fileAPI: FileAPI, weblinkAPI: WebLinkAPI): string[] {
-    const items: string[] = [];
-    list.forEach((item: BoxItem) => {
-        const { id, type }: BoxItem = item;
+export default function (list, folderAPI, fileAPI, weblinkAPI) {
+    const items = [];
+    list.forEach((item) => {
+        const { id, type } = item;
         if (!id || !type) {
             throw getBadItemError();
         }
-
         let api;
         switch (type) {
             case TYPE_FOLDER:
@@ -41,17 +38,16 @@ export default function(list: BoxItem[], folderAPI: FolderAPI, fileAPI: FileAPI,
             default:
                 throw new Error('Unknown Type!');
         }
-
-        const cache: APICache = api.getCache();
-        const key: string = api.getCacheKey(id);
-
+        const cache = api.getCache();
+        const key = api.getCacheKey(id);
         if (cache.has(key)) {
             cache.merge(key, item);
-        } else {
+        }
+        else {
             cache.set(key, item);
         }
-
         items.push(key);
     });
     return items;
 }
+//# sourceMappingURL=flatten.js.map

@@ -1,3 +1,9 @@
-// @flow
+// @was-flow
 export { default } from './ContentSidebar';
-export type { ContentSidebarProps } from './ContentSidebar';
+type;
+{
+    ContentSidebarProps;
+}
+from;
+'./ContentSidebar';
+//# sourceMappingURL=index.js.map

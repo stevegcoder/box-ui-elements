@@ -1,7 +1,4 @@
-import * as React from 'react';
 import { shallow } from 'enzyme';
-import EditableKeywords from '../EditableKeywords';
-
 describe('components/ContentSidebar/Skills/Keywords/EditableKeywords', () => {
     test('should correctly render', () => {
         const props = {
@@ -11,21 +8,19 @@ describe('components/ContentSidebar/Skills/Keywords/EditableKeywords', () => {
             onSave: jest.fn(),
             onCancel: jest.fn(),
         };
-
-        const wrapper = shallow(<EditableKeywords {...props} />);
+        const wrapper = shallow(Object.assign({}, props) /  > );
         expect(wrapper).toMatchSnapshot();
     });
-
     describe('onKeyDown()', () => {
         test('should call onBlur when enter is pressed and is not in composition mode', () => {
-            const wrapper = shallow(<EditableKeywords />);
+            const wrapper = shallow(/>););
             const instance = wrapper.instance();
             instance.onBlur = jest.fn();
             instance.onKeyDown({ key: 'Enter' });
             expect(instance.onBlur).toBeCalled();
         });
         test('should not call onBlur when in composition mode', () => {
-            const wrapper = shallow(<EditableKeywords />);
+            const wrapper = shallow(/>););
             const instance = wrapper.instance();
             instance.setState({ isInCompositionMode: true });
             instance.onBlur = jest.fn();
@@ -34,3 +29,4 @@ describe('components/ContentSidebar/Skills/Keywords/EditableKeywords', () => {
         });
     });
 });
+//# sourceMappingURL=EditableKeywords-test.js.map

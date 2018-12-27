@@ -1,12 +1,8 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import LoadingIndicator from 'box-react-ui/lib/components/loading-indicator/LoadingIndicator';
-import { SkillsSidebarComponent as SkillsSidebar } from '../SkillsSidebar';
 import SidebarSkills from '../Skills/SidebarSkills';
-
 describe('components/ContentSidebar/Skills/SkillsSidebar', () => {
-    const getWrapper = props => shallow(<SkillsSidebar {...props} />);
-
+    const getWrapper = props => shallow(Object.assign({}, props) /  > );
     test('should render skills sidebar component when cards are available', () => {
         const getSkills = jest.fn();
         const api = {
@@ -26,7 +22,6 @@ describe('components/ContentSidebar/Skills/SkillsSidebar', () => {
         expect(getSkills).toHaveBeenCalled();
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
-
     test('should render loading indicator component when cards are not available', () => {
         const getSkills = jest.fn();
         const api = {
@@ -46,3 +41,4 @@ describe('components/ContentSidebar/Skills/SkillsSidebar', () => {
         expect(api.getMetadataAPI).toHaveBeenCalled();
     });
 });
+//# sourceMappingURL=SkillsSidebar-test.js.map

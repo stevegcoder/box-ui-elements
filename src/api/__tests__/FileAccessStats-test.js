@@ -1,12 +1,9 @@
 import FileAccessStats from '../FileAccessStats';
-
 let accessStats;
-
 describe('api/FileAccessStats', () => {
     beforeEach(() => {
         accessStats = new FileAccessStats({});
     });
-
     describe('getUrl()', () => {
         test('should throw when access stats api url without id', () => {
             expect(() => {
@@ -18,3 +15,4 @@ describe('api/FileAccessStats', () => {
         });
     });
 });
+//# sourceMappingURL=FileAccessStats-test.js.map
