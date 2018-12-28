@@ -1,5 +1,4 @@
 import Cache from '../Cache';
-
 let cache;
 describe('util/Cache', () => {
     beforeEach(() => {
@@ -46,9 +45,10 @@ describe('util/Cache', () => {
     test('should not merge non existant items', () => {
         try {
             cache.merge('foo', { b: 2 });
-        } catch (e) {
+        }
+        catch (e) {
             expect('Key foo not in cache!').toBe(e.message);
         }
     });
 });
-// # sourceMappingURL=Cache-test.js.map
+//# sourceMappingURL=Cache-test.js.map

@@ -4,7 +4,6 @@
  * @author Box
  */
 import Cache from './Cache';
-
 const KEY_PREFIX = 'localStore';
 const SERVICE_VERSION = '0';
 class LocalStore {
@@ -18,7 +17,6 @@ class LocalStore {
         this.localStorage = window.localStorage;
         this.isLocalStorageAvailable = this.canUseLocalStorage();
     }
-
     /**
      * Builds a key for the session store
      * @private
@@ -29,7 +27,6 @@ class LocalStore {
     buildKey(key) {
         return `${KEY_PREFIX}/${SERVICE_VERSION}/${key}`;
     }
-
     /**
      * Test to see browser can use local storage.
      * See http://stackoverflow.com/questions/14555347
@@ -47,11 +44,11 @@ class LocalStore {
             this.localStorage.setItem(this.buildKey('TestKey'), 'testValue');
             this.localStorage.removeItem(this.buildKey('TestKey'));
             return true;
-        } catch (e) {
+        }
+        catch (e) {
             return false;
         }
     }
-
     /**
      * Set an item
      *
@@ -64,14 +61,15 @@ class LocalStore {
         if (this.isLocalStorageAvailable) {
             try {
                 this.localStorage.setItem(this.buildKey(key), JSON.stringify(value));
-            } catch (e) {
+            }
+            catch (e) {
                 // no-op
             }
-        } else {
+        }
+        else {
             this.memoryStore.set(key, value);
         }
     }
-
     /**
      * Get an item
      *
@@ -87,14 +85,15 @@ class LocalStore {
                     return null;
                 }
                 return JSON.parse(item);
-            } catch (e) {
+            }
+            catch (e) {
                 return null;
             }
-        } else {
+        }
+        else {
             return this.memoryStore.get(key);
         }
     }
-
     /**
      * Remove an item
      *
@@ -106,7 +105,8 @@ class LocalStore {
         if (this.isLocalStorageAvailable) {
             try {
                 this.localStorage.removeItem(this.buildKey(key));
-            } catch (e) {
+            }
+            catch (e) {
                 // no-op
             }
             return;
@@ -115,4 +115,4 @@ class LocalStore {
     }
 }
 export default LocalStore;
-// # sourceMappingURL=LocalStore.js.map
+//# sourceMappingURL=LocalStore.js.map

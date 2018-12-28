@@ -15,12 +15,10 @@ export function isInputElement(element) {
         return false;
     }
     const tag = element.tagName.toLowerCase();
-    return (
-        tag === 'input' ||
+    return (tag === 'input' ||
         tag === 'select' ||
         tag === 'textarea' ||
-        (tag === 'div' && !!element.getAttribute('contenteditable'))
-    );
+        (tag === 'div' && !!element.getAttribute('contenteditable')));
 }
 /**
  * Checks if an html element is some kind of element
@@ -35,13 +33,11 @@ export function isFocusableElement(element) {
     }
     const tag = element.tagName.toLowerCase();
     // Box React UI sensitive checks
-    const isCheckbox =
-        element.classList.contains('checkbox-pointer-target') ||
+    const isCheckbox = element.classList.contains('checkbox-pointer-target') ||
         (element.parentElement instanceof HTMLElement
             ? element.parentElement.classList.contains('checkbox-label')
             : false);
-    const isButton =
-        element.classList.contains('btn-content') ||
+    const isButton = element.classList.contains('btn-content') ||
         (element.parentElement instanceof HTMLElement ? element.parentElement.classList.contains('btn') : false);
     return isInputElement(element) || tag === 'button' || tag === 'a' || tag === 'option' || isCheckbox || isButton;
 }
@@ -64,8 +60,9 @@ export function focus(root, selector, focusRoot = true) {
     const element = root.querySelector(selector);
     if (element && typeof element.focus === 'function') {
         element.focus();
-    } else if (focusRoot) {
+    }
+    else if (focusRoot) {
         root.focus();
     }
 }
-// # sourceMappingURL=dom.js.map
+//# sourceMappingURL=dom.js.map

@@ -1,5 +1,4 @@
 import formatTaggedMessage from '../formatTaggedMessage';
-
 describe('components/ContentSidebar/ActivityFeed/utils/formatTaggedMessage', () => {
     test('should return correct result when shouldReturnString is true', () => {
         const actualResult = formatTaggedMessage('test @[3203255873:test user]', 123, true);
@@ -7,4 +6,4 @@ describe('components/ContentSidebar/ActivityFeed/utils/formatTaggedMessage', () 
         expect(actualResult).toEqual(expectedResult);
     });
 });
-// # sourceMappingURL=formatTaggedMessage-test.js.map
+//# sourceMappingURL=formatTaggedMessage-test.js.map

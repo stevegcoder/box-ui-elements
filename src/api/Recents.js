@@ -11,7 +11,6 @@ import flatten from '../util/flatten';
 import { getBadItemError } from '../util/error';
 import { FOLDER_FIELDS_TO_FETCH } from '../util/fields';
 import { DEFAULT_ROOT, CACHE_PREFIX_RECENTS, FIELD_DATE, SORT_DESC, ERROR_CODE_FETCH_RECENTS } from '../constants';
-
 class Recents extends Base {
     constructor() {
         super(...arguments);
@@ -25,26 +24,17 @@ class Recents extends Base {
             if (this.isDestroyed()) {
                 return;
             }
-            const {
-                entries,
-                order: { by, direction },
-            } = data;
+            const { entries, order: { by, direction }, } = data;
             const items = [];
             entries.forEach(({ item, interacted_at }) => {
                 const { path_collection } = item;
-                const shouldInclude =
-                    this.id === DEFAULT_ROOT ||
-                    (!!path_collection && path_collection.entries.findIndex(crumb => crumb.id === this.id) !== -1);
+                const shouldInclude = this.id === DEFAULT_ROOT ||
+                    (!!path_collection && path_collection.entries.findIndex((crumb) => crumb.id === this.id) !== -1);
                 if (shouldInclude) {
                     items.push(Object.assign(item, { interacted_at }));
                 }
             });
-            const flattenedItems = flatten(
-                items,
-                new FolderAPI(this.options),
-                new FileAPI(this.options),
-                new WebLinkAPI(this.options),
-            );
+            const flattenedItems = flatten(items, new FolderAPI(this.options), new FileAPI(this.options), new WebLinkAPI(this.options));
             this.getCache().set(this.key, {
                 item_collection: {
                     entries: flattenedItems,
@@ -64,14 +54,13 @@ class Recents extends Base {
          * @param {Error} error fetch error
          * @return {void}
          */
-        this.recentsErrorHandler = error => {
+        this.recentsErrorHandler = (error) => {
             if (this.isDestroyed()) {
                 return;
             }
             this.errorCallback(error, this.errorCode);
         };
     }
-
     /**
      * Creates a key for the cache
      *
@@ -81,7 +70,6 @@ class Recents extends Base {
     getCacheKey(id) {
         return `${CACHE_PREFIX_RECENTS}${id}`;
     }
-
     /**
      * URL for recents api
      *
@@ -90,7 +78,6 @@ class Recents extends Base {
     getUrl() {
         return `${this.getBaseApiUrl()}/recent_items`;
     }
-
     /**
      * Returns the results
      *
@@ -112,14 +99,13 @@ class Recents extends Base {
         }
         const collection = {
             id: this.id,
-            items: entries.map(key => cache.get(key)),
+            items: entries.map((key) => cache.get(key)),
             percentLoaded: 100,
             sortBy: FIELD_DATE,
             sortDirection: SORT_DESC,
         };
         this.successCallback(collection);
     }
-
     /**
      * Does the network request
      *
@@ -132,15 +118,14 @@ class Recents extends Base {
         this.errorCode = ERROR_CODE_FETCH_RECENTS;
         return this.xhr
             .get({
-                url: this.getUrl(),
-                params: {
-                    fields: FOLDER_FIELDS_TO_FETCH.toString(),
-                },
-            })
+            url: this.getUrl(),
+            params: {
+                fields: FOLDER_FIELDS_TO_FETCH.toString(),
+            },
+        })
             .then(this.recentsSuccessHandler)
             .catch(this.recentsErrorHandler);
     }
-
     /**
      * Gets recent files
      *
@@ -174,4 +159,4 @@ class Recents extends Base {
     }
 }
 export default Recents;
-// # sourceMappingURL=Recents.js.map
+//# sourceMappingURL=Recents.js.map

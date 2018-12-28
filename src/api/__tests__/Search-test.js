@@ -2,7 +2,6 @@ import Search from '../Search';
 import Cache from '../../util/Cache';
 import { FOLDER_FIELDS_TO_FETCH } from '../../util/fields';
 import { FIELD_RELEVANCE, SORT_DESC } from '../../constants';
-
 let search;
 let cache;
 let item1;
@@ -268,46 +267,38 @@ describe('api/Search', () => {
         });
         test('should throw bad item error when entries is missing', () => {
             search.finish = jest.fn();
-            expect(
-                search.searchSuccessHandler.bind(search, {
-                    total_count: 1,
-                    offset: 0,
-                    limit: 100,
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(search.searchSuccessHandler.bind(search, {
+                total_count: 1,
+                offset: 0,
+                limit: 100,
+            })).toThrow(Error, /Bad box item/);
             expect(search.finish).not.toHaveBeenCalled();
         });
         test('should throw bad item error when total count is missing', () => {
             search.finish = jest.fn();
-            expect(
-                search.searchSuccessHandler.bind(search, {
-                    entries: [],
-                    offset: 0,
-                    limit: 100,
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(search.searchSuccessHandler.bind(search, {
+                entries: [],
+                offset: 0,
+                limit: 100,
+            })).toThrow(Error, /Bad box item/);
             expect(search.finish).not.toHaveBeenCalled();
         });
         test('should throw bad item error when offset is missing', () => {
             search.finish = jest.fn();
-            expect(
-                search.searchSuccessHandler.bind(search, {
-                    entries: [],
-                    total_count: 0,
-                    limit: 100,
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(search.searchSuccessHandler.bind(search, {
+                entries: [],
+                total_count: 0,
+                limit: 100,
+            })).toThrow(Error, /Bad box item/);
             expect(search.finish).not.toHaveBeenCalled();
         });
         test('should throw bad item error when limit is missing', () => {
             search.finish = jest.fn();
-            expect(
-                search.searchSuccessHandler.bind(search, {
-                    entries: [],
-                    total_count: 0,
-                    offset: 100,
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(search.searchSuccessHandler.bind(search, {
+                entries: [],
+                total_count: 0,
+                offset: 100,
+            })).toThrow(Error, /Bad box item/);
             expect(search.finish).not.toHaveBeenCalled();
         });
     });
@@ -402,4 +393,4 @@ describe('api/Search', () => {
         });
     });
 });
-// # sourceMappingURL=Search-test.js.map
+//# sourceMappingURL=Search-test.js.map

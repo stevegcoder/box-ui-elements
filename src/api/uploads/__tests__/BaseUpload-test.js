@@ -1,5 +1,4 @@
 import BaseUpload from '../BaseUpload';
-
 let upload;
 let clock;
 let file;
@@ -149,14 +148,14 @@ describe('api/uploads/BaseUpload', () => {
             const error = new Error();
             error.status = 500;
             upload.errorCallback = jest.fn();
-            upload.preflightErrorHandler(error, () => {});
+            upload.preflightErrorHandler(error, () => { });
             expect(upload.errorCallback).toHaveBeenCalledWith(error);
         });
         test('should call the error callback if error message is from CORS', () => {
             const error = new Error();
             error.message = 'Failed to fetch';
             upload.errorCallback = jest.fn();
-            upload.preflightErrorHandler(error, () => {});
+            upload.preflightErrorHandler(error, () => { });
             expect(upload.errorCallback).toHaveBeenCalledWith(error);
         });
         test('should retry after default interval for other errors', () => {
@@ -180,4 +179,4 @@ describe('api/uploads/BaseUpload', () => {
         });
     });
 });
-// # sourceMappingURL=BaseUpload-test.js.map
+//# sourceMappingURL=BaseUpload-test.js.map

@@ -4,16 +4,8 @@
  * @author Box
  */
 import Base from './Base';
-import {
-    PERMISSION_CAN_COMMENT,
-    ERROR_CODE_CREATE_TASK,
-    ERROR_CODE_UPDATE_TASK,
-    ERROR_CODE_DELETE_TASK,
-    ERROR_CODE_FETCH_TASK_ASSIGNMENT,
-    ERROR_CODE_FETCH_TASKS,
-} from '../constants';
+import { PERMISSION_CAN_COMMENT, ERROR_CODE_CREATE_TASK, ERROR_CODE_UPDATE_TASK, ERROR_CODE_DELETE_TASK, ERROR_CODE_FETCH_TASK_ASSIGNMENT, ERROR_CODE_FETCH_TASKS, } from '../constants';
 import { TASKS_FIELDS_TO_FETCH, TASK_ASSIGNMENTS_FIELDS_TO_FETCH } from '../util/fields';
-
 class Tasks extends Base {
     /**
      * API URL for tasks
@@ -27,7 +19,6 @@ class Tasks extends Base {
         }
         return `${this.getBaseApiUrl()}/files/${id}/tasks`;
     }
-
     /**
      * API URL for tasks endpoint
      *
@@ -38,7 +29,6 @@ class Tasks extends Base {
         const baseUrl = `${this.getBaseApiUrl()}/tasks`;
         return id ? `${baseUrl}/${id}` : baseUrl;
     }
-
     /**
      * API for getting assignments for a given task
      *
@@ -49,22 +39,15 @@ class Tasks extends Base {
      * @param {Object} params request params
      * @return {Promise}
      */
-    getAssignments(
-        id,
-        taskId,
-        successCallback,
-        errorCallback,
-        requestData = {
-            params: {
-                fields: TASK_ASSIGNMENTS_FIELDS_TO_FETCH.toString(),
-            },
+    getAssignments(id, taskId, successCallback, errorCallback, requestData = {
+        params: {
+            fields: TASK_ASSIGNMENTS_FIELDS_TO_FETCH.toString(),
         },
-    ) {
+    }) {
         this.errorCode = ERROR_CODE_FETCH_TASK_ASSIGNMENT;
         const url = `${this.tasksUrl(taskId)}/assignments`;
         this.get({ id, successCallback, errorCallback, requestData, url });
     }
-
     /**
      * API for creating a task on a file
      *
@@ -75,12 +58,13 @@ class Tasks extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    createTask({ file, message, dueAt, successCallback, errorCallback }) {
+    createTask({ file, message, dueAt, successCallback, errorCallback, }) {
         const { id = '', permissions } = file;
         this.errorCode = ERROR_CODE_CREATE_TASK;
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -102,7 +86,6 @@ class Tasks extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for updating a task on a file
      *
@@ -114,13 +97,14 @@ class Tasks extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    updateTask({ file, taskId, message, dueAt, successCallback, errorCallback }) {
+    updateTask({ file, taskId, message, dueAt, successCallback, errorCallback, }) {
         const { id = '', permissions } = file;
         this.errorCode = ERROR_CODE_UPDATE_TASK;
         try {
             // We don't know task_edit specific permissions, so let the client try and fail gracefully
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -137,7 +121,6 @@ class Tasks extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for deleting a task on a file
      *
@@ -147,13 +130,14 @@ class Tasks extends Base {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    deleteTask({ file, taskId, successCallback, errorCallback }) {
+    deleteTask({ file, taskId, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_DELETE_TASK;
         const { id = '', permissions } = file;
         try {
             // We don't know task_delete specific permissions, so let the client try and fail gracefully
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -164,7 +148,6 @@ class Tasks extends Base {
             errorCallback,
         });
     }
-
     /**
      * API for fetching tasks on a file
      *
@@ -174,16 +157,11 @@ class Tasks extends Base {
      * @param {Object} requestData - additional request data
      * @returns {Promise<void>}
      */
-    getTasks(
-        id,
-        successCallback,
-        errorCallback,
-        requestData = {
-            params: {
-                fields: TASKS_FIELDS_TO_FETCH.toString(),
-            },
+    getTasks(id, successCallback, errorCallback, requestData = {
+        params: {
+            fields: TASKS_FIELDS_TO_FETCH.toString(),
         },
-    ) {
+    }) {
         this.errorCode = ERROR_CODE_FETCH_TASKS;
         this.get({
             id,
@@ -194,4 +172,4 @@ class Tasks extends Base {
     }
 }
 export default Tasks;
-// # sourceMappingURL=Tasks.js.map
+//# sourceMappingURL=Tasks.js.map

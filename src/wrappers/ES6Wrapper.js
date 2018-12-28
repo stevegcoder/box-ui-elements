@@ -8,7 +8,6 @@ import ReactDOM from 'react-dom';
 import { addLocaleData } from 'react-intl';
 import { DEFAULT_CONTAINER } from '../constants';
 import i18n from '../i18n';
-
 class ES6Wrapper extends EventEmitter {
     /**
      * [constructor]
@@ -36,7 +35,7 @@ class ES6Wrapper extends EventEmitter {
          * @protected
          * @return {void}
          */
-        this.setComponent = component => {
+        this.setComponent = (component) => {
             this.component = component;
         };
         /**
@@ -44,12 +43,11 @@ class ES6Wrapper extends EventEmitter {
          *
          * @return {void}
          */
-        this.onInteraction = data => {
+        this.onInteraction = (data) => {
             this.emit('interaction', data);
         };
         addLocaleData(this.localeData);
     }
-
     /**
      * Shows the content picker.
      *
@@ -66,12 +64,13 @@ class ES6Wrapper extends EventEmitter {
         this.options.version = __VERSION__;
         this.emit = this.emit.bind(this);
         const container = options.container || DEFAULT_CONTAINER;
-        this.container = container instanceof HTMLElement ? container : document.querySelector(container);
+        this.container =
+            container instanceof HTMLElement ? container : ((document.querySelector(container)));
         any;
         HTMLElement;
+        ;
         this.render();
     }
-
     /**
      * Hides the content picker.
      * Removes all event listeners.
@@ -87,7 +86,6 @@ class ES6Wrapper extends EventEmitter {
             this.container.innerHTML = '';
         }
     }
-
     /**
      * Renders the component.
      * Should be overriden.
@@ -98,7 +96,6 @@ class ES6Wrapper extends EventEmitter {
     render() {
         throw new Error('Unimplemented!');
     }
-
     /**
      * Gets reference to the inner component
      *
@@ -108,7 +105,6 @@ class ES6Wrapper extends EventEmitter {
     getComponent() {
         return this.component;
     }
-
     /**
      * Clears out the cache used by the component
      *
@@ -121,7 +117,6 @@ class ES6Wrapper extends EventEmitter {
             component.clearCache();
         }
     }
-
     /**
      * Wrapper for emit to prevent JS exceptions
      * in the listeners own code.
@@ -134,11 +129,12 @@ class ES6Wrapper extends EventEmitter {
     emit(eventName, data) {
         try {
             return super.emit(eventName, data);
-        } catch (e) {
+        }
+        catch (e) {
             // do nothing
         }
         return false;
     }
 }
 export default ES6Wrapper;
-// # sourceMappingURL=ES6Wrapper.js.map
+//# sourceMappingURL=ES6Wrapper.js.map

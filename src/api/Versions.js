@@ -6,7 +6,6 @@
 import OffsetBasedAPI from './OffsetBasedAPI';
 import { ERROR_CODE_FETCH_VERSIONS, DEFAULT_FETCH_START, DEFAULT_FETCH_END } from '../constants';
 import { VERSIONS_FIELDS_TO_FETCH } from '../util/fields';
-
 const ACTION = {
     upload: 'upload',
     delete: 'delete',
@@ -19,18 +18,17 @@ class Versions extends OffsetBasedAPI {
          * Formats the versions api response to usable data
          * @param {Object} data the api response data
          */
-        this.successHandler = data => {
+        this.successHandler = (data) => {
             if (this.isDestroyed() || typeof this.successCallback !== 'function') {
                 return;
             }
             const { entries } = data;
-            const versions = entries.map(version => {
+            const versions = entries.map((version) => {
                 return Object.assign({}, version, { action: version.trashed_at ? ACTION.delete : ACTION.upload });
             });
             this.successCallback(Object.assign({}, data, { entries: versions }));
         };
     }
-
     /**
      * API URL for versions
      *
@@ -43,7 +41,6 @@ class Versions extends OffsetBasedAPI {
         }
         return `${this.getBaseApiUrl()}/files/${id}/versions`;
     }
-
     /**
      * API for fetching versions on a file
      *
@@ -56,18 +53,10 @@ class Versions extends OffsetBasedAPI {
      * @param {boolean} shouldFetchAll - true if all versions should be fetched
      * @returns {void}
      */
-    getVersions(
-        fileId,
-        successCallback,
-        errorCallback,
-        offset = DEFAULT_FETCH_START,
-        limit = DEFAULT_FETCH_END,
-        fields = VERSIONS_FIELDS_TO_FETCH,
-        shouldFetchAll = true,
-    ) {
+    getVersions(fileId, successCallback, errorCallback, offset = DEFAULT_FETCH_START, limit = DEFAULT_FETCH_END, fields = VERSIONS_FIELDS_TO_FETCH, shouldFetchAll = true) {
         this.errorCode = ERROR_CODE_FETCH_VERSIONS;
         this.offsetGet(fileId, successCallback, errorCallback, offset, limit, fields, shouldFetchAll);
     }
 }
 export default Versions;
-// # sourceMappingURL=Versions.js.map
+//# sourceMappingURL=Versions.js.map

@@ -14,7 +14,6 @@ class Browser {
     static getUserAgent() {
         return global.navigator.userAgent;
     }
-
     /**
      * Returns whether browser is mobile.
      *
@@ -24,7 +23,6 @@ class Browser {
         // Relying on the user agent to avoid desktop browsers on machines with touch screens.
         return /iphone|ipad|ipod|android|blackberry|bb10|mini|windows\sce|palm/i.test(Browser.getUserAgent());
     }
-
     /**
      * Returns whether browser is IE.
      *
@@ -33,7 +31,6 @@ class Browser {
     static isIE() {
         return /Trident/i.test(Browser.getUserAgent());
     }
-
     /**
      * Checks the browser for Dash support using H264 high.
      * Dash requires MediaSource extensions to exist and be applicable
@@ -48,11 +45,11 @@ class Browser {
             const mse = global.MediaSource;
             isDashSupported =
                 !!mse &&
-                typeof mse.isTypeSupported === 'function' &&
-                mse.isTypeSupported('video/mp4; codecs="avc1.64001E"');
+                    typeof mse.isTypeSupported === 'function' &&
+                    mse.isTypeSupported('video/mp4; codecs="avc1.64001E"');
         }
         return isDashSupported;
     }
 }
 export default Browser;
-// # sourceMappingURL=Browser.js.map
+//# sourceMappingURL=Browser.js.map

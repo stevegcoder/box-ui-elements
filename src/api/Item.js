@@ -7,16 +7,7 @@ import noop from 'lodash/noop';
 import setProp from 'lodash/set';
 import Base from './Base';
 import { getBadItemError, getBadPermissionsError } from '../util/error';
-import {
-    ACCESS_NONE,
-    CACHE_PREFIX_SEARCH,
-    CACHE_PREFIX_FOLDER,
-    TYPE_FOLDER,
-    ERROR_CODE_DELETE_ITEM,
-    ERROR_CODE_RENAME_ITEM,
-    ERROR_CODE_SHARE_ITEM,
-} from '../constants';
-
+import { ACCESS_NONE, CACHE_PREFIX_SEARCH, CACHE_PREFIX_FOLDER, TYPE_FOLDER, ERROR_CODE_DELETE_ITEM, ERROR_CODE_RENAME_ITEM, ERROR_CODE_SHARE_ITEM, } from '../constants';
 class Item extends Base {
     constructor() {
         super(...arguments);
@@ -52,16 +43,12 @@ class Item extends Base {
             }
             const childKey = this.getCacheKey(this.id);
             const oldCount = entries.length;
-            const newEntries = entries.filter(entry => entry !== childKey);
+            const newEntries = entries.filter((entry) => entry !== childKey);
             const newCount = newEntries.length;
-            const updatedObject = this.merge(
-                parentKey,
-                'item_collection',
-                Object.assign(item_collection, {
-                    entries: newEntries,
-                    total_count: total_count - (oldCount - newCount),
-                }),
-            );
+            const updatedObject = this.merge(parentKey, 'item_collection', Object.assign(item_collection, {
+                entries: newEntries,
+                total_count: total_count - (oldCount - newCount),
+            }));
             this.successCallback(updatedObject);
             this.postDeleteCleanup();
         };
@@ -92,7 +79,6 @@ class Item extends Base {
             }
         };
     }
-
     /**
      * Creates a key for the item's parent
      * This is always a folder
@@ -103,7 +89,6 @@ class Item extends Base {
     getParentCacheKey(id) {
         return `${CACHE_PREFIX_FOLDER}${id}`;
     }
-
     /**
      * Creates a key for the cache
      *
@@ -113,7 +98,6 @@ class Item extends Base {
     getCacheKey(id) {
         return `getCacheKey(${id}) should be overriden`;
     }
-
     /**
      * API URL for items
      *
@@ -124,7 +108,6 @@ class Item extends Base {
     getUrl(id) {
         return `getUrl(${id}) should be overriden`;
     }
-
     /**
      * Merges new data with old data and returns new data
      *
@@ -138,7 +121,6 @@ class Item extends Base {
         cache.merge(cacheKey, setProp({}, key, value));
         return cache.get(cacheKey);
     }
-
     /**
      * Steps to do after deletion
      *
@@ -152,7 +134,6 @@ class Item extends Base {
         this.getCache().unsetAll(CACHE_PREFIX_SEARCH);
         this.successCallback();
     }
-
     /**
      * API to delete an Item
      *
@@ -185,11 +166,10 @@ class Item extends Base {
         return this.xhr
             .delete({ url })
             .then(this.deleteSuccessHandler)
-            .catch(e => {
-                this.errorHandler(e);
-            });
+            .catch((e) => {
+            this.errorHandler(e);
+        });
     }
-
     /**
      * API to rename an Item
      *
@@ -220,11 +200,10 @@ class Item extends Base {
         return this.xhr
             .put({ url: `${this.getUrl(id)}`, data: { name } })
             .then(this.renameSuccessHandler)
-            .catch(e => {
-                this.errorHandler(e);
-            });
+            .catch((e) => {
+            this.errorHandler(e);
+        });
     }
-
     /**
      * API to create or remove a shared link
      *
@@ -256,16 +235,16 @@ class Item extends Base {
         // only content explorer or picker which works onf folder tokens
         return this.xhr
             .put({
-                url: this.getUrl(this.id),
-                data: {
-                    shared_link: access === ACCESS_NONE ? null : { access },
-                },
-            })
+            url: this.getUrl(this.id),
+            data: {
+                shared_link: access === ACCESS_NONE ? null : { access },
+            },
+        })
             .then(this.shareSuccessHandler)
-            .catch(e => {
-                this.errorHandler(e);
-            });
+            .catch((e) => {
+            this.errorHandler(e);
+        });
     }
 }
 export default Item;
-// # sourceMappingURL=Item.js.map
+//# sourceMappingURL=Item.js.map

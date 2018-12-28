@@ -1,5 +1,4 @@
 import { digest, getRandomValues } from '../webcrypto';
-
 describe('util/webcrypto', () => {
     describe('getRandomValues()', () => {
         test('should call getRandomValues() to get an array of random values', () => {
@@ -61,4 +60,4 @@ describe('util/webcrypto', () => {
         });
     });
 });
-// # sourceMappingURL=webcrypto-test.js.map
+//# sourceMappingURL=webcrypto-test.js.map

@@ -5,5 +5,5 @@ type;
     ContentSidebarProps;
 }
 from;
-('./ContentSidebar');
-// # sourceMappingURL=index.js.map
+'./ContentSidebar';
+//# sourceMappingURL=index.js.map

@@ -21,9 +21,9 @@ const isValidSkillsCard = (file, card) => {
  * @param {BoxItem} file - box file
  * @return {boolean} if there are valid skills to show
  */
-const hasSkills = file => {
+const hasSkills = (file) => {
     const cards = getProp(file, 'metadata.global.boxSkillsCards.cards', []);
     return Array.isArray(cards) && cards.length > 0 && cards.some(card => isValidSkillsCard(file, card));
 };
 export { hasSkills, isValidSkillsCard };
-// # sourceMappingURL=skillUtils.js.map
+//# sourceMappingURL=skillUtils.js.map

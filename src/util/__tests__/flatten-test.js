@@ -3,7 +3,6 @@ import FolderAPI from '../../api/Folder';
 import FileAPI from '../../api/File';
 import WebLinkAPI from '../../api/WebLink';
 import flatten from '../flatten';
-
 const list = [
     { id: '1', type: 'folder', name: 'folderName' },
     { id: '2', type: 'file', name: 'fileName' },
@@ -49,4 +48,4 @@ describe('util/flatten', () => {
         expect(flatten.bind(flatten, badList, folder, file, weblink)).toThrow(Error, /Bad box item/);
     });
 });
-// # sourceMappingURL=flatten-test.js.map
+//# sourceMappingURL=flatten-test.js.map

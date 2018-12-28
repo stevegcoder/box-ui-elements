@@ -249,6 +249,7 @@
     "dependencies": {
         "@types/lodash": "^4.14.119",
         "@types/react": "^16.7.13",
-        "@types/react-intl": "^2.3.14"
+        "@types/react-intl": "^2.3.14",
+        "@types/react-modal": "^3.6.0"
     }
 }

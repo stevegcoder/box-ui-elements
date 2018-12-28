@@ -3,38 +3,17 @@
  * @file Helper for the plain Box Upload API
  * @author Box
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import noop from 'lodash/noop';
 import BaseUpload from './BaseUpload';
 import { digest } from '../../util/webcrypto';
-
-const __awaiter =
-    (this && this.__awaiter) ||
-    function(thisArg, _arguments, P, generator) {
-        return new (P || (P = Promise))((resolve, reject) => {
-            function fulfilled(value) {
-                try {
-                    step(generator.next(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function rejected(value) {
-                try {
-                    step(generator.throw(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function step(result) {
-                result.done
-                    ? resolve(result.value)
-                    : new P(resolve => {
-                          resolve(result.value);
-                      }).then(fulfilled, rejected);
-            }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-    };
 const CONTENT_MD5_HEADER = 'Content-MD5';
 class PlainUpload extends BaseUpload {
     constructor() {
@@ -61,7 +40,7 @@ class PlainUpload extends BaseUpload {
          * @param {Object} event - Progress event
          * @return {void}
          */
-        this.uploadProgressHandler = event => {
+        this.uploadProgressHandler = (event) => {
             if (this.isDestroyed()) {
                 return;
             }
@@ -77,45 +56,43 @@ class PlainUpload extends BaseUpload {
          * @param {boolean} [options.url] - Upload URL to use
          * @return {Promise} Async function promise
          */
-        this.preflightSuccessHandler = ({ data }) =>
-            __awaiter(this, void 0, void 0, function*() {
-                if (this.isDestroyed()) {
-                    return;
+        this.preflightSuccessHandler = ({ data }) => __awaiter(this, void 0, void 0, function* () {
+            if (this.isDestroyed()) {
+                return;
+            }
+            // Use provided upload URL if passed in, otherwise construct
+            let uploadUrl = data.upload_url;
+            if (!uploadUrl) {
+                uploadUrl = `${this.getBaseUploadUrl()}/files/content`;
+                if (this.fileId) {
+                    uploadUrl = uploadUrl.replace('content', `${this.fileId}/content`);
                 }
-                // Use provided upload URL if passed in, otherwise construct
-                let uploadUrl = data.upload_url;
-                if (!uploadUrl) {
-                    uploadUrl = `${this.getBaseUploadUrl()}/files/content`;
-                    if (this.fileId) {
-                        uploadUrl = uploadUrl.replace('content', `${this.fileId}/content`);
-                    }
-                }
-                const attributes = JSON.stringify({
-                    name: this.fileName,
-                    parent: { id: this.folderId },
-                });
-                const options = {
-                    url: uploadUrl,
-                    data: {
-                        attributes,
-                        file: this.file,
-                    },
-                    headers: {},
-                    successHandler: this.uploadSuccessHandler,
-                    errorHandler: this.preflightErrorHandler,
-                    progressHandler: this.uploadProgressHandler,
-                };
-                // Calculate SHA1 for file consistency check
-                const sha1 = yield this.computeSHA1(this.file);
-                if (sha1) {
-                    options.headers = {
-                        [CONTENT_MD5_HEADER]: sha1,
-                    };
-                }
-                this.xhr.uploadFile(options);
+            }
+            const attributes = JSON.stringify({
+                name: this.fileName,
+                parent: { id: this.folderId },
             });
+            const options = {
+                url: uploadUrl,
+                data: {
+                    attributes,
+                    file: this.file,
+                },
+                headers: {},
+                successHandler: this.uploadSuccessHandler,
+                errorHandler: this.preflightErrorHandler,
+                progressHandler: this.uploadProgressHandler,
+            };
+            // Calculate SHA1 for file consistency check
+            const sha1 = yield this.computeSHA1(this.file);
+            if (sha1) {
+                options.headers = {
+                    [CONTENT_MD5_HEADER]: sha1,
+                };
+            }
+            this.xhr.uploadFile(options);
+        });
     }
-
     /**
      * Uploads a file. If there is a conflict and overwrite is true, replace the file.
      * Otherwise, re-upload with a different name.
@@ -130,15 +107,7 @@ class PlainUpload extends BaseUpload {
      * @param {boolean} [overwrite] - Should upload overwrite file with same name
      * @return {void}
      */
-    upload({
-        folderId,
-        fileId,
-        file,
-        successCallback = noop,
-        errorCallback = noop,
-        progressCallback = noop,
-        overwrite = true,
-    }) {
+    upload({ folderId, fileId, file, successCallback = noop, errorCallback = noop, progressCallback = noop, overwrite = true, }) {
         if (this.isDestroyed()) {
             return;
         }
@@ -153,7 +122,6 @@ class PlainUpload extends BaseUpload {
         this.overwrite = overwrite;
         this.makePreflightRequest();
     }
-
     /**
      * Cancels upload of a file.
      *
@@ -166,7 +134,6 @@ class PlainUpload extends BaseUpload {
         clearTimeout(this.retryTimeout);
         this.destroy();
     }
-
     /**
      * Calculates SHA1 of a file
      *
@@ -174,7 +141,7 @@ class PlainUpload extends BaseUpload {
      * @return {Promise} Promise that resolves with SHA1 digest
      */
     computeSHA1(file) {
-        return __awaiter(this, void 0, void 0, function*() {
+        return __awaiter(this, void 0, void 0, function* () {
             let sha1 = '';
             try {
                 // Adapted from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
@@ -183,7 +150,8 @@ class PlainUpload extends BaseUpload {
                 const hashBuffer = yield digest('SHA-1', buffer);
                 const hashArray = Array.from(new Uint8Array(hashBuffer));
                 sha1 = hashArray.map(b => `00${b.toString(16)}`.slice(-2)).join('');
-            } catch (e) {
+            }
+            catch (e) {
                 // Return empty sha1 if hashing fails
             }
             return sha1;
@@ -191,4 +159,4 @@ class PlainUpload extends BaseUpload {
     }
 }
 export default PlainUpload;
-// # sourceMappingURL=PlainUpload.js.map
+//# sourceMappingURL=PlainUpload.js.map

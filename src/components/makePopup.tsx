@@ -5,13 +5,13 @@
  */
 
 import React, { PureComponent } from 'react';
-import Modal from 'react-modal';
+import {Modal, ModalOptions} from 'react-modal';
 import noop from 'lodash/noop';
 import omit from 'lodash/omit';
 
 import { CLIENT_NAME_CONTENT_PICKER, CLIENT_NAME_CONTENT_UPLOADER } from '../constants';
 
-type PropsShape = {
+type PopupProps = {
     onCancel?: Function,
     onChoose?: Function,
     onClose?: Function,
@@ -23,9 +23,9 @@ type State = {
     isOpen: boolean,
 };
 
-const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
-    class Wrapper extends PureComponent<Props, State> {
-        props: Props;
+const makePopup = (kit: string) => (Wrapped: any) =>
+    class Wrapper extends PureComponent<PopupProps, State> {
+        props: PopupProps;
 
         state: State;
 
@@ -35,7 +35,7 @@ const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
          * @param {*} props
          * @return {Wrapper}
          */
-        constructor(props: Props) {
+        constructor(props: PopupProps) {
             super(props);
             this.state = {
                 isOpen: false,
@@ -59,7 +59,7 @@ const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
          * @return {void}
          */
         onClick = (data: any) => {
-            const { onClick = noop }: Props = this.props;
+            const { onClick = noop } = this.props;
             this.close(onClick, data);
         };
 
@@ -70,7 +70,7 @@ const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
          * @return {void}
          */
         onClose = (data: any) => {
-            const { onClose = noop }: Props = this.props;
+            const { onClose = noop } = this.props;
             this.close(onClose, data);
         };
 
@@ -81,7 +81,7 @@ const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
          * @return {void}
          */
         onCancel = (data: any) => {
-            const { onCancel = noop }: Props = this.props;
+            const { onCancel = noop } = this.props;
             this.close(onCancel, data);
         };
 
@@ -92,7 +92,7 @@ const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
          * @return {void}
          */
         onChoose = (data: any) => {
-            const { onChoose = noop }: Props = this.props;
+            const { onChoose = noop } = this.props;
             this.close(onChoose, data);
         };
 
@@ -112,7 +112,7 @@ const makePopup = (kit: string) => <Props: PropsShape>(Wrapped: any) =>
          */
         render() {
             const { isOpen }: State = this.state;
-            const { modal, ...rest }: Props = this.props;
+            const { modal, ...rest } = this.props;
             const wrappedProps = omit(rest, ['onCancel', 'onChoose', 'onClose', 'modal']);
             const {
                 buttonLabel = 'Missing modal.buttonLabel in options',

@@ -1,5 +1,4 @@
 import { isValidTimeSlice } from '../timeSliceUtils';
-
 describe('components/Transcript/timeSliceUtils/isValidTimeSlice', () => {
     test('should return false when no time slices', () => {
         expect(isValidTimeSlice()).toBeFalsy();
@@ -17,4 +16,4 @@ describe('components/Transcript/timeSliceUtils/isValidTimeSlice', () => {
         expect(isValidTimeSlice([{ start: 10 }])).toBeTruthy();
     });
 });
-// # sourceMappingURL=timeSliceUtils-test.js.map
+//# sourceMappingURL=timeSliceUtils-test.js.map

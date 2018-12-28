@@ -1,7 +1,6 @@
 import Folder from '../Folder';
 import Cache from '../../util/Cache';
 import { FOLDER_FIELDS_TO_FETCH } from '../../util/fields';
-
 let folder;
 let cache;
 let item1;
@@ -265,46 +264,38 @@ describe('api/Folder', () => {
         });
         test('should throw bad item error when item collection entries is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: { total_count: 1, offset: 0, limit: 100 },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: { total_count: 1, offset: 0, limit: 100 },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
         test('should throw bad item error when item collection total count is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: { entries: [], offset: 0, limit: 100 },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: { entries: [], offset: 0, limit: 100 },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
         test('should throw bad item error when item collection offset is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: {
-                        entries: [],
-                        total_count: 0,
-                        limit: 100,
-                    },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: {
+                    entries: [],
+                    total_count: 0,
+                    limit: 100,
+                },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
         test('should throw bad item error when item collection limit is missing', () => {
             folder.finish = jest.fn();
-            expect(
-                folder.folderSuccessHandler.bind(folder, {
-                    item_collection: {
-                        entries: [],
-                        total_count: 0,
-                        offset: 100,
-                    },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.folderSuccessHandler.bind(folder, {
+                item_collection: {
+                    entries: [],
+                    total_count: 0,
+                    offset: 100,
+                },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.finish).not.toHaveBeenCalled();
         });
     });
@@ -638,14 +629,12 @@ describe('api/Folder', () => {
                     entries: [],
                 },
             });
-            expect(
-                folder.createSuccessHandler.bind(folder, {
-                    id: 'foo',
-                    item_collection: { entries: [] },
-                }),
-            ).toThrow(Error, /Bad box item/);
+            expect(folder.createSuccessHandler.bind(folder, {
+                id: 'foo',
+                item_collection: { entries: [] },
+            })).toThrow(Error, /Bad box item/);
             expect(folder.successCallback).not.toHaveBeenCalled();
         });
     });
 });
-// # sourceMappingURL=Folder-test.js.map
+//# sourceMappingURL=Folder-test.js.map

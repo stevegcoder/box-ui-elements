@@ -5,7 +5,6 @@
  */
 import Base from './Base';
 import { ERROR_CODE_FETCH_ACCESS_STATS } from '../constants';
-
 class FileAccessStats extends Base {
     /**
      * API URL for access stats
@@ -19,7 +18,6 @@ class FileAccessStats extends Base {
         }
         return `${this.getBaseApiUrl()}/file_access_stats/${id}`;
     }
-
     /**
      * API for fetching access stats on a file
      *
@@ -38,4 +36,4 @@ class FileAccessStats extends Base {
     }
 }
 export default FileAccessStats;
-// # sourceMappingURL=FileAccessStats.js.map
+//# sourceMappingURL=FileAccessStats.js.map

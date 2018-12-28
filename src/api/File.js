@@ -3,46 +3,19 @@
  * @file Helper for the box file API
  * @author Box
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import Item from './Item';
 import { findMissingProperties, fillMissingProperties } from '../util/fields';
 import { getTypedFileId } from '../util/file';
-import {
-    FIELD_DOWNLOAD_URL,
-    CACHE_PREFIX_FILE,
-    X_REP_HINTS,
-    ERROR_CODE_GET_DOWNLOAD_URL,
-    ERROR_CODE_FETCH_FILE,
-} from '../constants';
+import { FIELD_DOWNLOAD_URL, CACHE_PREFIX_FILE, X_REP_HINTS, ERROR_CODE_GET_DOWNLOAD_URL, ERROR_CODE_FETCH_FILE, } from '../constants';
 import { getBadItemError, getBadPermissionsError } from '../util/error';
-
-const __awaiter =
-    (this && this.__awaiter) ||
-    function(thisArg, _arguments, P, generator) {
-        return new (P || (P = Promise))((resolve, reject) => {
-            function fulfilled(value) {
-                try {
-                    step(generator.next(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function rejected(value) {
-                try {
-                    step(generator.throw(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function step(result) {
-                result.done
-                    ? resolve(result.value)
-                    : new P(resolve => {
-                          resolve(result.value);
-                      }).then(fulfilled, rejected);
-            }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-    };
 class File extends Item {
     /**
      * Creates a key for the cache
@@ -53,7 +26,6 @@ class File extends Item {
     getCacheKey(id) {
         return `${CACHE_PREFIX_FILE}${id}`;
     }
-
     /**
      * API URL for files
      *
@@ -64,7 +36,6 @@ class File extends Item {
         const suffix = id ? `/${id}` : '';
         return `${this.getBaseApiUrl()}/files${suffix}`;
     }
-
     /**
      * API for getting download URL for files
      *
@@ -79,19 +50,18 @@ class File extends Item {
         this.errorCallback = errorCallback;
         return this.xhr
             .get({
-                url: this.getUrl(id),
-                params: {
-                    fields: FIELD_DOWNLOAD_URL,
-                },
-            })
+            url: this.getUrl(id),
+            params: {
+                fields: FIELD_DOWNLOAD_URL,
+            },
+        })
             .then(({ data }) => {
-                this.successHandler(data[FIELD_DOWNLOAD_URL]);
-            })
-            .catch(e => {
-                this.errorHandler(e);
-            });
+            this.successHandler(data[FIELD_DOWNLOAD_URL]);
+        })
+            .catch((e) => {
+            this.errorHandler(e);
+        });
     }
-
     /**
      * API for setting the description of a file
      *
@@ -113,24 +83,23 @@ class File extends Item {
         }
         return this.xhr
             .put({
-                id: getTypedFileId(id),
-                url: this.getUrl(id),
-                data: { description },
-            })
+            id: getTypedFileId(id),
+            url: this.getUrl(id),
+            data: { description },
+        })
             .then(({ data }) => {
-                if (!this.isDestroyed()) {
-                    const updatedFile = this.merge(this.getCacheKey(id), 'description', data.description);
-                    successCallback(updatedFile);
-                }
-            })
+            if (!this.isDestroyed()) {
+                const updatedFile = this.merge(this.getCacheKey(id), 'description', data.description);
+                successCallback(updatedFile);
+            }
+        })
             .catch(() => {
-                if (!this.isDestroyed()) {
-                    const originalFile = this.merge(this.getCacheKey(id), 'description', file.description);
-                    errorCallback(originalFile);
-                }
-            });
+            if (!this.isDestroyed()) {
+                const originalFile = this.merge(this.getCacheKey(id), 'description', file.description);
+                errorCallback(originalFile);
+            }
+        });
     }
-
     /**
      * Gets a box file
      *
@@ -143,7 +112,7 @@ class File extends Item {
      * @return {Promise}
      */
     getFile(id, successCallback, errorCallback, options = {}) {
-        return __awaiter(this, void 0, void 0, function*() {
+        return __awaiter(this, void 0, void 0, function* () {
             if (this.isDestroyed()) {
                 return;
             }
@@ -188,16 +157,18 @@ class File extends Item {
                 // Cache check is again done since this code is executed async
                 if (cache.has(key)) {
                     cache.merge(key, dataWithMissingFields);
-                } else {
+                }
+                else {
                     // If there was nothing in the cache
                     cache.set(key, dataWithMissingFields);
                 }
                 this.successHandler(cache.get(key));
-            } catch (e) {
+            }
+            catch (e) {
                 this.errorHandler(e);
             }
         });
     }
 }
 export default File;
-// # sourceMappingURL=File.js.map
+//# sourceMappingURL=File.js.map

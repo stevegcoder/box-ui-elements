@@ -5,5 +5,5 @@ type;
     ContentPreviewProps;
 }
 from;
-('./ContentPreview');
-// # sourceMappingURL=index.js.map
+'./ContentPreview';
+//# sourceMappingURL=index.js.map

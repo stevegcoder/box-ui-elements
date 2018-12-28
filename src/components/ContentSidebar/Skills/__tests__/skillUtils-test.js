@@ -1,5 +1,4 @@
 import { hasSkills, isValidSkillsCard } from '../skillUtils';
-
 describe('components/ContentSidebar/skillUtils', () => {
     describe('isValidSkillsCard()', () => {
         test('should return false when no box skills cards', () => {
@@ -15,9 +14,7 @@ describe('components/ContentSidebar/skillUtils', () => {
             expect(isValidSkillsCard({ file_version: { id: 'fvid' } }, { file_version: {}, entries: [] })).toBeFalsy();
         });
         test('should return true when file version matches with skills', () => {
-            expect(
-                isValidSkillsCard({ file_version: { id: 'fvid' } }, { file_version: { id: 'fvid' }, entries: [] }),
-            ).toBeTruthy();
+            expect(isValidSkillsCard({ file_version: { id: 'fvid' } }, { file_version: { id: 'fvid' }, entries: [] })).toBeTruthy();
         });
     });
     describe('hasSkills()', () => {
@@ -37,103 +34,91 @@ describe('components/ContentSidebar/skillUtils', () => {
             expect(hasSkills({ metadata: { global: { boxSkillsCards: {} } } })).toBeFalsy();
         });
         test('should return false when box skills cards empty', () => {
-            expect(
-                hasSkills({
-                    metadata: { global: { boxSkillsCards: { cards: [] } } },
-                }),
-            ).toBeFalsy();
+            expect(hasSkills({
+                metadata: { global: { boxSkillsCards: { cards: [] } } },
+            })).toBeFalsy();
         });
         test('should return true when box skills cards entries empty', () => {
-            expect(
-                hasSkills({
-                    metadata: {
-                        global: {
-                            boxSkillsCards: {
-                                cards: [
-                                    {
-                                        entries: [],
-                                    },
-                                ],
-                            },
+            expect(hasSkills({
+                metadata: {
+                    global: {
+                        boxSkillsCards: {
+                            cards: [
+                                {
+                                    entries: [],
+                                },
+                            ],
                         },
                     },
-                }),
-            ).toBeTruthy();
+                },
+            })).toBeTruthy();
         });
         test('should return true when box skills cards has status error', () => {
-            expect(
-                hasSkills({
-                    metadata: {
-                        global: {
-                            boxSkillsCards: {
-                                cards: [
-                                    {
-                                        status: 'error',
-                                    },
-                                ],
-                            },
+            expect(hasSkills({
+                metadata: {
+                    global: {
+                        boxSkillsCards: {
+                            cards: [
+                                {
+                                    status: 'error',
+                                },
+                            ],
                         },
                     },
-                }),
-            ).toBeTruthy();
+                },
+            })).toBeTruthy();
         });
         test('should return true when box skills cards entries have data', () => {
-            expect(
-                hasSkills({
-                    metadata: {
-                        global: {
-                            boxSkillsCards: {
-                                cards: [
-                                    {
-                                        entries: [{}],
-                                    },
-                                ],
-                            },
+            expect(hasSkills({
+                metadata: {
+                    global: {
+                        boxSkillsCards: {
+                            cards: [
+                                {
+                                    entries: [{}],
+                                },
+                            ],
                         },
                     },
-                }),
-            ).toBeTruthy();
+                },
+            })).toBeTruthy();
         });
         test('should return true when even one box skills cards entries have data', () => {
-            expect(
-                hasSkills({
-                    metadata: {
-                        global: {
-                            boxSkillsCards: {
-                                cards: [
-                                    {
-                                        entries: [],
-                                    },
-                                    {
-                                        entries: [{}],
-                                    },
-                                ],
-                            },
+            expect(hasSkills({
+                metadata: {
+                    global: {
+                        boxSkillsCards: {
+                            cards: [
+                                {
+                                    entries: [],
+                                },
+                                {
+                                    entries: [{}],
+                                },
+                            ],
                         },
                     },
-                }),
-            ).toBeTruthy();
+                },
+            })).toBeTruthy();
         });
         test('should return true when even one box skills cards entries has error', () => {
-            expect(
-                hasSkills({
-                    metadata: {
-                        global: {
-                            boxSkillsCards: {
-                                cards: [
-                                    {
-                                        entries: [],
-                                    },
-                                    {
-                                        error: {},
-                                    },
-                                ],
-                            },
+            expect(hasSkills({
+                metadata: {
+                    global: {
+                        boxSkillsCards: {
+                            cards: [
+                                {
+                                    entries: [],
+                                },
+                                {
+                                    error: {},
+                                },
+                            ],
                         },
                     },
-                }),
-            ).toBeTruthy();
+                },
+            })).toBeTruthy();
         });
     });
 });
-// # sourceMappingURL=skillUtils-test.js.map
+//# sourceMappingURL=skillUtils-test.js.map

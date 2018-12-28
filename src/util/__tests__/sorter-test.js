@@ -1,7 +1,6 @@
 import Cache from '../Cache';
 import sort, { sortFeedItems } from '../sorter';
 import { SORT_ASC, SORT_DESC } from '../../constants';
-
 let cache;
 let item;
 describe('util/sorter', () => {
@@ -282,4 +281,4 @@ describe('util/sorter', () => {
         });
     });
 });
-// # sourceMappingURL=sorter-test.js.map
+//# sourceMappingURL=sorter-test.js.map

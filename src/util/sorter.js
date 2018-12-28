@@ -5,7 +5,6 @@
  */
 import comparator from './comparator';
 import { getBadItemError } from './error';
-
 function isSortingNeeded(order, sortBy, sortDirection) {
     return !Array.isArray(order) || !order.some(entry => entry.by === sortBy && entry.direction === sortDirection);
 }
@@ -18,7 +17,7 @@ function isSortingNeeded(order, sortBy, sortDirection) {
  * @param {Cache} cache item cache
  * @return {void}
  */
-export default function(item, sortBy, sortDirection, cache) {
+export default function (item, sortBy, sortDirection, cache) {
     const { item_collection } = item;
     if (!item_collection) {
         throw getBadItemError();
@@ -48,12 +47,12 @@ export default function(item, sortBy, sortDirection, cache) {
 export function sortFeedItems(...args) {
     const feedItems = args
         .reduce((items, itemContainer) => {
-            if (itemContainer) {
-                return items.concat(itemContainer.entries);
-            }
-            return items;
-        }, [])
+        if (itemContainer) {
+            return items.concat(itemContainer.entries);
+        }
+        return items;
+    }, [])
         .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
     return feedItems;
 }
-// # sourceMappingURL=sorter.js.map
+//# sourceMappingURL=sorter.js.map

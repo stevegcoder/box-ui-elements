@@ -11,7 +11,6 @@ import flatten from '../util/flatten';
 import { FOLDER_FIELDS_TO_FETCH } from '../util/fields';
 import { CACHE_PREFIX_SEARCH, FIELD_RELEVANCE, SORT_DESC, ERROR_CODE_SEARCH } from '../constants';
 import { getBadItemError } from '../util/error';
-
 class Search extends Base {
     constructor() {
         super(...arguments);
@@ -26,20 +25,13 @@ class Search extends Base {
                 return;
             }
             const { entries, total_count, limit, offset } = data;
-            if (
-                !Array.isArray(entries) ||
+            if (!Array.isArray(entries) ||
                 typeof total_count !== 'number' ||
                 typeof limit !== 'number' ||
-                typeof offset !== 'number'
-            ) {
+                typeof offset !== 'number') {
                 throw getBadItemError();
             }
-            const flattened = flatten(
-                entries,
-                new FolderAPI(this.options),
-                new FileAPI(this.options),
-                new WebLinkAPI(this.options),
-            );
+            const flattened = flatten(entries, new FolderAPI(this.options), new FileAPI(this.options), new WebLinkAPI(this.options));
             this.itemCache = (this.itemCache || []).concat(flattened);
             this.getCache().set(this.key, {
                 item_collection: Object.assign({}, data, {
@@ -54,14 +46,13 @@ class Search extends Base {
          * @param {Error} error fetch error
          * @return {void}
          */
-        this.searchErrorHandler = error => {
+        this.searchErrorHandler = (error) => {
             if (this.isDestroyed()) {
                 return;
             }
             this.errorCallback(error, this.errorCode);
         };
     }
-
     /**
      * Creates a key for the cache
      *
@@ -72,7 +63,6 @@ class Search extends Base {
     getEncodedQuery(query) {
         return encodeURIComponent(query);
     }
-
     /**
      * Creates a key for the cache
      *
@@ -83,7 +73,6 @@ class Search extends Base {
     getCacheKey(id, query) {
         return `${CACHE_PREFIX_SEARCH}${id}|${query}`;
     }
-
     /**
      * URL for search api
      *
@@ -93,7 +82,6 @@ class Search extends Base {
     getUrl() {
         return `${this.getBaseApiUrl()}/search`;
     }
-
     /**
      * Tells if a search results has its items all loaded
      *
@@ -103,7 +91,6 @@ class Search extends Base {
         const cache = this.getCache();
         return cache.has(this.key);
     }
-
     /**
      * Returns the results
      *
@@ -125,7 +112,7 @@ class Search extends Base {
         }
         const collection = {
             id: this.id,
-            items: entries.map(key => cache.get(key)),
+            items: entries.map((key) => cache.get(key)),
             offset: this.offset,
             percentLoaded: 100,
             sortBy: FIELD_RELEVANCE,
@@ -134,7 +121,6 @@ class Search extends Base {
         };
         this.successCallback(collection);
     }
-
     /**
      * Does the network request
      *
@@ -147,19 +133,18 @@ class Search extends Base {
         this.errorCode = ERROR_CODE_SEARCH;
         return this.xhr
             .get({
-                url: this.getUrl(),
-                params: {
-                    offset: this.offset,
-                    query: this.query,
-                    ancestor_folder_ids: this.id,
-                    limit: this.limit,
-                    fields: FOLDER_FIELDS_TO_FETCH.toString(),
-                },
-            })
+            url: this.getUrl(),
+            params: {
+                offset: this.offset,
+                query: this.query,
+                ancestor_folder_ids: this.id,
+                limit: this.limit,
+                fields: FOLDER_FIELDS_TO_FETCH.toString(),
+            },
+        })
             .then(this.searchSuccessHandler)
             .catch(this.searchErrorHandler);
     }
-
     /**
      * Gets search results
      *
@@ -198,4 +183,4 @@ class Search extends Base {
     }
 }
 export default Search;
-// # sourceMappingURL=Search.js.map
+//# sourceMappingURL=Search.js.map

@@ -1,30 +1,26 @@
 import { withData } from 'leche';
 import browser from '../Browser';
-
 describe('util/Browser/isMobile()', () => {
     test('should return false if not mobile', () => {
         browser.getUserAgent = jest.fn().mockReturnValueOnce('foobar');
         expect(browser.isMobile()).toBeFalsy();
     });
-    withData(
-        {
-            ipad: 'ipad',
-            iphone: 'iphone',
-            ipod: 'ipod',
-            android: 'android',
-            blackberry: 'blackberry',
-            bb10: 'bb10',
-            mini: 'mini',
-            'window ce': 'windows ce',
-            palm: 'palm',
-        },
-        device => {
-            test(`should return true for ${device}`, () => {
-                browser.getUserAgent = jest.fn().mockReturnValueOnce(device);
-                expect(browser.isMobile()).toBeTruthy();
-            });
-        },
-    );
+    withData({
+        ipad: 'ipad',
+        iphone: 'iphone',
+        ipod: 'ipod',
+        android: 'android',
+        blackberry: 'blackberry',
+        bb10: 'bb10',
+        mini: 'mini',
+        'window ce': 'windows ce',
+        palm: 'palm',
+    }, device => {
+        test(`should return true for ${device}`, () => {
+            browser.getUserAgent = jest.fn().mockReturnValueOnce(device);
+            expect(browser.isMobile()).toBeTruthy();
+        });
+    });
 });
 describe('util/Browser/isIE()', () => {
     test('should return true if IE', () => {
@@ -58,4 +54,4 @@ describe('util/Browser/canPlayDash()', () => {
         expect(isTypeSupportedMock).toHaveBeenCalledWith('video/mp4; codecs="avc1.64001E"');
     });
 });
-// # sourceMappingURL=Browser-test.js.map
+//# sourceMappingURL=Browser-test.js.map

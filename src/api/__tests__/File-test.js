@@ -1,37 +1,15 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import File from '../File';
 import Cache from '../../util/Cache';
 import * as fields from '../../util/fields';
 import { X_REP_HINTS, ERROR_CODE_FETCH_FILE, ERROR_CODE_GET_DOWNLOAD_URL } from '../../constants';
-
-const __awaiter =
-    (this && this.__awaiter) ||
-    function(thisArg, _arguments, P, generator) {
-        return new (P || (P = Promise))((resolve, reject) => {
-            function fulfilled(value) {
-                try {
-                    step(generator.next(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function rejected(value) {
-                try {
-                    step(generator.throw(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function step(result) {
-                result.done
-                    ? resolve(result.value)
-                    : new P(resolve => {
-                          resolve(result.value);
-                      }).then(fulfilled, rejected);
-            }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-    };
-
 jest.mock('../../util/file', () => ({
     getTypedFileId: jest.fn().mockReturnValue('file_id'),
 }));
@@ -245,194 +223,186 @@ describe('api/File', () => {
         });
     });
     describe('getFile()', () => {
-        test('should not do anything if destroyed', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                file.isDestroyed = jest.fn().mockReturnValueOnce(true);
-                file.getCache = jest.fn();
-                file.getCacheKey = jest.fn();
-                file.xhr = null;
-                const success = jest.fn();
-                const error = jest.fn();
-                yield file.getFile('id', success, error);
-                expect(file.getCache).not.toHaveBeenCalled();
-                expect(file.getCacheKey).not.toHaveBeenCalled();
-                expect(success).not.toHaveBeenCalled();
-                expect(error).not.toHaveBeenCalled();
-            }));
-        test('should return cached file', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                cache.set('key', 'file');
-                file.xhr = null;
-                file.options = { cache };
-                file.getCache = jest.fn().mockReturnValueOnce(cache);
-                file.getCacheKey = jest.fn().mockReturnValueOnce('key');
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
-                const success = jest.fn();
-                yield file.getFile('id', success);
-                expect(file.getCacheKey).toHaveBeenCalledWith('id');
-                expect(success).toHaveBeenCalledWith('file');
-                expect(fields.findMissingProperties).toHaveBeenCalledWith('file', undefined);
-            }));
-        test('should make xhr to get file when cached if missing fields', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                cache.set('key', { id: '123' });
-                file.options = { cache };
-                file.getCache = jest.fn().mockReturnValueOnce(cache);
-                file.getCacheKey = jest.fn().mockReturnValueOnce('key');
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce(['missing1', 'missing2']);
-                fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: '123', foo: 'bar', missing: null });
-                file.xhr = {
-                    get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { foo: 'bar' } })),
-                };
-                const success = jest.fn();
-                yield file.getFile('id', success);
-                expect(success).toHaveBeenCalledWith({
-                    id: '123',
-                    foo: 'bar',
-                    missing: null,
-                });
-                expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: '123' }, undefined);
-                expect(fields.fillMissingProperties).toHaveBeenCalledWith({ foo: 'bar' }, ['missing1', 'missing2']);
-                expect(file.xhr.get).toHaveBeenCalledWith({
-                    id: 'file_id',
-                    url: 'https://api.box.com/2.0/files/id',
-                    params: {
-                        fields: 'missing1,missing2',
-                    },
-                    headers: {
-                        'X-Rep-Hints': X_REP_HINTS,
-                    },
-                });
-            }));
-        test('should make xhr to get file and call success callback when missing fields', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                file.options = { cache };
-                file.getCache = jest.fn().mockReturnValueOnce(cache);
-                file.getCacheKey = jest.fn().mockReturnValueOnce('key');
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce(['missing1', 'missing2']);
-                fields.fillMissingProperties = jest.fn().mockReturnValueOnce('new file');
-                file.xhr = {
-                    get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: 'new file' })),
-                };
-                const success = jest.fn();
-                yield file.getFile('id', success);
-                expect(success).toHaveBeenCalledWith('new file');
-                expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: 'id' }, undefined);
-                expect(fields.fillMissingProperties).toHaveBeenCalledWith('new file', ['missing1', 'missing2']);
-                expect(file.xhr.get).toHaveBeenCalledWith({
-                    id: 'file_id',
-                    url: 'https://api.box.com/2.0/files/id',
-                    params: {
-                        fields: 'missing1,missing2',
-                    },
-                    headers: {
-                        'X-Rep-Hints': X_REP_HINTS,
-                    },
-                });
-            }));
-        test('should make xhr to get file and not call success callback when destroyed', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
-                file.isDestroyed = jest
-                    .fn()
-                    .mockReturnValueOnce(false)
-                    .mockReturnValueOnce(true);
-                file.xhr = {
-                    get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { file: 'new file' } })),
-                };
-                const success = jest.fn();
-                yield file.getFile('id', success);
-                expect(success).not.toHaveBeenCalled();
-                expect(file.xhr.get).toHaveBeenCalledWith({
-                    id: 'file_id',
-                    url: 'https://api.box.com/2.0/files/id',
-                    headers: {
-                        'X-Rep-Hints': X_REP_HINTS,
-                    },
-                });
-            }));
-        test('should call error callback when xhr fails', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                const error = new Error('error');
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
-                file.xhr = {
-                    get: jest.fn().mockReturnValueOnce(Promise.reject(error)),
-                };
-                const successCb = jest.fn();
-                const errorCb = jest.fn();
-                yield file.getFile('id', successCb, errorCb, {
-                    forceFetch: false,
-                    includePreviewSidebarFields: true,
-                });
-                expect(successCb).not.toHaveBeenCalled();
-                expect(errorCb).toHaveBeenCalledWith(error, ERROR_CODE_FETCH_FILE);
-                expect(file.xhr.get).toHaveBeenCalledWith({
-                    id: 'file_id',
-                    url: 'https://api.box.com/2.0/files/id',
-                    headers: {
-                        'X-Rep-Hints': X_REP_HINTS,
-                    },
-                });
-            }));
-        test('should make xhr to get file when forced to clear cache', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                cache.set('key', { id: '123' });
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
-                fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: '123', foo: 'bar' });
-                file.options = { cache };
-                file.getCache = jest.fn().mockReturnValueOnce(cache);
-                file.getCacheKey = jest.fn().mockReturnValueOnce('key');
-                file.xhr = {
-                    get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { foo: 'bar' } })),
-                };
-                const success = jest.fn();
-                yield file.getFile('id', success, 'error', { forceFetch: true });
-                expect(file.getCacheKey).toHaveBeenCalledWith('id');
-                expect(success).toHaveBeenCalledWith({ id: '123', foo: 'bar' });
-                expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: 'id' }, undefined);
-                expect(fields.fillMissingProperties).toHaveBeenCalledWith({ foo: 'bar' }, []);
-                expect(file.xhr.get).toHaveBeenCalledWith({
-                    id: 'file_id',
-                    url: 'https://api.box.com/2.0/files/id',
-                    headers: {
-                        'X-Rep-Hints': X_REP_HINTS,
-                    },
-                });
-            }));
-        test('should make xhr to get file even with cached file when asked to update cache', () =>
-            __awaiter(this, void 0, void 0, function*() {
-                cache.set('key', { id: '123' });
-                fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
-                fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: 'new', foo: 'bar', missing: null });
-                file.options = { cache };
-                file.getCache = jest.fn().mockReturnValueOnce(cache);
-                file.getCacheKey = jest.fn().mockReturnValueOnce('key');
-                file.xhr = {
-                    get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { id: 'new', foo: 'bar' } })),
-                };
-                const success = jest.fn();
-                yield file.getFile('id', success, 'error', {
-                    forceFetch: false,
-                    refreshCache: true,
-                });
-                expect(file.getCacheKey).toHaveBeenCalledWith('id');
-                expect(success).toHaveBeenCalledTimes(2);
-                expect(success).toHaveBeenNthCalledWith(1, { id: '123' });
-                expect(success).toHaveBeenNthCalledWith(2, {
-                    id: 'new',
-                    foo: 'bar',
-                    missing: null,
-                });
-                expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: '123' }, undefined);
-                expect(fields.fillMissingProperties).toHaveBeenCalledWith({ id: 'new', foo: 'bar' }, []);
-                expect(file.xhr.get).toHaveBeenCalledWith({
-                    id: 'file_id',
-                    url: 'https://api.box.com/2.0/files/id',
-                    headers: {
-                        'X-Rep-Hints': X_REP_HINTS,
-                    },
-                });
-            }));
+        test('should not do anything if destroyed', () => __awaiter(this, void 0, void 0, function* () {
+            file.isDestroyed = jest.fn().mockReturnValueOnce(true);
+            file.getCache = jest.fn();
+            file.getCacheKey = jest.fn();
+            file.xhr = null;
+            const success = jest.fn();
+            const error = jest.fn();
+            yield file.getFile('id', success, error);
+            expect(file.getCache).not.toHaveBeenCalled();
+            expect(file.getCacheKey).not.toHaveBeenCalled();
+            expect(success).not.toHaveBeenCalled();
+            expect(error).not.toHaveBeenCalled();
+        }));
+        test('should return cached file', () => __awaiter(this, void 0, void 0, function* () {
+            cache.set('key', 'file');
+            file.xhr = null;
+            file.options = { cache };
+            file.getCache = jest.fn().mockReturnValueOnce(cache);
+            file.getCacheKey = jest.fn().mockReturnValueOnce('key');
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
+            const success = jest.fn();
+            yield file.getFile('id', success);
+            expect(file.getCacheKey).toHaveBeenCalledWith('id');
+            expect(success).toHaveBeenCalledWith('file');
+            expect(fields.findMissingProperties).toHaveBeenCalledWith('file', undefined);
+        }));
+        test('should make xhr to get file when cached if missing fields', () => __awaiter(this, void 0, void 0, function* () {
+            cache.set('key', { id: '123' });
+            file.options = { cache };
+            file.getCache = jest.fn().mockReturnValueOnce(cache);
+            file.getCacheKey = jest.fn().mockReturnValueOnce('key');
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce(['missing1', 'missing2']);
+            fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: '123', foo: 'bar', missing: null });
+            file.xhr = {
+                get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { foo: 'bar' } })),
+            };
+            const success = jest.fn();
+            yield file.getFile('id', success);
+            expect(success).toHaveBeenCalledWith({
+                id: '123',
+                foo: 'bar',
+                missing: null,
+            });
+            expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: '123' }, undefined);
+            expect(fields.fillMissingProperties).toHaveBeenCalledWith({ foo: 'bar' }, ['missing1', 'missing2']);
+            expect(file.xhr.get).toHaveBeenCalledWith({
+                id: 'file_id',
+                url: 'https://api.box.com/2.0/files/id',
+                params: {
+                    fields: 'missing1,missing2',
+                },
+                headers: {
+                    'X-Rep-Hints': X_REP_HINTS,
+                },
+            });
+        }));
+        test('should make xhr to get file and call success callback when missing fields', () => __awaiter(this, void 0, void 0, function* () {
+            file.options = { cache };
+            file.getCache = jest.fn().mockReturnValueOnce(cache);
+            file.getCacheKey = jest.fn().mockReturnValueOnce('key');
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce(['missing1', 'missing2']);
+            fields.fillMissingProperties = jest.fn().mockReturnValueOnce('new file');
+            file.xhr = {
+                get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: 'new file' })),
+            };
+            const success = jest.fn();
+            yield file.getFile('id', success);
+            expect(success).toHaveBeenCalledWith('new file');
+            expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: 'id' }, undefined);
+            expect(fields.fillMissingProperties).toHaveBeenCalledWith('new file', ['missing1', 'missing2']);
+            expect(file.xhr.get).toHaveBeenCalledWith({
+                id: 'file_id',
+                url: 'https://api.box.com/2.0/files/id',
+                params: {
+                    fields: 'missing1,missing2',
+                },
+                headers: {
+                    'X-Rep-Hints': X_REP_HINTS,
+                },
+            });
+        }));
+        test('should make xhr to get file and not call success callback when destroyed', () => __awaiter(this, void 0, void 0, function* () {
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
+            file.isDestroyed = jest
+                .fn()
+                .mockReturnValueOnce(false)
+                .mockReturnValueOnce(true);
+            file.xhr = {
+                get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { file: 'new file' } })),
+            };
+            const success = jest.fn();
+            yield file.getFile('id', success);
+            expect(success).not.toHaveBeenCalled();
+            expect(file.xhr.get).toHaveBeenCalledWith({
+                id: 'file_id',
+                url: 'https://api.box.com/2.0/files/id',
+                headers: {
+                    'X-Rep-Hints': X_REP_HINTS,
+                },
+            });
+        }));
+        test('should call error callback when xhr fails', () => __awaiter(this, void 0, void 0, function* () {
+            const error = new Error('error');
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
+            file.xhr = {
+                get: jest.fn().mockReturnValueOnce(Promise.reject(error)),
+            };
+            const successCb = jest.fn();
+            const errorCb = jest.fn();
+            yield file.getFile('id', successCb, errorCb, {
+                forceFetch: false,
+                includePreviewSidebarFields: true,
+            });
+            expect(successCb).not.toHaveBeenCalled();
+            expect(errorCb).toHaveBeenCalledWith(error, ERROR_CODE_FETCH_FILE);
+            expect(file.xhr.get).toHaveBeenCalledWith({
+                id: 'file_id',
+                url: 'https://api.box.com/2.0/files/id',
+                headers: {
+                    'X-Rep-Hints': X_REP_HINTS,
+                },
+            });
+        }));
+        test('should make xhr to get file when forced to clear cache', () => __awaiter(this, void 0, void 0, function* () {
+            cache.set('key', { id: '123' });
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
+            fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: '123', foo: 'bar' });
+            file.options = { cache };
+            file.getCache = jest.fn().mockReturnValueOnce(cache);
+            file.getCacheKey = jest.fn().mockReturnValueOnce('key');
+            file.xhr = {
+                get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { foo: 'bar' } })),
+            };
+            const success = jest.fn();
+            yield file.getFile('id', success, 'error', { forceFetch: true });
+            expect(file.getCacheKey).toHaveBeenCalledWith('id');
+            expect(success).toHaveBeenCalledWith({ id: '123', foo: 'bar' });
+            expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: 'id' }, undefined);
+            expect(fields.fillMissingProperties).toHaveBeenCalledWith({ foo: 'bar' }, []);
+            expect(file.xhr.get).toHaveBeenCalledWith({
+                id: 'file_id',
+                url: 'https://api.box.com/2.0/files/id',
+                headers: {
+                    'X-Rep-Hints': X_REP_HINTS,
+                },
+            });
+        }));
+        test('should make xhr to get file even with cached file when asked to update cache', () => __awaiter(this, void 0, void 0, function* () {
+            cache.set('key', { id: '123' });
+            fields.findMissingProperties = jest.fn().mockReturnValueOnce([]);
+            fields.fillMissingProperties = jest.fn().mockReturnValueOnce({ id: 'new', foo: 'bar', missing: null });
+            file.options = { cache };
+            file.getCache = jest.fn().mockReturnValueOnce(cache);
+            file.getCacheKey = jest.fn().mockReturnValueOnce('key');
+            file.xhr = {
+                get: jest.fn().mockReturnValueOnce(Promise.resolve({ data: { id: 'new', foo: 'bar' } })),
+            };
+            const success = jest.fn();
+            yield file.getFile('id', success, 'error', {
+                forceFetch: false,
+                refreshCache: true,
+            });
+            expect(file.getCacheKey).toHaveBeenCalledWith('id');
+            expect(success).toHaveBeenCalledTimes(2);
+            expect(success).toHaveBeenNthCalledWith(1, { id: '123' });
+            expect(success).toHaveBeenNthCalledWith(2, {
+                id: 'new',
+                foo: 'bar',
+                missing: null,
+            });
+            expect(fields.findMissingProperties).toHaveBeenCalledWith({ id: '123' }, undefined);
+            expect(fields.fillMissingProperties).toHaveBeenCalledWith({ id: 'new', foo: 'bar' }, []);
+            expect(file.xhr.get).toHaveBeenCalledWith({
+                id: 'file_id',
+                url: 'https://api.box.com/2.0/files/id',
+                headers: {
+                    'X-Rep-Hints': X_REP_HINTS,
+                },
+            });
+        }));
     });
 });
-// # sourceMappingURL=File-test.js.map
+//# sourceMappingURL=File-test.js.map

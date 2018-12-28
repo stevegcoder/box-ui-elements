@@ -270,4 +270,4 @@ export const VERSION_UPLOAD_ACTION = 'upload';
 export const PLACEHOLDER_USER = { type: 'user', id: '2', name: '' };
 /* ------------------ Integrations ------------------------- */
 export const APP_INTEGRATION = 'app_integration';
-// # sourceMappingURL=constants.js.map
+//# sourceMappingURL=constants.js.map

@@ -3,7 +3,6 @@
  * @file Activity feed utility methods
  */
 import { PLACEHOLDER_USER } from '../../../../constants';
-
 export const ItemTypes = {
     fileVersion: 'file_version',
     upload: 'upload',
@@ -17,18 +16,11 @@ export function collapseFeedState(feedState) {
         if (!previousFeedItem) {
             return collapsedFeedState.concat([feedItem]);
         }
-        if (
-            feedItem.type === ItemTypes.fileVersion &&
+        if (feedItem.type === ItemTypes.fileVersion &&
             previousFeedItem.type === ItemTypes.fileVersion &&
             feedItem.action === ItemTypes.upload &&
-            previousFeedItem.action === ItemTypes.upload
-        ) {
-            const {
-                modified_by: tmpModifiedBy,
-                versions = [previousFeedItem],
-                version_start = parseInt(previousFeedItem.version_number, 10),
-                version_end = parseInt(previousFeedItem.version_number, 10),
-            } = previousFeedItem;
+            previousFeedItem.action === ItemTypes.upload) {
+            const { modified_by: tmpModifiedBy, versions = [previousFeedItem], version_start = parseInt(previousFeedItem.version_number, 10), version_end = parseInt(previousFeedItem.version_number, 10), } = previousFeedItem;
             const prevModifiedBy = tmpModifiedBy || PLACEHOLDER_USER;
             const { action, modified_by: tmpCurModifiedBy, created_at, trashed_at, id, version_number } = feedItem;
             const parsedVersionNumber = parseInt(version_number, 10);
@@ -57,4 +49,4 @@ export function collapseFeedState(feedState) {
         return collapsedFeedState.concat([previousFeedItem, feedItem]);
     }, []);
 }
-// # sourceMappingURL=activityFeedUtils.js.map
+//# sourceMappingURL=activityFeedUtils.js.map

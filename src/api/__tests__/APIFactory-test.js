@@ -15,7 +15,6 @@ import MetadataAPI from '../Metadata';
 import FileCollaboratorsAPI from '../FileCollaborators';
 import UsersAPI from '../Users';
 import { DEFAULT_HOSTNAME_API, DEFAULT_HOSTNAME_UPLOAD } from '../../constants';
-
 let factory;
 describe('api/APIFactory', () => {
     beforeEach(() => {
@@ -297,4 +296,4 @@ describe('api/APIFactory', () => {
         });
     });
 });
-// # sourceMappingURL=APIFactory-test.js.map
+//# sourceMappingURL=APIFactory-test.js.map

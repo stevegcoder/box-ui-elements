@@ -1,5 +1,4 @@
 import Versions from '../Versions';
-
 let versions;
 describe('api/Versions', () => {
     beforeEach(() => {
@@ -48,4 +47,4 @@ describe('api/Versions', () => {
         });
     });
 });
-// # sourceMappingURL=Versions-test.js.map
+//# sourceMappingURL=Versions-test.js.map

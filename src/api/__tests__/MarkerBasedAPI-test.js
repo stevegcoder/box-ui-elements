@@ -1,5 +1,4 @@
 import MarkerBasedAPI from '../MarkerBasedAPI';
-
 const LIMIT = 1000;
 describe('api/MarkerBasedAPI', () => {
     let markerBasedAPI;
@@ -33,20 +32,16 @@ describe('api/MarkerBasedAPI', () => {
             markerBasedAPI.xhr = {
                 get: jest
                     .fn()
-                    .mockReturnValueOnce(
-                        Promise.resolve({
-                            data: {
-                                next_marker: 'next_marker',
-                                limit: LIMIT,
-                                entries: [],
-                            },
-                        }),
-                    )
-                    .mockReturnValueOnce(
-                        Promise.resolve({
-                            data: markerBasedAPIResponse,
-                        }),
-                    ),
+                    .mockReturnValueOnce(Promise.resolve({
+                    data: {
+                        next_marker: 'next_marker',
+                        limit: LIMIT,
+                        entries: [],
+                    },
+                }))
+                    .mockReturnValueOnce(Promise.resolve({
+                    data: markerBasedAPIResponse,
+                })),
             };
             return markerBasedAPI.markerGetRequest('id', 'next_marker', LIMIT, true).then(() => {
                 expect(markerBasedAPI.xhr.get).toHaveBeenCalledTimes(2);
@@ -56,11 +51,9 @@ describe('api/MarkerBasedAPI', () => {
         });
         test('should do one xhr call and call successHandler once', () => {
             markerBasedAPI.xhr = {
-                get: jest.fn().mockReturnValue(
-                    Promise.resolve({
-                        data: markerBasedAPIResponse,
-                    }),
-                ),
+                get: jest.fn().mockReturnValue(Promise.resolve({
+                    data: markerBasedAPIResponse,
+                })),
             };
             return markerBasedAPI.markerGetRequest('id', 'next_marker', LIMIT, true).then(() => {
                 expect(markerBasedAPI.xhr.get).toHaveBeenCalledTimes(1);
@@ -80,14 +73,14 @@ describe('api/MarkerBasedAPI', () => {
             markerBasedAPI.xhr = null;
             return markerBasedAPI
                 .markerGet({
-                    id: 'id',
-                    successCallback,
-                    errorCallback,
-                })
+                id: 'id',
+                successCallback,
+                errorCallback,
+            })
                 .catch(() => {
-                    expect(successCallback).not.toHaveBeenCalled();
-                    expect(errorCallback).not.toHaveBeenCalled();
-                });
+                expect(successCallback).not.toHaveBeenCalled();
+                expect(errorCallback).not.toHaveBeenCalled();
+            });
         });
         test('should make xhr to get markerBasedAPI and call success callback', () => {
             const requestData = {
@@ -99,24 +92,24 @@ describe('api/MarkerBasedAPI', () => {
             markerBasedAPI.marker = '';
             return markerBasedAPI
                 .markerGet({
-                    id: 'id',
-                    successCallback,
-                    errorCallback,
-                    marker: 'next_marker',
-                    limit: LIMIT,
-                    shouldFetchAll: true,
-                    requestData,
-                })
+                id: 'id',
+                successCallback,
+                errorCallback,
+                marker: 'next_marker',
+                limit: LIMIT,
+                shouldFetchAll: true,
+                requestData,
+            })
                 .then(() => {
-                    expect(successCallback).toHaveBeenCalledWith(markerBasedAPIResponse);
-                    expect(successCallback).toHaveBeenCalledTimes(1);
-                    expect(errorCallback).not.toHaveBeenCalled();
-                    expect(markerBasedAPI.xhr.get).toHaveBeenCalledWith({
-                        id: 'file_id',
-                        url,
-                        params: Object.assign({ marker: 'next_marker', limit: LIMIT }, requestData),
-                    });
+                expect(successCallback).toHaveBeenCalledWith(markerBasedAPIResponse);
+                expect(successCallback).toHaveBeenCalledTimes(1);
+                expect(errorCallback).not.toHaveBeenCalled();
+                expect(markerBasedAPI.xhr.get).toHaveBeenCalledWith({
+                    id: 'file_id',
+                    url,
+                    params: Object.assign({ marker: 'next_marker', limit: LIMIT }, requestData),
                 });
+            });
         });
         test('should call error callback when xhr fails', () => {
             const error = new Error('error');
@@ -125,27 +118,27 @@ describe('api/MarkerBasedAPI', () => {
             };
             return markerBasedAPI
                 .markerGet({
-                    id: 'id',
-                    successCallback,
-                    errorCallback,
-                    marker: '',
-                    limit: LIMIT,
-                    shouldFetchAll: true,
-                    errorCode,
-                })
+                id: 'id',
+                successCallback,
+                errorCallback,
+                marker: '',
+                limit: LIMIT,
+                shouldFetchAll: true,
+                errorCode,
+            })
                 .then(() => {
-                    expect(successCallback).not.toHaveBeenCalled();
-                    expect(errorCallback).toHaveBeenCalledWith(error, errorCode);
-                    expect(markerBasedAPI.xhr.get).toHaveBeenCalledWith({
-                        id: 'file_id',
-                        url,
-                        params: {
-                            marker: '',
-                            limit: LIMIT,
-                        },
-                    });
+                expect(successCallback).not.toHaveBeenCalled();
+                expect(errorCallback).toHaveBeenCalledWith(error, errorCode);
+                expect(markerBasedAPI.xhr.get).toHaveBeenCalledWith({
+                    id: 'file_id',
+                    url,
+                    params: {
+                        marker: '',
+                        limit: LIMIT,
+                    },
                 });
+            });
         });
     });
 });
-// # sourceMappingURL=MarkerBasedAPI-test.js.map
+//# sourceMappingURL=MarkerBasedAPI-test.js.map

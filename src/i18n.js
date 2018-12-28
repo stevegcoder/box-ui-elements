@@ -9,4 +9,4 @@ import boxReactUILocaleData from 'box-react-ui-locale-data'; // eslint-disable-l
 const language = __LANGUAGE__;
 const messages = Object.assign({}, uiElementsLocaleData, boxReactUILocaleData);
 export default { language, messages, localeData };
-// # sourceMappingURL=i18n.js.map
+//# sourceMappingURL=i18n.js.map

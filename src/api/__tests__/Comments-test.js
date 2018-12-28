@@ -1,7 +1,6 @@
 import Comments from '../Comments';
 import { PERMISSION_CAN_COMMENT, PERMISSION_CAN_DELETE, PERMISSION_CAN_EDIT } from '../../constants';
 import { COMMENTS_FIELDS_TO_FETCH } from '../../util/fields';
-
 let comments;
 describe('api/Comments', () => {
     beforeEach(() => {
@@ -200,17 +199,9 @@ describe('api/Comments', () => {
                     [PERMISSION_CAN_COMMENT]: true,
                 };
                 comments.getComments(file.id, permissions, successCallback, errorCallback);
-                expect(comments.offsetGet).toBeCalledWith(
-                    'foo',
-                    successCallback,
-                    errorCallback,
-                    undefined,
-                    undefined,
-                    COMMENTS_FIELDS_TO_FETCH,
-                    undefined,
-                );
+                expect(comments.offsetGet).toBeCalledWith('foo', successCallback, errorCallback, undefined, undefined, COMMENTS_FIELDS_TO_FETCH, undefined);
             });
         });
     });
 });
-// # sourceMappingURL=Comments-test.js.map
+//# sourceMappingURL=Comments-test.js.map

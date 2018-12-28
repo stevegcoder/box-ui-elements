@@ -3,7 +3,6 @@ import IconFileDefault from 'box-react-ui/lib/icons/file/IconFileDefault';
 import IconGoogleDocs from 'box-react-ui/lib/icons/google-docs/IconGoogleDocs';
 import IconGoogleSheets from 'box-react-ui/lib/icons/google-docs/IconGoogleSheets';
 import IconGoogleSlides from 'box-react-ui/lib/icons/google-docs/IconGoogleSlides';
-
 const ICON_FILE_MAP = {
     default: IconFileDefault,
     'Adobe Sign': IconAdobeSign,
@@ -12,4 +11,4 @@ const ICON_FILE_MAP = {
     'Google Slides': IconGoogleSlides,
 };
 export default ICON_FILE_MAP;
-// # sourceMappingURL=IconFileMap.js.map
+//# sourceMappingURL=IconFileMap.js.map

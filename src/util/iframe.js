@@ -11,9 +11,7 @@
  * @return {HTMLIFrameElement} Iframe
  */
 function createDownloadIframe() {
-    let iframe = document.querySelector('#boxdownloadiframe'),
-        any,
-        HTMLIFrameElement;
+    let iframe = ((document.querySelector('#boxdownloadiframe'))), any, HTMLIFrameElement;
     if (!iframe) {
         // if no existing iframe create a new one
         iframe = document.createElement('iframe');
@@ -39,4 +37,4 @@ export default function openUrlInsideIframe(url) {
     iframe.src = url;
     return iframe;
 }
-// # sourceMappingURL=iframe.js.map
+//# sourceMappingURL=iframe.js.map

@@ -11,7 +11,6 @@ import WebLinkAPI from './WebLink';
 import { FOLDER_FIELDS_TO_FETCH } from '../util/fields';
 import { CACHE_PREFIX_FOLDER, ERROR_CODE_FETCH_FOLDER, ERROR_CODE_CREATE_FOLDER } from '../constants';
 import { getBadItemError } from '../util/error';
-
 class Folder extends Item {
     constructor() {
         super(...arguments);
@@ -30,29 +29,19 @@ class Folder extends Item {
                 throw getBadItemError();
             }
             const { entries, total_count, limit, offset } = item_collection;
-            if (
-                !Array.isArray(entries) ||
+            if (!Array.isArray(entries) ||
                 typeof total_count !== 'number' ||
                 typeof limit !== 'number' ||
-                typeof offset !== 'number'
-            ) {
+                typeof offset !== 'number') {
                 throw getBadItemError();
             }
-            const flattened = flatten(
-                entries,
-                new Folder(this.options),
-                new FileAPI(this.options),
-                new WebLinkAPI(this.options),
-            );
+            const flattened = flatten(entries, new Folder(this.options), new FileAPI(this.options), new WebLinkAPI(this.options));
             this.itemCache = (this.itemCache || []).concat(flattened);
-            this.getCache().set(
-                this.key,
-                Object.assign({}, data, {
-                    item_collection: Object.assign({}, item_collection, {
-                        entries: this.itemCache,
-                    }),
+            this.getCache().set(this.key, Object.assign({}, data, {
+                item_collection: Object.assign({}, item_collection, {
+                    entries: this.itemCache,
                 }),
-            );
+            }));
             this.finish();
         };
         /**
@@ -90,7 +79,6 @@ class Folder extends Item {
             this.successCallback(data);
         };
     }
-
     /**
      * Creates a key for the cache
      *
@@ -100,7 +88,6 @@ class Folder extends Item {
     getCacheKey(id) {
         return `${CACHE_PREFIX_FOLDER}${id}`;
     }
-
     /**
      * Base URL for folder api
      *
@@ -111,7 +98,6 @@ class Folder extends Item {
         const suffix = id ? `/${id}` : '';
         return `${this.getBaseApiUrl()}/folders${suffix}`;
     }
-
     /**
      * Tells if a folder has its items all loaded
      *
@@ -121,7 +107,6 @@ class Folder extends Item {
         const cache = this.getCache();
         return cache.has(this.key);
     }
-
     /**
      * Composes and returns the results
      *
@@ -149,14 +134,13 @@ class Folder extends Item {
             permissions,
             boxItem: folder,
             breadcrumbs: path_collection.entries,
-            items: entries.map(key => cache.get(key)),
+            items: entries.map((key) => cache.get(key)),
             sortBy: this.sortBy,
             sortDirection: this.sortDirection,
             totalCount: total_count,
         };
         this.successCallback(collection);
     }
-
     /**
      * Does the network request for fetching a folder
      *
@@ -169,19 +153,18 @@ class Folder extends Item {
         this.errorCode = ERROR_CODE_FETCH_FOLDER;
         return this.xhr
             .get({
-                url: this.getUrl(this.id),
-                params: {
-                    direction: this.sortDirection.toLowerCase(),
-                    limit: this.limit,
-                    offset: this.offset,
-                    fields: FOLDER_FIELDS_TO_FETCH.toString(),
-                    sort: this.sortBy.toLowerCase(),
-                },
-            })
+            url: this.getUrl(this.id),
+            params: {
+                direction: this.sortDirection.toLowerCase(),
+                limit: this.limit,
+                offset: this.offset,
+                fields: FOLDER_FIELDS_TO_FETCH.toString(),
+                sort: this.sortBy.toLowerCase(),
+            },
+        })
             .then(this.folderSuccessHandler)
             .catch(this.errorHandler);
     }
-
     /**
      * Gets a box folder and its items
      *
@@ -222,7 +205,6 @@ class Folder extends Item {
         // Make the XHR request
         this.folderRequest();
     }
-
     /**
      * Does the network request for fetching a folder
      *
@@ -236,18 +218,17 @@ class Folder extends Item {
         const url = `${this.getUrl()}?fields=${FOLDER_FIELDS_TO_FETCH.toString()}`;
         return this.xhr
             .post({
-                url,
-                data: {
-                    name,
-                    parent: {
-                        id: this.id,
-                    },
+            url,
+            data: {
+                name,
+                parent: {
+                    id: this.id,
                 },
-            })
+            },
+        })
             .then(this.createSuccessHandler)
             .catch(this.errorHandler);
     }
-
     /**
      * API to create a folder
      *
@@ -269,4 +250,4 @@ class Folder extends Item {
     }
 }
 export default Folder;
-// # sourceMappingURL=Folder.js.map
+//# sourceMappingURL=Folder.js.map

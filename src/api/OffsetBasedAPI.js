@@ -1,3 +1,11 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 /**
  * @was-flow
  * @file class for Box offset based API's to inherit common functionality from
@@ -6,36 +14,6 @@
 import Base from './Base';
 import { getTypedFileId } from '../util/file';
 import { DEFAULT_FETCH_START, DEFAULT_FETCH_END } from '../constants';
-
-const __awaiter =
-    (this && this.__awaiter) ||
-    function(thisArg, _arguments, P, generator) {
-        return new (P || (P = Promise))((resolve, reject) => {
-            function fulfilled(value) {
-                try {
-                    step(generator.next(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function rejected(value) {
-                try {
-                    step(generator.throw(value));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-            function step(result) {
-                result.done
-                    ? resolve(result.value)
-                    : new P(resolve => {
-                          resolve(result.value);
-                      }).then(fulfilled, rejected);
-            }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-    };
-
 class OffsetBasedApi extends Base {
     /**
      * Gets query params for the API
@@ -55,7 +33,6 @@ class OffsetBasedApi extends Base {
         }
         return queryParams;
     }
-
     /**
      * Determines if the API has more items to fetch
      *
@@ -66,7 +43,6 @@ class OffsetBasedApi extends Base {
     hasMoreItems(offset, totalCount) {
         return totalCount === undefined || offset < totalCount;
     }
-
     /**
      * Helper for get
      *
@@ -78,7 +54,7 @@ class OffsetBasedApi extends Base {
      * @private
      */
     offsetGetRequest(id, offset, limit, shouldFetchAll, fields) {
-        return __awaiter(this, void 0, void 0, function*() {
+        return __awaiter(this, void 0, void 0, function* () {
             if (this.isDestroyed()) {
                 return;
             }
@@ -100,12 +76,12 @@ class OffsetBasedApi extends Base {
                     return;
                 }
                 this.successHandler(this.data);
-            } catch (error) {
+            }
+            catch (error) {
                 this.errorHandler(error);
             }
         });
     }
-
     /**
      * Offset based API get
      *
@@ -117,16 +93,8 @@ class OffsetBasedApi extends Base {
      * @param {array} fields the fields to fetch
      * @param {boolean} shouldFetchAll true if should get all the pages before calling the sucessCallback
      */
-    offsetGet(
-        id,
-        successCallback,
-        errorCallback,
-        offset = DEFAULT_FETCH_START,
-        limit = DEFAULT_FETCH_END,
-        fields,
-        shouldFetchAll = true,
-    ) {
-        return __awaiter(this, void 0, void 0, function*() {
+    offsetGet(id, successCallback, errorCallback, offset = DEFAULT_FETCH_START, limit = DEFAULT_FETCH_END, fields, shouldFetchAll = true) {
+        return __awaiter(this, void 0, void 0, function* () {
             this.successCallback = successCallback;
             this.errorCallback = errorCallback;
             return this.offsetGetRequest(id, offset, limit, shouldFetchAll, fields);
@@ -134,4 +102,4 @@ class OffsetBasedApi extends Base {
     }
 }
 export default OffsetBasedApi;
-// # sourceMappingURL=OffsetBasedAPI.js.map
+//# sourceMappingURL=OffsetBasedAPI.js.map

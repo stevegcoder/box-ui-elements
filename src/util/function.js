@@ -26,14 +26,14 @@ function retryNumOfTimes(func, times, initialTimeout = 0, backoffFactor = 1) {
             })
                 .then(resolve)
                 .catch(reason => {
-                    if (tries < times) {
-                        timeout *= backoffFactor;
-                        // eslint-disable-next-line no-use-before-define
-                        executeAfterTimeout(timeout);
-                        return;
-                    }
-                    hardReject(reason);
-                });
+                if (tries < times) {
+                    timeout *= backoffFactor;
+                    // eslint-disable-next-line no-use-before-define
+                    executeAfterTimeout(timeout);
+                    return;
+                }
+                hardReject(reason);
+            });
         }
         function executeAfterTimeout(time) {
             setTimeout(() => {
@@ -45,4 +45,4 @@ function retryNumOfTimes(func, times, initialTimeout = 0, backoffFactor = 1) {
 }
 // eslint-disable-next-line import/prefer-default-export
 export { retryNumOfTimes };
-// # sourceMappingURL=function.js.map
+//# sourceMappingURL=function.js.map

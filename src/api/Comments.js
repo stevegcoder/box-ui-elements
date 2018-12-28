@@ -4,17 +4,8 @@
  * @author Box
  */
 import OffsetBasedAPI from './OffsetBasedAPI';
-import {
-    PERMISSION_CAN_COMMENT,
-    PERMISSION_CAN_DELETE,
-    PERMISSION_CAN_EDIT,
-    ERROR_CODE_CREATE_COMMENT,
-    ERROR_CODE_UPDATE_COMMENT,
-    ERROR_CODE_DELETE_COMMENT,
-    ERROR_CODE_FETCH_COMMENTS,
-} from '../constants';
+import { PERMISSION_CAN_COMMENT, PERMISSION_CAN_DELETE, PERMISSION_CAN_EDIT, ERROR_CODE_CREATE_COMMENT, ERROR_CODE_UPDATE_COMMENT, ERROR_CODE_DELETE_COMMENT, ERROR_CODE_FETCH_COMMENTS, } from '../constants';
 import { COMMENTS_FIELDS_TO_FETCH } from '../util/fields';
-
 class Comments extends OffsetBasedAPI {
     constructor() {
         super(...arguments);
@@ -22,7 +13,7 @@ class Comments extends OffsetBasedAPI {
          * Formats the comments api response to usable data
          * @param {Object} data the api response data
          */
-        this.successHandler = data => {
+        this.successHandler = (data) => {
             if (this.isDestroyed() || typeof this.successCallback !== 'function') {
                 return;
             }
@@ -40,7 +31,6 @@ class Comments extends OffsetBasedAPI {
             this.successCallback(Object.assign({}, data, { entries: comments }));
         };
     }
-
     /**
      * API URL for comments on a file
      *
@@ -53,7 +43,6 @@ class Comments extends OffsetBasedAPI {
         }
         return `${this.getBaseApiUrl()}/files/${id}/comments`;
     }
-
     /**
      * API URL for comments endpoint
      *
@@ -64,7 +53,6 @@ class Comments extends OffsetBasedAPI {
         const baseUrl = `${this.getBaseApiUrl()}/comments`;
         return id ? `${baseUrl}/${id}` : baseUrl;
     }
-
     /**
      * Formats comment data for use in components.
      *
@@ -72,11 +60,8 @@ class Comments extends OffsetBasedAPI {
      * @return {Task} A task
      */
     format(comment) {
-        return Object.assign({}, comment, {
-            tagged_message: comment.tagged_message !== '' ? comment.tagged_message : comment.message,
-        });
+        return Object.assign({}, comment, { tagged_message: comment.tagged_message !== '' ? comment.tagged_message : comment.message });
     }
-
     /**
      * API for creating a comment on a file
      *
@@ -87,12 +72,13 @@ class Comments extends OffsetBasedAPI {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    createComment({ file, message, taggedMessage, successCallback, errorCallback }) {
+    createComment({ file, message, taggedMessage, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_CREATE_COMMENT;
         const { id = '', permissions } = file;
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -117,7 +103,6 @@ class Comments extends OffsetBasedAPI {
             errorCallback,
         });
     }
-
     /**
      * API for updating a comment on a file
      *
@@ -129,12 +114,13 @@ class Comments extends OffsetBasedAPI {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    updateComment({ file, commentId, message, permissions, successCallback, errorCallback }) {
+    updateComment({ file, commentId, message, permissions, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_UPDATE_COMMENT;
         const { id = '' } = file;
         try {
             this.checkApiCallValidity(PERMISSION_CAN_EDIT, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -149,7 +135,6 @@ class Comments extends OffsetBasedAPI {
             errorCallback,
         });
     }
-
     /**
      * API for deleting a comment on a file
      *
@@ -160,12 +145,13 @@ class Comments extends OffsetBasedAPI {
      * @param {Function} errorCallback - Error callback
      * @return {void}
      */
-    deleteComment({ file, commentId, permissions, successCallback, errorCallback }) {
+    deleteComment({ file, commentId, permissions, successCallback, errorCallback, }) {
         this.errorCode = ERROR_CODE_DELETE_COMMENT;
         const { id = '' } = file;
         try {
             this.checkApiCallValidity(PERMISSION_CAN_DELETE, permissions, id);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -176,7 +162,6 @@ class Comments extends OffsetBasedAPI {
             errorCallback,
         });
     }
-
     /**
      * API for fetching comments on a file
      *
@@ -190,20 +175,12 @@ class Comments extends OffsetBasedAPI {
      * @param {boolean} shouldFetchAll - true if should get all the pages before calling the sucessCallback
      * @returns {void}
      */
-    getComments(
-        fileId,
-        permissions,
-        successCallback,
-        errorCallback,
-        fields = COMMENTS_FIELDS_TO_FETCH,
-        offset,
-        limit,
-        shouldFetchAll,
-    ) {
+    getComments(fileId, permissions, successCallback, errorCallback, fields = COMMENTS_FIELDS_TO_FETCH, offset, limit, shouldFetchAll) {
         this.errorCode = ERROR_CODE_FETCH_COMMENTS;
         try {
             this.checkApiCallValidity(PERMISSION_CAN_COMMENT, permissions, fileId);
-        } catch (e) {
+        }
+        catch (e) {
             errorCallback(e, this.errorCode);
             return;
         }
@@ -211,4 +188,4 @@ class Comments extends OffsetBasedAPI {
     }
 }
 export default Comments;
-// # sourceMappingURL=Comments.js.map
+//# sourceMappingURL=Comments.js.map

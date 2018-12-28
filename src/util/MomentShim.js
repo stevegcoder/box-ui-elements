@@ -5,19 +5,16 @@ class MomentShim {
     constructor(date) {
         this.date = new Date(date);
     }
-
     format() {
         return this.date.toLocaleDateString(__LANGUAGE__);
     }
-
     toDate() {
         return new Date(this.date);
     }
-
     isValid() {
         return this.date.getTime() > 0;
     }
 }
-const momentGenerator = date => new MomentShim(date);
+const momentGenerator = (date) => new MomentShim(date);
 export default momentGenerator;
-// # sourceMappingURL=MomentShim.js.map
+//# sourceMappingURL=MomentShim.js.map

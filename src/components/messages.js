@@ -4,7 +4,6 @@
  * @author Box
  */
 import { defineMessages } from 'react-intl';
-
 const messages = defineMessages({
     today: {
         id: 'be.today',
@@ -653,8 +652,7 @@ const messages = defineMessages({
     },
     approvalAddTaskTooltip: {
         id: 'be.approvalAddTaskTooltip',
-        defaultMessage:
-            'Assigning a task to someone will send them a notification with the message in the comment box and allow them to approve or deny.',
+        defaultMessage: 'Assigning a task to someone will send them a notification with the message in the comment box and allow them to approve or deny.',
         description: 'Tooltip text for checkbox to add approvers to a comment',
     },
     approvalAssignees: {
@@ -830,32 +828,27 @@ const messages = defineMessages({
     versionDeleted: {
         id: 'be.versionDeleted',
         defaultMessage: '{ name } deleted version { version_number }',
-        description:
-            'Message displayed in the activity feed for a deleted version. {name} is the user who performed the action. { version_number } is the file version string.',
+        description: 'Message displayed in the activity feed for a deleted version. {name} is the user who performed the action. { version_number } is the file version string.',
     },
     versionRestored: {
         id: 'be.versionRestored',
         defaultMessage: '{ name } restored version { version_number }',
-        description:
-            'Message displayed in the activity feed for a restored version. {name} is the user who performed the action. { version_number } is the file version string.',
+        description: 'Message displayed in the activity feed for a restored version. {name} is the user who performed the action. { version_number } is the file version string.',
     },
     versionMultipleUsersUploaded: {
         id: 'be.versionMultipleUsersUploaded',
         defaultMessage: '{ numberOfCollaborators } collaborators uploaded versions { versions }',
-        description:
-            'Message displayed in the activity feed to represent the range of versions uploaded by multiple users. { numberOfCollaborators } is a number and { versions } is a range of versions.',
+        description: 'Message displayed in the activity feed to represent the range of versions uploaded by multiple users. { numberOfCollaborators } is a number and { versions } is a range of versions.',
     },
     versionUploadCollapsed: {
         id: 'be.versionUploadCollapsed',
         defaultMessage: '{ name } uploaded versions { versions }',
-        description:
-            'Message displayed in the activity feed to represent the range of versions uploaded by a single user. { name } is the user who uploaded. { versions } is a range of versions.',
+        description: 'Message displayed in the activity feed to represent the range of versions uploaded by a single user. { name } is the user who uploaded. { versions } is a range of versions.',
     },
     versionUploaded: {
         id: 'be.versionUploaded',
         defaultMessage: '{ name } uploaded version { version_number }',
-        description:
-            'Message displayed in the activity feed for a newly uploaded version. {name} is the user who performed the action. { version_number } is the file version string.',
+        description: 'Message displayed in the activity feed for a newly uploaded version. {name} is the user who performed the action. { version_number } is the file version string.',
     },
     defaultInlineErrorContentMessage: {
         id: 'be.defaultInlineErrorContentMessage',
@@ -979,4 +972,4 @@ const messages = defineMessages({
     },
 });
 export default messages;
-// # sourceMappingURL=messages.js.map
+//# sourceMappingURL=messages.js.map
