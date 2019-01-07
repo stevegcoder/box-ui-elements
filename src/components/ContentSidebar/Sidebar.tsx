@@ -16,9 +16,9 @@ import {
     SIDEBAR_VIEW_DETAILS,
     SIDEBAR_VIEW_METADATA,
 } from '../../constants';
-import type { DetailsSidebarProps } from './DetailsSidebar';
-import type { ActivitySidebarProps } from './ActivitySidebar';
-import type { MetadataSidebarProps } from './MetadataSidebar';
+import { DetailsSidebarProps } from './DetailsSidebar';
+import { ActivitySidebarProps } from './ActivitySidebar';
+import { MetadataSidebarProps } from './MetadataSidebar';
 import './Sidebar.scss';
 
 type Props = {

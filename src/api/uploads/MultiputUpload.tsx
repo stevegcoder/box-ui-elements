@@ -1,988 +1,539 @@
 /**
  * @was-flow
- * @file Multiput upload
+ * @file Main entry point for the box api
  * @author Box
  */
+import Cache from '../util/Cache';
+import ChunkedUploadAPI from './uploads/MultiputUpload';
+import PlainUploadAPI from './uploads/PlainUpload';
+import FolderAPI from './Folder';
+import FileAPI from './File';
+import WebLinkAPI from './WebLink';
+import SearchAPI from './Search';
+import RecentsAPI from './Recents';
+import VersionsAPI from './Versions';
+import CommentsAPI from './Comments';
+import TasksAPI from './Tasks';
+import TaskAssignmentsAPI from './TaskAssignments';
+import FileAccessStatsAPI from './FileAccessStats';
+import UsersAPI from './Users';
+import MetadataAPI from './Metadata';
+import FileCollaboratorsAPI from './FileCollaborators';
+import FeedAPI from './Feed';
+import AppIntegrationsAPI from './AppIntegrations';
+import OpenWithAPI from './OpenWith';
+import { DEFAULT_HOSTNAME_API, DEFAULT_HOSTNAME_UPLOAD, TYPE_FOLDER, TYPE_FILE, TYPE_WEBLINK } from '../constants';
 
-import noop from 'lodash/noop';
-import BaseMultiput from './BaseMultiput';
-import { getFileLastModifiedAsISONoMSIfPossible, getBoundedExpBackoffRetryDelay } from '../../util/uploads';
-import { retryNumOfTimes } from '../../util/function';
-import { digest } from '../../util/webcrypto';
-import hexToBase64 from '../../util/base64';
-import { DEFAULT_RETRY_DELAY_MS, HTTP_STATUS_CODE_FORBIDDEN } from '../../constants';
-import MultiputPart, { PART_STATE_UPLOADED, PART_STATE_DIGEST_READY, PART_STATE_NOT_STARTED } from './MultiputPart';
-import createWorker from '../../util/uploadsSHA1Worker';
+class APIFactory {
+  /**
+   * @property {*}
+   */
+  options: Options;
+  /**
+   * @property {FileAPI}
+   */
 
-// Constants used for specifying log event types.
+  fileAPI: FileAPI;
+  /**
+   * @property {WebLink}
+   */
 
-// This type is a catch-all for create session errors that aren't 5xx's (for which we'll do
-// retries) and aren't specific 4xx's we know how to specifically handle (e.g. out of storage).
-const LOG_EVENT_TYPE_CREATE_SESSION_MISC_ERROR = 'create_session_misc_error';
-const LOG_EVENT_TYPE_CREATE_SESSION_RETRIES_EXCEEDED = 'create_session_retries_exceeded';
-const LOG_EVENT_TYPE_FILE_CHANGED_DURING_UPLOAD = 'file_changed_during_upload';
-const LOG_EVENT_TYPE_PART_UPLOAD_RETRIES_EXCEEDED = 'part_upload_retries_exceeded';
-const LOG_EVENT_TYPE_COMMIT_RETRIES_EXCEEDED = 'commit_retries_exceeded';
-const LOG_EVENT_TYPE_WEB_WORKER_ERROR = 'web_worker_error';
-const LOG_EVENT_TYPE_FILE_READER_RECEIVED_NOT_FOUND_ERROR = 'file_reader_received_not_found_error';
-const LOG_EVENT_TYPE_PART_DIGEST_RETRIES_EXCEEDED = 'part_digest_retries_exceeded';
+  weblinkAPI: WebLinkAPI;
+  /**
+   * @property {FolderAPI}
+   */
 
-class MultiputUpload extends BaseMultiput {
-    clientId: ?string;
+  folderAPI: FolderAPI;
+  /**
+   * @property {PlainUploadAPI}
+   */
 
-    commitRetryCount: number;
+  plainUploadAPI: PlainUploadAPI;
+  /**
+   * @property {ChunkedUploadAPI}
+   */
 
-    createSessionNumRetriesPerformed: number;
+  chunkedUploadAPI: ChunkedUploadAPI;
+  /**
+   * @property {SearchAPI}
+   */
 
-    destinationFileId: ?string;
+  searchAPI: SearchAPI;
+  /**
+   * @property {RecentsAPI}
+   */
 
-    folderId: string;
+  recentsAPI: RecentsAPI;
+  /**
+   * @property {VersionsAPI}
+   */
 
-    fileSha1: ?string;
+  versionsAPI: VersionsAPI;
+  /**
+   * @property {CommentsAPI}
+   */
 
-    firstUnuploadedPartIndex: number;
+  commentsAPI: CommentsAPI;
+  /**
+   * @property {TasksAPI}
+   */
 
-    initialFileLastModified: ?string;
+  tasksAPI: TasksAPI;
+  /**
+   * @property {TaskAssignmentsAPI}
+   */
 
-    initialFileSize: number;
+  taskAssignmentsAPI: TaskAssignmentsAPI;
+  /*
+   * @property {FileAccessStatsAPI}
+   */
 
-    successCallback: Function;
+  fileAccessStatsAPI: FileAccessStatsAPI;
+  /*
+   * @property {UsersAPI}
+   */
 
-    progressCallback: Function;
+  usersAPI: UsersAPI;
+  /*
+   * @property {MetadataAPI}
+   */
 
-    options: Options;
+  metadataAPI: MetadataAPI;
+  /**
+   * @property {FileCollaboratorsAPI}
+   */
 
-    partSize: number;
+  fileCollaboratorsAPI: FileCollaboratorsAPI;
+  /**
+   * @property {FeedAPI}
+   */
 
-    parts: Array<MultiputPart>;
+  feedItemsAPI: FeedAPI;
+  /**
+   * @property {OpenWithAPI}
+   */
 
-    numPartsDigestComputing: number;
+  openWithAPI: OpenWithAPI;
+  /**
+   * @property {AppIntegrationsAPI}
+   */
 
-    numPartsDigestReady: number;
+  appIntegrationsAPI: AppIntegrationsAPI;
+  /**
+   * [constructor]
+   *
+   * @param {Object} options
+   * @param {string} options.id - item id
+   * @param {string|function} options.token - Auth token
+   * @param {string} [options.sharedLink] - Shared link
+   * @param {string} [options.sharedLinkPassword] - Shared link password
+   * @param {string} [options.apiHost] - Api host
+   * @param {string} [options.uploadHost] - Upload host name
+   * @return {API} Api instance
+   */
 
-    numPartsNotStarted: number;
+  constructor(options: Options) {
+    this.options = Object.assign({}, options, {
+      apiHost: options.apiHost || DEFAULT_HOSTNAME_API,
+      uploadHost: options.uploadHost || DEFAULT_HOSTNAME_UPLOAD,
+      cache: options.cache || new Cache()
+    });
+  }
+  /**
+   * [destructor]
+   *
+   * @param {boolean} destroyCache - true to destroy cache
+   * @return {void}
+   */
 
-    numPartsUploaded: number;
 
-    numPartsUploading: number;
-
-    sessionEndpoints: Object;
-
-    sessionId: string;
-
-    totalUploadedBytes: number;
-
-    sha1Worker: Worker;
-
-    createSessionTimeout: TimeoutID;
-
-    commitSessionTimeout: TimeoutID;
-
-    partsUploaded: number;
-
-    /**
-     * [constructor]
-     *
-     * @param {Options} options
-     * @param {MultiputConfig} [config]
-     */
-    constructor(options: Options, config?: MultiputConfig) {
-        super(
-            options,
-            {
-                createSession: null,
-                uploadPart: null,
-                listParts: null,
-                commit: null,
-                abort: null,
-                logEvent: null,
-            },
-            config,
-        );
-        this.parts = [];
-        this.options = options;
-        this.fileSha1 = null;
-        this.totalUploadedBytes = 0;
-        this.numPartsNotStarted = 0; // # of parts yet to be processed
-        this.numPartsDigestComputing = 0; // # of parts sent to the digest worker
-        this.numPartsDigestReady = 0; // # of parts with digest finished that are waiting to be uploaded.
-        this.numPartsUploading = 0; // # of parts with upload requests currently inflight
-        this.numPartsUploaded = 0; // # of parts successfully uploaded
-        this.firstUnuploadedPartIndex = 0; // Index of first part that hasn't been uploaded yet.
-        this.createSessionNumRetriesPerformed = 0;
-        this.partSize = 0;
-        this.commitRetryCount = 0;
-        this.clientId = null;
+  destroy(destroyCache: boolean = false) {
+    if (this.fileAPI) {
+      this.fileAPI.destroy();
+      delete this.fileAPI;
     }
 
-    /**
-     * Upload a given file
-     *
-     *
-     * @param {Object} options
-     * @param {File} options.file
-     * @param {string} options.folderId - Untyped folder id (e.g. no "folder_" prefix)
-     * @param {string} [options.fileId] - Untyped file id (e.g. no "file_" prefix)
-     * @param {Function} [options.errorCallback]
-     * @param {Function} [options.progressCallback]
-     * @param {Function} [options.successCallback]
-     * @return {void}
-     */
-    upload({
-        file,
-        folderId,
-        errorCallback,
-        progressCallback,
-        successCallback,
-        overwrite = true,
-        fileId,
-    }: {
-        file: File,
-        folderId: string,
-        errorCallback?: Function,
-        progressCallback?: Function,
-        successCallback?: Function,
-        overwrite?: boolean,
-        fileId: ?string,
-    }): void {
-        this.file = file;
-        this.fileName = this.file.name;
-        // These values are used as part of our (best effort) attempt to abort uploads if we detect
-        // a file change during the upload.
-        this.initialFileSize = this.file.size;
-        this.initialFileLastModified = getFileLastModifiedAsISONoMSIfPossible(this.file);
-        this.folderId = folderId;
-        this.errorCallback = errorCallback || noop;
-        this.progressCallback = progressCallback || noop;
-        this.successCallback = successCallback || noop;
-
-        this.sha1Worker = createWorker();
-        this.sha1Worker.addEventListener('message', this.onWorkerMessage);
-
-        this.overwrite = overwrite;
-        this.fileId = fileId;
-
-        this.makePreflightRequest();
+    if (this.weblinkAPI) {
+      this.weblinkAPI.destroy();
+      delete this.weblinkAPI;
     }
 
-    /**
-     * Update uploadHost with preflight response and return the base uploadUrl
-     *
-     * @private
-     * @param {Object} response
-     * @param {Object} [response.data]
-     * @return {string}
-     */
-    getBaseUploadUrlFromPreflightResponse = ({ data }: { data: { upload_url?: string } }) => {
-        if (!data || !data.upload_url) {
-            return this.getBaseUploadUrl();
-        }
-
-        const splitUrl = data.upload_url.split('/');
-        // splitUrl[0] is the protocol (e.g., https:), splitUrl[2] is hostname (e.g., www.box.com)
-        this.uploadHost = `${splitUrl[0]}//${splitUrl[2]}`;
-        return this.getBaseUploadUrl();
-    };
-
-    /**
-     * Creates upload session. If a file ID is supplied, use the Chunked Upload File Version
-     * API to replace the file.
-     *
-     * @private
-     * @return {void}
-     */
-    preflightSuccessHandler = async (preflightResponse: Object): Promise<any> => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        const uploadUrl = this.getBaseUploadUrlFromPreflightResponse(preflightResponse);
-        let createSessionUrl = `${uploadUrl}/files/upload_sessions`;
-
-        // Set up post body
-        const postData: StringAnyMap = {
-            file_size: this.file.size,
-            file_name: this.fileName,
-        };
-
-        if (this.fileId) {
-            createSessionUrl = createSessionUrl.replace('upload_sessions', `${this.fileId}/upload_sessions`);
-        } else {
-            postData.folder_id = this.folderId;
-        }
-
-        try {
-            const response = await this.xhr.post({
-                url: createSessionUrl,
-                data: postData,
-            });
-            this.createSessionSuccessHandler(response.data);
-        } catch (error) {
-            const errorData = this.getErrorResponse(error);
-
-            if (errorData && errorData.status >= 500 && errorData.status < 600) {
-                this.createSessionErrorHandler(error);
-                return;
-            }
-
-            // Recover from 409 session_conflict.  The server will return the session information
-            // in context_info, so treat it as a success.
-            if (errorData && errorData.status === 409 && errorData.code === 'session_conflict') {
-                this.createSessionSuccessHandler(errorData.context_info.session);
-                return;
-            }
-
-            if (
-                (errorData &&
-                    (errorData.status === HTTP_STATUS_CODE_FORBIDDEN && errorData.code === 'storage_limit_exceeded')) ||
-                (errorData.status === HTTP_STATUS_CODE_FORBIDDEN &&
-                    errorData.code === 'access_denied_insufficient_permissions')
-            ) {
-                this.errorCallback(errorData);
-                return;
-            }
-
-            if (errorData && errorData.status === 409) {
-                this.resolveConflict(errorData);
-                this.createSessionRetry();
-                return;
-            }
-
-            // All other cases get treated as an upload failure.
-            this.sessionErrorHandler(error, LOG_EVENT_TYPE_CREATE_SESSION_MISC_ERROR, JSON.stringify(error));
-        }
-    };
-
-    /**
-     * Create session error handler.
-     * Retries the create session request or fails the upload.
-     *
-     * @private
-     * @param {Error} error
-     * @return {void}
-     */
-    createSessionErrorHandler = (error: Error): void => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        if (this.createSessionNumRetriesPerformed < this.config.retries) {
-            this.createSessionRetry();
-            return;
-        }
-
-        this.consoleLog('Too many create session failures, failing upload');
-        this.sessionErrorHandler(error, LOG_EVENT_TYPE_CREATE_SESSION_RETRIES_EXCEEDED, JSON.stringify(error));
-    };
-
-    /**
-     * Schedule a retry for create session request upon failure
-     *
-     * @private
-     * @return {void}
-     */
-    createSessionRetry(): void {
-        const retryDelayMs = getBoundedExpBackoffRetryDelay(
-            this.config.initialRetryDelayMs,
-            this.config.maxRetryDelayMs,
-            this.createSessionNumRetriesPerformed,
-        );
-        this.createSessionNumRetriesPerformed += 1;
-        this.consoleLog(`Retrying create session in ${retryDelayMs} ms`);
-        this.createSessionTimeout = setTimeout(this.makePreflightRequest, retryDelayMs);
+    if (this.plainUploadAPI) {
+      this.plainUploadAPI.destroy();
+      delete this.plainUploadAPI;
     }
 
-    /**
-     * Handles a upload session success response
-     *
-     * @private
-     * @param {Object} data - Upload session creation success data
-     * @return {void}
-     */
-    createSessionSuccessHandler(data: any): void {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        const { id, part_size, session_endpoints } = data;
-
-        this.sessionId = id;
-        this.partSize = part_size;
-        this.sessionEndpoints = {
-            ...this.sessionEndpoints,
-            uploadPart: session_endpoints.upload_part,
-            listParts: session_endpoints.list_parts,
-            commit: session_endpoints.commit,
-            abort: session_endpoints.abort,
-            logEvent: session_endpoints.log_event,
-        };
-
-        this.populateParts();
-        this.processNextParts();
+    if (this.chunkedUploadAPI) {
+      this.chunkedUploadAPI.destroy();
+      delete this.chunkedUploadAPI;
     }
 
-    /**
-     * Session error handler.
-     * Retries the create session request or fails the upload.
-     *
-     * @private
-     * @param {?Error} error
-     * @param {string} logEventType
-     * @param {string} [logMessage]
-     * @return {Promise}
-     */
-    async sessionErrorHandler(error: ?Error, logEventType: string, logMessage?: string): Promise<any> {
-        this.destroy();
-        const errorData = this.getErrorResponse(error);
-        this.errorCallback(errorData);
-
-        try {
-            if (!this.sessionEndpoints.logEvent) {
-                throw new Error('logEvent endpoint not found');
-            }
-
-            await retryNumOfTimes(
-                (resolve: Function, reject: Function): void => {
-                    this.logEvent(logEventType, logMessage)
-                        .then(resolve)
-                        .catch(reject);
-                },
-                this.config.retries,
-                this.config.initialRetryDelayMs,
-            );
-
-            this.abortSession();
-        } catch (err) {
-            this.abortSession();
-        }
+    if (this.folderAPI) {
+      this.folderAPI.destroy();
+      delete this.folderAPI;
     }
 
-    /**
-     * Aborts the upload session
-     *
-     * @private
-     * @return {void}
-     */
-    abortSession(): void {
-        if (this.sha1Worker) {
-            this.sha1Worker.terminate();
-        }
-
-        if (this.sessionEndpoints.abort) {
-            this.xhr.delete({
-                url: this.sessionEndpoints.abort,
-            });
-        }
+    if (this.searchAPI) {
+      this.searchAPI.destroy();
+      delete this.searchAPI;
     }
 
-    /**
-     * Part upload success handler
-     *
-     * @private
-     * @param {MultiputPart} part
-     * @return {void}
-     */
-    partUploadSuccessHandler = (part: MultiputPart): void => {
-        this.numPartsUploading -= 1;
-        this.numPartsUploaded += 1;
-        this.updateProgress(part.uploadedBytes, this.partSize);
-        this.processNextParts();
-    };
-
-    /**
-     * Part upload error handler
-     *
-     * @private
-     * @param {Error} error
-     * @param {string} eventInfo
-     * @return {void}
-     */
-    partUploadErrorHandler = (error: Error, eventInfo: string): void => {
-        this.sessionErrorHandler(error, LOG_EVENT_TYPE_PART_UPLOAD_RETRIES_EXCEEDED, eventInfo);
-    };
-
-    /**
-     * Update upload progress
-     *
-     * @private
-     * @param {number} prevUploadedBytes
-     * @param {number} newUploadedBytes
-     * @return {void}
-     */
-    updateProgress = (prevUploadedBytes: number, newUploadedBytes: number): void => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        this.totalUploadedBytes += newUploadedBytes - prevUploadedBytes;
-        this.progressCallback({
-            loaded: this.totalUploadedBytes,
-            total: this.file.size,
-        });
-    };
-
-    /**
-     * Attempts to process more parts, except in the case where everything is done or we detect
-     * a file change (in which case we want to abort and not process more parts).
-     *
-     * @private
-     * @return {void}
-     */
-    processNextParts = (): void => {
-        if (this.failSessionIfFileChangeDetected()) {
-            return;
-        }
-
-        if (this.numPartsUploaded === this.parts.length && this.fileSha1) {
-            this.commitSession();
-            return;
-        }
-
-        this.updateFirstUnuploadedPartIndex();
-
-        while (this.canStartMorePartUploads()) {
-            this.uploadNextPart();
-        }
-
-        if (this.shouldComputeDigestForNextPart()) {
-            this.computeDigestForNextPart();
-        }
-    };
-
-    /**
-     * We compute digest for parts one at a time.  This is done for simplicity and also to guarantee that
-     * we send parts in order to the web sha1Worker (which is computing the digest for the entire file).
-     *
-     * @private
-     * @return {boolean} true if there is work to do, false otherwise.
-     */
-    shouldComputeDigestForNextPart(): boolean {
-        return (
-            !this.isDestroyed() &&
-            this.numPartsDigestComputing === 0 &&
-            this.numPartsNotStarted > 0 &&
-            this.numPartsDigestReady < this.config.digestReadahead
-        );
+    if (this.recentsAPI) {
+      this.recentsAPI.destroy();
+      delete this.recentsAPI;
     }
 
-    /**
-     * Find first part in parts array that doesn't have a digest, and compute its digest.
-
-     * @private
-     * @return {void}
-     */
-    computeDigestForNextPart(): void {
-        for (let i = this.firstUnuploadedPartIndex; i < this.parts.length; i += 1) {
-            const part = this.parts[i];
-            if (part.state === PART_STATE_NOT_STARTED) {
-                // Update the counters here instead of computeDigestForPart because computeDigestForPart
-                // can get called on retries
-                this.numPartsNotStarted -= 1;
-                this.numPartsDigestComputing += 1;
-                this.computeDigestForPart(part);
-                return;
-            }
-        }
+    if (this.versionsAPI) {
+      this.versionsAPI.destroy();
+      delete this.versionsAPI;
     }
 
-    /**
-     * Compute digest for this part
-     *
-     * @private
-     * @param {MultiputPart} part
-     * @return {Promise}
-     */
-    async computeDigestForPart(part: MultiputPart): Promise<any> {
-        const blob = this.file.slice(part.offset, part.offset + this.partSize);
-        const reader = new window.FileReader();
-        const startTimestamp = Date.now();
-
-        try {
-            const {
-                buffer,
-                readCompleteTimestamp,
-            }: {
-                buffer: ArrayBuffer,
-                readCompleteTimestamp: number,
-            } = await this.readFile(reader, blob);
-            const sha256ArrayBuffer = await digest('SHA-256', buffer);
-            const sha256 = btoa(
-                [].reduce.call(new Uint8Array(sha256ArrayBuffer), (data, byte) => data + String.fromCharCode(byte), ''),
-            );
-            this.sendPartToWorker(part, buffer);
-
-            part.sha256 = sha256;
-            part.state = PART_STATE_DIGEST_READY;
-            part.blob = blob;
-
-            this.numPartsDigestReady += 1;
-            const digestCompleteTimestamp = Date.now();
-
-            part.timing = {
-                partDigestTime: digestCompleteTimestamp - startTimestamp,
-                readTime: readCompleteTimestamp - startTimestamp,
-                subtleCryptoTime: digestCompleteTimestamp - readCompleteTimestamp,
-            };
-
-            this.processNextParts();
-        } catch (error) {
-            this.onPartDigestError(error, part);
-        }
+    if (this.fileAccessStatsAPI) {
+      this.fileAccessStatsAPI.destroy();
+      delete this.fileAccessStatsAPI;
     }
 
-    /**
-     * Deal with a message from the worker (either a part sha-1 ready, file sha-1 ready, or error).
-     *
-     * @private
-     * @param {object} event
-     * @return {void}
-     */
-    onWorkerMessage = (event: Object) => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        const { data } = event;
-        if (data.type === 'partDone') {
-            this.numPartsDigestComputing -= 1;
-            const { part } = data;
-            this.parts[part.index].timing.fileDigestTime = data.duration;
-            this.processNextParts();
-        } else if (data.type === 'done') {
-            this.fileSha1 = hexToBase64(data.sha1);
-            this.sha1Worker.terminate();
-            if (this.partsUploaded === this.parts.length) {
-                this.commitSession();
-            }
-        } else if (data.type === 'error') {
-            this.sessionErrorHandler(null, LOG_EVENT_TYPE_WEB_WORKER_ERROR, JSON.stringify(data));
-        }
-    };
-
-    /**
-     * Sends a part to the sha1Worker
-     *
-     * @private
-     * @param {MultiputPart} part
-     * @param {ArrayBuffer} buffer
-     * @return {void}
-     */
-    sendPartToWorker = (part: MultiputPart, buffer: ArrayBuffer): void => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        // Don't send entire part since XHR can't be cloned
-        const partInformation = {
-            index: part.index,
-            offset: part.offset,
-            size: part.partSize,
-        };
-        this.sha1Worker.postMessage(
-            {
-                part: partInformation,
-                fileSize: this.file.size,
-                partContents: buffer,
-            },
-            [buffer], // This transfers the ArrayBuffer to the worker context without copying contents.
-        );
-        this.consoleLog(`Part sent to worker: ${JSON.stringify(part)}.}`);
-    };
-
-    /**
-     * Error handler for part digest computation
-     *
-     * @private
-     * @param {Error} error
-     * @param {MultiputPart} part
-     * @return {void}
-     */
-    onPartDigestError = (error: Error, part: MultiputPart): void => {
-        this.consoleLog(`Error computing digest for part ${JSON.stringify(part)}: ${JSON.stringify(error)}`);
-
-        // When a FileReader is processing a file that changes on disk, Chrome reports a 'NotFoundError'
-        // and Safari reports a 'NOT_FOUND_ERR'. (Other browsers seem to allow the reader to keep
-        // going, either with the old version of the new file or the new one.) Since the error name
-        // implies that retrying will not help, we fail the session.
-        if (error.name === 'NotFoundError' || error.name === 'NOT_FOUND_ERR') {
-            this.sessionErrorHandler(null, LOG_EVENT_TYPE_FILE_READER_RECEIVED_NOT_FOUND_ERROR, JSON.stringify(error));
-            return;
-        }
-
-        if (this.failSessionIfFileChangeDetected()) {
-            return;
-        }
-
-        if (part.numDigestRetriesPerformed >= this.config.retries) {
-            this.sessionErrorHandler(null, LOG_EVENT_TYPE_PART_DIGEST_RETRIES_EXCEEDED, JSON.stringify(error));
-            return;
-        }
-
-        const retryDelayMs = getBoundedExpBackoffRetryDelay(
-            this.config.initialRetryDelayMs,
-            this.config.maxRetryDelayMs,
-            part.numDigestRetriesPerformed,
-        );
-        part.numDigestRetriesPerformed += 1;
-        this.consoleLog(`Retrying digest work for part ${JSON.stringify(part)} in ${retryDelayMs} ms`);
-
-        setTimeout(() => {
-            this.computeDigestForPart(part);
-        }, retryDelayMs);
-    };
-
-    /**
-     * Send a request to commit the upload.
-     *
-     * @private
-     * @return {void}
-     */
-    commitSession = (): void => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        const stats = {
-            totalPartReadTime: 0,
-            totalPartDigestTime: 0,
-            totalFileDigestTime: 0,
-            totalPartUploadTime: 0,
-        };
-
-        const data = {
-            parts: this.parts
-                .map(part => {
-                    stats.totalPartReadTime += part.timing.readTime;
-                    stats.totalPartDigestTime += part.timing.subtleCryptoTime;
-                    stats.totalFileDigestTime += part.timing.fileDigestTime;
-                    stats.totalPartUploadTime += part.timing.uploadTime;
-                    return part.getPart();
-                })
-                .sort((part1, part2) => part1.offset - part2.offset),
-            attributes: {},
-        };
-
-        const fileLastModified = getFileLastModifiedAsISONoMSIfPossible(this.file);
-        if (fileLastModified) {
-            data.attributes.content_modified_at = fileLastModified;
-        }
-
-        const clientEventInfo = {
-            avg_part_read_time: Math.round(stats.totalPartReadTime / this.parts.length),
-            avg_part_digest_time: Math.round(stats.totalPartDigestTime / this.parts.length),
-            avg_file_digest_time: Math.round(stats.totalFileDigestTime / this.parts.length),
-            avg_part_upload_time: Math.round(stats.totalPartUploadTime / this.parts.length),
-        };
-
-        // To make flow stop complaining about this.fileSha1 could potentially be undefined/null
-        const fileSha1: string = (this.fileSha1: any);
-        const headers = {
-            Digest: `sha=${fileSha1}`,
-            'X-Box-Client-Event-Info': JSON.stringify(clientEventInfo),
-        };
-
-        this.xhr
-            .post({ url: this.sessionEndpoints.commit, data, headers })
-            .then(this.commitSessionSuccessHandler)
-            .catch(this.commitSessionErrorHandler);
-    };
-
-    /**
-     * Commit response handler.  Succeeds the upload, retries the commit on 202
-     *
-     * @private
-     * @param {Object} response
-     * @return {void}
-     */
-    commitSessionSuccessHandler = (response: Object): void => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        const { status, data } = response;
-
-        if (status === 202) {
-            this.commitSessionRetry(response);
-            return;
-        }
-
-        let { entries } = data;
-        // v2.1 API response format is different from v2.0. v2.1 returns individual upload entry directly inside data,
-        // while v2.0 returns a collection of entries under data.entries
-        if (!entries && data.id) {
-            entries = [data];
-        }
-
-        this.destroy();
-
-        if (this.successCallback && entries) {
-            this.successCallback(entries);
-        }
-    };
-
-    /**
-     * Commit error handler.
-     * Retries the commit or fails the multiput session.
-     *
-     * @private
-     * @param {Object} error
-     * @return {void}
-     */
-    commitSessionErrorHandler = (error: Object): void => {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        const { response } = error;
-
-        if (!response) {
-            // Some random error happened
-            this.consoleError(error);
-            return;
-        }
-
-        if (this.commitRetryCount >= this.config.retries) {
-            this.consoleLog('Too many commit failures, failing upload');
-            this.sessionErrorHandler(error, LOG_EVENT_TYPE_COMMIT_RETRIES_EXCEEDED, JSON.stringify(error));
-            return;
-        }
-
-        this.commitSessionRetry(response);
-    };
-
-    /**
-     * Retry commit.
-     * Retries the commit or fails the multiput session.
-     *
-     * @private
-     * @param {Object} response
-     * @return {void}
-     */
-    commitSessionRetry(response: Object): void {
-        const { status, headers } = response;
-        let retryAfterMs = DEFAULT_RETRY_DELAY_MS;
-
-        if (headers) {
-            const retryAfterSec = parseInt(headers['retry-after'], 10);
-
-            if (!Number.isNaN(retryAfterSec)) {
-                retryAfterMs = retryAfterSec * 1000;
-            }
-        }
-
-        const defaultRetryDelayMs = getBoundedExpBackoffRetryDelay(
-            this.config.initialRetryDelayMs,
-            this.config.maxRetryDelayMs,
-            this.commitRetryCount,
-        );
-        // If status is 202 then don't increment the retry count.
-        // In this case, frontend will keep retrying until it gets another status code.
-        // Retry interval = value specified for the Retry-After header in 202 response.
-        if (status !== 202) {
-            this.commitRetryCount += 1;
-        }
-
-        const retryDelayMs = retryAfterMs || defaultRetryDelayMs;
-        this.consoleLog(`Retrying commit in ${retryDelayMs} ms`);
-        this.commitSessionTimeout = setTimeout(this.commitSession, retryDelayMs);
+    if (this.tasksAPI) {
+      this.tasksAPI.destroy();
+      delete this.tasksAPI;
     }
 
-    /**
-     * Find first part in parts array that we can upload, and upload it.
-     *
-     * @private
-     * @return {void}
-     */
-    uploadNextPart(): void {
-        for (let i = this.firstUnuploadedPartIndex; i < this.parts.length; i += 1) {
-            const part = this.parts[i];
-
-            if (part.state === PART_STATE_DIGEST_READY) {
-                // Update the counters here instead of uploadPart because uploadPart
-                // can get called on retries
-                this.numPartsDigestReady -= 1;
-                this.numPartsUploading += 1;
-                part.upload();
-                break;
-            }
-        }
+    if (this.commentsAPI) {
+      this.commentsAPI.destroy();
+      delete this.commentsAPI;
     }
 
-    /**
-     * Checks if upload pipeline is full
-     *
-     * @private
-     * @return {boolean}
-     */
-    canStartMorePartUploads(): boolean {
-        return !this.isDestroyed() && this.numPartsUploading < this.config.parallelism && this.numPartsDigestReady > 0;
+    if (this.usersAPI) {
+      this.usersAPI.destroy();
+      delete this.usersAPI;
     }
 
-    /**
-     * Functions that walk the parts array get called a lot, so we cache which part we should
-     * start work at to avoid always iterating through entire parts list.
-     *
-     * @private
-     * @return {void}
-     */
-    updateFirstUnuploadedPartIndex(): void {
-        let part = this.parts[this.firstUnuploadedPartIndex];
-        while (part && part.state === PART_STATE_UPLOADED) {
-            this.firstUnuploadedPartIndex += 1;
-            part = this.parts[this.firstUnuploadedPartIndex];
-        }
+    if (this.metadataAPI) {
+      this.metadataAPI.destroy();
+      delete this.metadataAPI;
     }
 
-    /**
-     * Get number of parts being uploaded
-     *
-     * @return {number}
-     */
-    getNumPartsUploading = (): number => this.numPartsUploading;
-
-    /**
-     * After session is created and we know the part size, populate the parts
-     * array.
-     *
-     * @private
-     * @return {void}
-     */
-    populateParts(): void {
-        this.numPartsNotStarted = Math.ceil(this.file.size / this.partSize);
-
-        for (let i = 0; i < this.numPartsNotStarted; i += 1) {
-            const offset = i * this.partSize;
-            const currentPartSize = Math.min(offset + this.partSize, this.file.size) - offset;
-            const part = new MultiputPart(
-                this.options,
-                i,
-                offset,
-                currentPartSize,
-                this.file.size,
-                this.sessionId,
-                this.sessionEndpoints,
-                this.config,
-                this.getNumPartsUploading,
-                this.partUploadSuccessHandler,
-                this.updateProgress,
-                this.partUploadErrorHandler,
-            );
-            this.parts.push(part);
-        }
+    if (this.fileCollaboratorsAPI) {
+      this.fileCollaboratorsAPI.destroy();
+      delete this.fileCollaboratorsAPI;
     }
 
-    /**
-     * Fails the session if the file's size or last modified has changed since the upload process
-     * began.
-     *
-     * This ensures that we don't upload a file that has parts from one file version and parts from
-     * another file version.
-     *
-     * This logic + the "not found" error logic in onWorkerError() is best effort and will not
-     * detect all possible file changes. This is because of browser differences. For example,
-     * -- In Safari, size and last modified will update when a file changes, and workers will
-     * get "not found" errors.
-     * -- In Chrome, size and last modified will update, but not in legacy drag and drop (that
-     * code path constructs a different file object). Workers will still get "not found" errors,
-     * though, so we can still detect changes even in legacy drag and drop.
-     * -- In IE 11/Edge, size will update but last modified will not. Workers will not get
-     * "not found" errors, but they may get a generic error saying that some bytes failed to be
-     * read.
-     * -- In Firefox, neither last modified nor size will update. Workers don't seem to get errors.
-     * (Not a whole lot we can do here...)
-     *
-     * Unfortunately, alternative solutions to catch more cases don't have a clear ROI (for
-     * example, doing a SHA-1 of the file before and after the upload is very expensive), so
-     * this is the best solution we have. We can revisit this if data shows that we need a better
-     * solution.
-     *
-     * @private
-     * @return {boolean} True if the session was failed, false if no action was taken
-     */
-    failSessionIfFileChangeDetected(): boolean {
-        const currentFileSize = this.file.size;
-        const currentFileLastModified = getFileLastModifiedAsISONoMSIfPossible(this.file);
-
-        if (currentFileSize !== this.initialFileSize || currentFileLastModified !== this.initialFileLastModified) {
-            this.sessionErrorHandler(
-                null,
-                LOG_EVENT_TYPE_FILE_CHANGED_DURING_UPLOAD,
-                JSON.stringify({
-                    oldSize: this.initialFileSize,
-                    newSize: currentFileSize,
-                    oldLastModified: this.initialFileLastModified,
-                    newLastModified: currentFileLastModified,
-                }),
-            );
-            return true;
-        }
-
-        return false;
+    if (this.appIntegrationsAPI) {
+      this.appIntegrationsAPI.destroy();
+      delete this.appIntegrationsAPI;
     }
 
-    /**
-     * Cancels an upload in progress by cancelling all upload parts.
-     * This cannot be undone or resumed.
-     *
-     * @private
-     * @return {void}
-     */
-    cancel(): void {
-        if (this.isDestroyed()) {
-            return;
-        }
-
-        // Cancel individual upload parts
-        this.parts.forEach(part => {
-            part.cancel();
-        });
-
-        this.parts = [];
-        clearTimeout(this.createSessionTimeout);
-        clearTimeout(this.commitSessionTimeout);
-        this.abortSession();
-        this.destroy();
+    if (this.openWithAPI) {
+      this.openWithAPI.destroy();
+      delete this.openWithAPI;
     }
 
-    /**
-     * Resolves upload conflict by overwriting or renaming
-     *
-     * @param {Object} response data
-     * @return {Promise}
-     */
-    async resolveConflict(data: Object): Promise<any> {
-        if (this.overwrite && data.context_info) {
-            this.fileId = data.context_info.conflicts.id;
-            return;
-        }
+    if (destroyCache) {
+      this.options.cache = new Cache();
+    }
+  }
+  /**
+   * Gets the cache instance
+   *
+   * @return {Cache} cache instance
+   */
 
-        const extension = this.fileName.substr(this.fileName.lastIndexOf('.')) || '';
-        // foo.txt => foo-1513385827917.txt
-        this.fileName = `${this.fileName.substr(0, this.fileName.lastIndexOf('.'))}-${Date.now()}${extension}`;
+
+  getCache(): APICache {
+    return ((this.options.cache as any) as APICache);
+  }
+  /**
+   * Returns the API based on type of item
+   *
+   * @private
+   * @param {String} type - item type
+   * @return {ItemAPI} api
+   */
+
+
+  getAPI(type: ItemType): ItemAPI {
+    let api: ItemAPI;
+
+    switch (type) {
+      case TYPE_FOLDER:
+        api = this.getFolderAPI();
+        break;
+
+      case TYPE_FILE:
+        api = this.getFileAPI();
+        break;
+
+      case TYPE_WEBLINK:
+        api = this.getWebLinkAPI();
+        break;
+
+      default:
+        throw new Error('Unknown Type!');
     }
 
-    /**
-     * Returns detailed error response
-     *
-     * @param {Object} error
-     * @return {Object}
-     */
-    getErrorResponse(error: ?Object): Object {
-        if (!error) {
-            return {};
-        }
+    return api;
+  }
+  /**
+   * API for file
+   *
+   * @return {FileAPI} FileAPI instance
+   */
 
-        const { response } = error;
-        if (!response) {
-            return {};
-        }
 
-        if (response.status === 401) {
-            return response;
-        }
+  getFileAPI(): FileAPI {
+    this.destroy();
+    this.fileAPI = new FileAPI(this.options);
+    return this.fileAPI;
+  }
+  /**
+   * API for web links
+   *
+   * @return {WebLinkAPI} WebLinkAPI instance
+   */
 
-        return response.data;
+
+  getWebLinkAPI(): WebLinkAPI {
+    this.destroy();
+    this.weblinkAPI = new WebLinkAPI(this.options);
+    return this.weblinkAPI;
+  }
+  /**
+   * API for plain uploads
+   *
+   * @return {UploadAPI} UploadAPI instance
+   */
+
+
+  getPlainUploadAPI(): PlainUploadAPI {
+    this.destroy();
+    this.plainUploadAPI = new PlainUploadAPI(this.options);
+    return this.plainUploadAPI;
+  }
+  /**
+   * API for chunked uploads
+   *
+   * @return {UploadAPI} UploadAPI instance
+   */
+
+
+  getChunkedUploadAPI(): ChunkedUploadAPI {
+    this.destroy();
+    this.chunkedUploadAPI = new ChunkedUploadAPI(this.options);
+    return this.chunkedUploadAPI;
+  }
+  /**
+   * API for folder
+   *
+   * @return {FolderAPI} FolderAPI instance
+   */
+
+
+  getFolderAPI(): FolderAPI {
+    this.destroy();
+    this.folderAPI = new FolderAPI(this.options);
+    return this.folderAPI;
+  }
+  /**
+   * API for search
+   *
+   * @return {SearchAPI} SearchAPI instance
+   */
+
+
+  getSearchAPI(): SearchAPI {
+    this.destroy();
+    this.searchAPI = new SearchAPI(this.options);
+    return this.searchAPI;
+  }
+  /**
+   * API for recents
+   *
+   * @return {RecentsAPI} RecentsAPI instance
+   */
+
+
+  getRecentsAPI(): RecentsAPI {
+    this.destroy();
+    this.recentsAPI = new RecentsAPI(this.options);
+    return this.recentsAPI;
+  }
+  /**
+   * API for metadata
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {MetadataAPI} MetadataAPI instance
+   */
+
+
+  getMetadataAPI(shouldDestroy: boolean): MetadataAPI {
+    if (shouldDestroy) {
+      this.destroy();
     }
+
+    this.metadataAPI = new MetadataAPI(this.options);
+    return this.metadataAPI;
+  }
+  /**
+   * API for versions
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {VersionsAPI} VersionsAPI instance
+   */
+
+
+  getVersionsAPI(shouldDestroy: boolean): VersionsAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.versionsAPI = new VersionsAPI(this.options);
+    return this.versionsAPI;
+  }
+  /**
+   * API for comments
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {CommentsAPI} CommentsAPI instance
+   */
+
+
+  getCommentsAPI(shouldDestroy: boolean): CommentsAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.commentsAPI = new CommentsAPI(this.options);
+    return this.commentsAPI;
+  }
+  /**
+   * API for tasks
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {TasksAPI} TasksAPI instance
+   */
+
+
+  getTasksAPI(shouldDestroy: boolean): TasksAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.tasksAPI = new TasksAPI(this.options);
+    return this.tasksAPI;
+  }
+  /**
+   * API for tasks
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {TasksAPI} TaskAssignmentsAPI instance
+   */
+
+
+  getTaskAssignmentsAPI(shouldDestroy: boolean): TaskAssignmentsAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.taskAssignmentsAPI = new TaskAssignmentsAPI(this.options);
+    return this.taskAssignmentsAPI;
+  }
+  /**
+   * API for file access stats
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {FileAccessStatsAPI} FileAccessStatsAPI instance
+   */
+
+
+  getFileAccessStatsAPI(shouldDestroy: boolean): FileAccessStatsAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.fileAccessStatsAPI = new FileAccessStatsAPI(this.options);
+    return this.fileAccessStatsAPI;
+  }
+  /**
+   * API for file collaborators
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {FileCollaboratorsAPI} FileCollaboratorsAPI instance
+   */
+
+
+  getFileCollaboratorsAPI(shouldDestroy: boolean): FileCollaboratorsAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.fileCollaboratorsAPI = new FileCollaboratorsAPI(this.options);
+    return this.fileCollaboratorsAPI;
+  }
+  /**
+   * API for Users
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {UsersAPI} UsersAPI instance
+   */
+
+
+  getUsersAPI(shouldDestroy: boolean): UsersAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.usersAPI = new UsersAPI(this.options);
+    return this.usersAPI;
+  }
+  /**
+   * API for Feed Items
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {FeedAPI} FeedAPI instance
+   */
+
+
+  getFeedAPI(shouldDestroy: boolean): FeedAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.feedItemsAPI = new FeedAPI(this.options);
+    return this.feedItemsAPI;
+  }
+  /**
+   * API for Open With
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {OpenWithAPI} OpenWithAPI instance
+   */
+
+
+  getOpenWithAPI(shouldDestroy: boolean): OpenWithAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.openWithAPI = new OpenWithAPI(this.options);
+    return this.openWithAPI;
+  }
+  /**
+   * API for the App Integrations endpoint
+   *
+   * @param {boolean} shouldDestroy - true if the factory should destroy before returning the call
+   * @return {AppIntegrationsAPI} AppIntegrationsAPI instance
+   */
+
+
+  getAppIntegrationsAPI(shouldDestroy: boolean): AppIntegrationsAPI {
+    if (shouldDestroy) {
+      this.destroy();
+    }
+
+    this.appIntegrationsAPI = new AppIntegrationsAPI(this.options);
+    return this.appIntegrationsAPI;
+  }
+
 }
 
-export default MultiputUpload;
+export default APIFactory;

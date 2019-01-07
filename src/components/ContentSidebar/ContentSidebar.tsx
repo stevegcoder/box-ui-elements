@@ -26,10 +26,10 @@ import {
     ORIGIN_CONTENT_SIDEBAR,
 } from '../../constants';
 import SidebarUtils from './SidebarUtils';
-import type { DetailsSidebarProps } from './DetailsSidebar';
-import type { ActivitySidebarProps } from './ActivitySidebar';
-import type { MetadataSidebarProps } from './MetadataSidebar';
-import type { $AxiosXHR } from 'axios'; // eslint-disable-line
+import { DetailsSidebarProps } from './DetailsSidebar';
+import { ActivitySidebarProps } from './ActivitySidebar';
+import { MetadataSidebarProps } from './MetadataSidebar';
+import { $AxiosXHR } from 'axios'; // eslint-disable-line
 import '../fonts.scss';
 import '../base.scss';
 import '../modal.scss';

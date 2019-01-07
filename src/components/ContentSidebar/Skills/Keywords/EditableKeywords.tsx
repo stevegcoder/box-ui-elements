@@ -12,7 +12,7 @@ import Button from 'box-react-ui/lib/components/button/Button';
 import messages from '../../../messages';
 import getPills from './keywordUtils';
 import { SKILLS_TARGETS } from '../../../../interactionTargets';
-import type { Pill, Pills } from './flowTypes';
+import { Pill, Pills } from './flowTypes';
 import './EditableKeywords.scss';
 
 type Props = {

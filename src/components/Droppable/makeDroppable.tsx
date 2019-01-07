@@ -8,7 +8,7 @@ import React, { PureComponent } from 'react';
 import { findDOMNode } from 'react-dom';
 import classNames from 'classnames';
 
-type PropsShape = {
+type DroppableProps = {
     className: string,
 };
 
@@ -19,13 +19,11 @@ type State = {
 };
 
 /* eslint-disable no-plusplus */
-const makeDroppable = ({ dropValidator, onDrop }: { dropValidator?: Function, onDrop?: Function }) => <
-    Props: PropsShape,
->(
+const makeDroppable = ({ dropValidator, onDrop }: { dropValidator?: Function, onDrop?: Function }) => (
     Wrapped: Function,
 ): ClassComponent<any, any> =>
-    class DroppableComponent extends PureComponent<Props, State> {
-        props: Props;
+    class DroppableComponent extends PureComponent<DroppableProps, State> {
+        props: DroppableProps;
 
         state: State;
 
@@ -43,7 +41,7 @@ const makeDroppable = ({ dropValidator, onDrop }: { dropValidator?: Function, on
          * @param {*} props
          * @return {DroppableComponent}
          */
-        constructor(props: Props) {
+        constructor(props: DroppableProps) {
             super(props);
             this.enterLeaveCounter = 0;
             this.state = {

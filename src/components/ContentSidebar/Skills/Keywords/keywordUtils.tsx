@@ -3,9 +3,8 @@
  * @file Utilities for keywords skill
  * @author Box
  */
-
-import type { Pill } from './flowTypes';
-
+import { Pill } from './flowTypes';
+import { SkillCardEntry } from '../../../../types';
 /**
  * Converts skill card entries into pills
  *
@@ -13,12 +12,13 @@ import type { Pill } from './flowTypes';
  * @param {Array<Object>} props - keyword entries
  * @return {Array<Object>} pills
  */
-const getPills = (keywords: Array<SkillCardEntry> = []): Array<Pill> =>
+
+const getPills = (keywords: Array<SkillCardEntry> = []): Array<Pill> => 
     keywords.map(
         (keyword: SkillCardEntry, index: number): Pill => ({
             value: index,
-            text: ((keyword.text: any): string),
-        }),
+            text: ((keyword.text as any) as string)
+        })
     );
 
 export default getPills;

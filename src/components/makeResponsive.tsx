@@ -10,7 +10,7 @@ import Measure from 'react-measure';
 import classNames from 'classnames';
 import { SIZE_LARGE, SIZE_MEDIUM, SIZE_SMALL, CLASS_IS_SMALL, CLASS_IS_TOUCH, CLASS_IS_MEDIUM } from '../constants';
 
-type PropsShape = {
+type ResponsiveProps = {
     isTouch: boolean,
     size?: Size,
     className: string,
@@ -25,9 +25,9 @@ const CROSS_OVER_WIDTH_SMALL = 700;
 const CROSS_OVER_WIDTH_MEDIUM = 1000;
 const HAS_TOUCH = !!('ontouchstart' in window || (window.DocumentTouch && document instanceof window.DocumentTouch));
 
-function makeResponsive<Props: PropsShape>(Wrapped: React.ComponentType<any>): React.ComponentType<any> {
-    return class extends React.PureComponent<Props, State> {
-        props: Props;
+function makeResponsive<ResponsiveProps>(Wrapped: React.ComponentType<any>): React.ComponentType<any> {
+    return class extends React.PureComponent<ResponsiveProps, State> {
+        props: ResponsiveProps;
 
         state: State;
 
@@ -104,7 +104,7 @@ function makeResponsive<Props: PropsShape>(Wrapped: React.ComponentType<any>): R
          * @return {Element}
          */
         render() {
-            const { isTouch, size, className, componentRef, ...rest }: Props = this.props;
+            const { isTouch, size, className, componentRef, ...rest } = this.props;
             let isSmall: boolean = size === SIZE_SMALL;
             let isLarge: boolean = size === SIZE_LARGE;
             let isMedium: boolean = size === SIZE_MEDIUM;

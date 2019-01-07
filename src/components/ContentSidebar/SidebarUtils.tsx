@@ -5,7 +5,7 @@
  */
 
 import { hasSkills as hasSkillsData } from './Skills/skillUtils';
-import type { MetadataSidebarProps } from './MetadataSidebar';
+import { MetadataSidebarProps } from './MetadataSidebar';
 
 class SidebarUtils {
     /**

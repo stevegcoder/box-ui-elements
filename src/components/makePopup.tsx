@@ -29,12 +29,6 @@ const makePopup = (kit: string) => (Wrapped: any) =>
 
         state: State;
 
-        /**
-         * [constructor]
-         *
-         * @param {*} props
-         * @return {Wrapper}
-         */
         constructor(props: PopupProps) {
             super(props);
             this.state = {
