@@ -363,7 +363,7 @@ class MultiputPart extends BaseMultiput {
      */
     unpause(): void {
         this.isPaused = false;
-        this.state = PART_STATE_UPLOADING;
+        // this.state = PART_STATE_UPLOADING;
         this.retryUpload();
     }
 
